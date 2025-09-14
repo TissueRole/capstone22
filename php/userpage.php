@@ -30,8 +30,6 @@
                   WHERE r.user_id = {$_SESSION['user_id']} ORDER BY r.created_at DESC";
     $reply_result = $conn->query($reply_sql);
 
-    $favorite_sql = "SELECT p.* FROM plant p JOIN favorites f ON p.plant_id = f.plant_id WHERE f.user_id = {$_SESSION['user_id']}";
-    $favorite_result = $conn->query($favorite_sql);
 
     $active_section = isset($_GET['section']) ? $_GET['section'] : 'profile'; 
 
@@ -202,7 +200,6 @@
     <nav class="nav flex-column w-100 mt-4">
         <a class="nav-link <?php echo ($active_section == 'profile') ? 'active' : ''; ?>" href="?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
         <a class="nav-link <?php echo ($active_section == 'settings') ? 'active' : ''; ?>" href="?section=settings"><i class="bi bi-gear"></i> Settings</a>
-        <a class="nav-link <?php echo ($active_section == 'favorites') ? 'active' : ''; ?>" href="?section=favorites"><i class="bi bi-heart"></i> Favorites</a>
         <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </nav>
 </div>
@@ -370,28 +367,7 @@
                 </div>
             </div>
         <?php elseif ($active_section == 'favorites'): ?>
-            <div class="card shadow-sm mb-4" data-aos="fade-up">
-                <div class="card-header bg-success text-white d-flex align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-heart me-2"></i>Your Favorite Plants</h5>
-                </div>
-                <div class="card-body">
-                    <?php if ($favorite_result && $favorite_result->num_rows > 0): ?>
-                        <div class="d-flex flex-wrap">
-                            <?php while ($plant = $favorite_result->fetch_assoc()): ?>
-                                <div class="card favorite-plant-card position-relative" data-plant-id="<?php echo $plant['plant_id']; ?>">
-                                    <img src="../images/<?php echo htmlspecialchars($plant['image']) ? htmlspecialchars($plant['image']) : 'default-plant.png'; ?>" class="favorite-plant-img card-img-top" alt="<?php echo htmlspecialchars($plant['name']); ?>" onerror="this.onerror=null;this.src='../images/default-plant.png';">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-1"><?php echo htmlspecialchars($plant['name']); ?></h6>
-                                        <button class="remove-fav-btn" title="Remove from Favorites"><i class="bi bi-x"></i></button>
-                                    </div>
-                                </div>
-                            <?php endwhile; ?>
-                        </div>
-                    <?php else: ?>
-                        <p>No favorite plants yet.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
+            
         <?php endif; ?>
     </div>
 </div>
