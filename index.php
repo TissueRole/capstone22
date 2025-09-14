@@ -81,33 +81,11 @@
           <div class="carousel-item active">
             <img src="images/ModulePage.png" class="d-block w-100 carousel-img" alt="Module 1">
             <div class="carousel-caption d-none d-md-block bg-success bg-opacity-75 rounded-3 p-3">
-              <h5>Soil Preparation</h5>
-              <p>Learn the basics of preparing your soil for planting success.</p>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img src="html/moduleimages/planning.avif" class="d-block w-100 carousel-img" alt="Module 2">
-            <div class="carousel-caption d-none d-md-block bg-success bg-opacity-75 rounded-3 p-3">
-              <h5>Planning & Planting</h5>
-              <p>Discover how to plan your garden and plant efficiently.</p>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img src="html/moduleimages/technique.jpg" class="d-block w-100 carousel-img" alt="Module 3">
-            <div class="carousel-caption d-none d-md-block bg-success bg-opacity-75 rounded-3 p-3">
-              <h5>Modern Techniques</h5>
-              <p>Explore innovative and sustainable farming techniques.</p>
+              <h5>Start Learning</h5>
+              <p>Learn the basics of Urban Farming and many more.</p>
             </div>
           </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#modulesCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#modulesCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
       </div>
       <div class="text-center mt-4">
         <a class="btn btn-success" href="php/modulepage.php" role="button">Learn Now</a>
@@ -203,9 +181,6 @@
         </div>
       </div>
     </section>
-    <div class="contact-fab" onclick="scrollToSection('contact-page')" title="Contact Us">
-      <i class="bi bi-chat-dots"></i>
-    </div>
     <footer>
       <div class="container-fluid footer-bg py-3 mt-5">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center px-5">
@@ -245,13 +220,6 @@
         animateCounter('modulesCounter', <?php echo $modulesCount; ?>, 1200);
       });
 
-      // Scroll to section
-      function scrollToSection(id) {
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
 
       // AJAX suggestion form
       $(function() {

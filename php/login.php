@@ -250,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <img src="../images/clearteenalogo.png" alt="TEEN-ANIM Logo" class="header-logo">
             <span class="header-title">TEEN-ANIM</span>
             <a href="../index.php" class="back-btn">
-                <i class="bi bi-arrow-left me-1"></i>Go Back to Dashboard
+                <i class="bi bi-arrow-left me-1">Go Back to Homepage</i>
             </a>
         </div>
     </header>
