@@ -48,11 +48,6 @@ if ($result->num_rows > 0) {
         $delete_questions->bind_param("i", $user_id);
         $delete_questions->execute();
         
-        // Delete user's favorites
-        $delete_favorites = $conn->prepare("DELETE FROM favorites WHERE user_id = ?");
-        $delete_favorites->bind_param("i", $user_id);
-        $delete_favorites->execute();
-        
         // Finally, delete the user
         $delete_user = $conn->prepare("DELETE FROM users WHERE user_id = ?");
         $delete_user->bind_param("i", $user_id);

@@ -392,12 +392,10 @@ include('../connection.php');
                     <tr>
                         <th>Title</th>
                         <th>Description</th>
-                        <th>Type</th>
                         <th>Image</th>
                         <th>Created_at</th>
                         <th>Updated_at</th>
                         <th>Edit</th>
-                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody id="moduleTable">
@@ -407,7 +405,6 @@ include('../connection.php');
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['title']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['description']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['content']) . "</td>";
                         // Display image preview in admin table
                         $image_path = $row['image_path'];
                         if (filter_var($image_path, FILTER_VALIDATE_URL)) {
@@ -427,9 +424,6 @@ include('../connection.php');
                         echo "<td>" . htmlspecialchars($row['updated_at']) . "</td>";
                         echo "<td>
                                 <a href='editmodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i>Edit</a>
-                              </td>";
-                        echo "<td>
-                                <a href='deletemodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-danger'><i class='bi bi-archive'></i>Archive</a>
                               </td>";
                         echo "</tr>";
                     }
@@ -520,7 +514,6 @@ include('../connection.php');
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Message</th>
                         <th>Date</th>
                         <th>Status</th>
@@ -531,7 +524,6 @@ include('../connection.php');
                     $suggestions = $conn->query("SELECT * FROM suggestions");
                     while ($row = $suggestions->fetch_assoc()) {
                         echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['suggestion_id']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['message']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
                         echo "<td>
