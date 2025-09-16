@@ -17,269 +17,7 @@ include('../connection.php');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Irish+Grover&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../css/homepage.css">
-    <style>
-        body {
-            background: #f8fcf7;
-            font-family: 'Poppins', Arial, sans-serif;
-        }
-        .admin-header {
-            width: 100%;
-            background: #fff;
-            color: #388e3c;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem 2rem;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 8px rgba(60,120,60,0.08);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 3px solid #4caf50;
-        }
-        .admin-header .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-family: 'Irish Grover', cursive;
-            font-size: 1.5rem;
-            color: #388e3c;
-        }
-        .admin-header .logo img {
-            height: 36px;
-            width: 36px;
-            border-radius: 8px;
-            border: 2px solid #4caf50;
-            background: #fff;
-        }
-        .admin-header .logout-link {
-            color: #fff;
-            background: #4caf50;
-            border-radius: 50px;
-            padding: 0.5rem 1.5rem;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: background 0.2s, color 0.2s;
-            font-weight: 600;
-            border: none;
-        }
-        .admin-header .logout-link:hover {
-            background: #388e3c;
-            color: #f7c35f;
-        }
-        .admin-nav {
-            background: #4caf50;
-            display: flex;
-            gap: 2rem;
-            padding: 0.5rem 2rem 0.5rem 2rem;
-            border-bottom: 1px solid #388e3c;
-            box-shadow: 0 1px 4px rgba(60,120,60,0.03);
-            position: sticky;
-            top: 56px;
-            z-index: 99;
-        }
-        .admin-nav .nav-link {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.2s, color 0.2s;
-            font-size: 1.08rem;
-        }
-        .admin-nav .nav-link.active, .admin-nav .nav-link:hover {
-            background: #f7c35f;
-            color: #388e3c;
-        }
-        .content {
-            padding: 2.5rem 1vw 2rem 1vw;
-            max-width: 98vw;
-            margin: 0 auto;
-            margin-top: 1px;
-        }
-        .card {
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 12px rgba(60,120,60,0.06);
-            border-radius: 18px;
-            width: 100%;
-            background: #fff;
-        }
-        .content-section {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        .content-section.active {
-            display: block;
-            opacity: 1;
-            animation: fadeIn 0.5s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .table thead {
-            background: #4caf50;
-            color: #fff;
-        }
-        .btn-dark, .btn-warning, .btn-danger {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-family: 'Poppins', Arial, sans-serif;
-        }
-        .btn-dark {
-            background: #388e3c;
-            color: #f7c35f;
-            border: none;
-        }
-        .btn-dark:hover {
-            background: #256029;
-            color: #fff;
-        }
-        .btn-warning {
-            background: #f7c35f;
-            color: #388e3c;
-            border: none;
-        }
-        .btn-warning:hover {
-            background: #ffe082;
-            color: #256029;
-        }
-        .btn-danger {
-            background: #e53935;
-            color: #fff;
-            border: none;
-        }
-        .btn-danger:hover {
-            background: #b71c1c;
-            color: #fff;
-        }
-        .btn-sm {
-            font-size: 0.875rem;
-            padding: 0.25rem 0.5rem;
-        }
-        .form-control {
-            border-radius: 8px;
-            font-family: 'Poppins', Arial, sans-serif;
-        }
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 1.5rem;
-            margin-bottom: 1.2rem;
-            color: #388e3c;
-            font-family: 'Irish Grover', cursive;
-        }
-        /* Responsive header for small screens */
-        @media (max-width: 768px) {
-            .admin-header {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0.5rem 1rem;
-                font-size: 1rem;
-                gap: 0.5rem;
-                position: relative;
-            }
-            .header-left {
-                flex: 1 1 0;
-                display: flex;
-                align-items: center;
-            }
-            .header-center {
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 201;
-            }
-            .header-right {
-                flex: 1 1 0;
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-            }
-            .admin-header .logo img {
-                height: 28px;
-                width: 28px;
-            }
-            .admin-header .logout-link {
-                align-self: center;
-                margin-top: 0;
-                font-size: 0.95rem;
-            }
-            .admin-nav-toggle {
-                display: block;
-                margin: 0;
-            }
-            .admin-nav {
-                flex-direction: column;
-                gap: 0.5rem;
-                padding: 0.5rem 1rem;
-                display: none;
-                background: #4caf50;
-                position: sticky;
-                top: 48px;
-                z-index: 99;
-            }
-            .admin-nav.show {
-                display: flex;
-                margin-top: 0.5rem;
-            }
-            .content {
-                margin-top: 20px;
-            }
-        }
-        /* Responsive nav for small screens */
-        @media (max-width: 768px) {
-            .admin-nav {
-                flex-direction: column;
-                gap: 0.5rem;
-                padding: 0.5rem 1rem;
-                display: none;
-                background: #4caf50;
-                position: relative;
-                margin-top: 0;
-            }
-            .admin-nav.show {
-                display: flex;
-                margin-top: 0.5rem;
-            }
-            .admin-nav-toggle {
-                display: block;
-                position: relative;
-                z-index: 200;
-                margin-top: 0.5rem;
-                margin-left: 0.5rem;
-            }
-            .admin-nav .nav-link {
-                width: 100%;
-                justify-content: flex-start;
-                font-size: 1rem;
-                padding: 0.75rem 1rem;
-                background: #4caf50;
-                color: #fff;
-                border-radius: 4px;
-            }
-        }
-        @media (min-width: 769px) {
-            .admin-nav-toggle {
-                display: none;
-            }
-            .admin-nav {
-                display: flex !important;
-                position: sticky;
-                margin-top: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../../css/adminpage.css">
 </head>
 <body>
     <div class="admin-header">
@@ -301,6 +39,7 @@ include('../connection.php');
     <nav class="admin-nav" id="adminNav">
         <a class="nav-link" href="#" onclick="showSection('user-management'); setActiveNav(this); return false;" id="nav-user"><i class="bi bi-people"></i>User Management</a>
         <a class="nav-link" href="#" onclick="showSection('module-management'); setActiveNav(this); return false;" id="nav-module"><i class="bi bi-journal-text"></i>Module Management</a>
+        <a class="nav-link" href="#" onclick="showSection('lesson-management'); setActiveNav(this); return false;" id="nav-lesson"><i class="bi bi-book"></i>Lesson Management</a>
         <a class="nav-link" href="#" onclick="showSection('forum-management'); setActiveNav(this); return false;" id="nav-forum"><i class="bi bi-chat-dots"></i>Forum Management</a>
         <a class="nav-link" href="#" onclick="showSection('suggestions'); setActiveNav(this); return false;" id="nav-suggestions"><i class="bi bi-lightbulb"></i>Suggestions</a>
     </nav>
@@ -430,6 +169,42 @@ include('../connection.php');
                     ?>
                 </tbody>
             </table>
+            </div>
+        </section>
+        <section id="lesson-management" class="content-section card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="section-title mb-0"><i class="bi bi-book"></i>Lesson Management</div>
+                <a href="addlesson.php" class="btn btn-dark"><i class="bi bi-plus-circle"></i>Add New Lesson</a>
+            </div>
+            <div class="mb-3">
+                <input type="text" id="lesson-search" class="form-control" placeholder="Search lessons...">
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Lesson Title</th>
+                            <th>Module</th>
+                            <th>Order</th>
+                            <th>Created_at</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lessonTable">
+                        <?php
+                        $lessons = $conn->query("SELECT l.*, m.title AS module_title FROM lessons l JOIN modules m ON l.module_id = m.module_id");
+                        while ($row = $lessons->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($row['title']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['module_title']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['lesson_order']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+                            echo "<td><a href='editlesson.php?id=" . $row['lesson_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i>Edit</a></td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
             </div>
         </section>
         <section id="forum-management" class="content-section card p-4">
@@ -562,6 +337,21 @@ include('../connection.php');
         document.getElementById('module-search').addEventListener('keyup', function() {
             var searchValue = this.value.toLowerCase();
             var rows = document.getElementById('moduleTable').getElementsByTagName('tr');
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var match = false;
+                for (var j = 0; j < cells.length; j++) {
+                    if (cells[j].innerText.toLowerCase().includes(searchValue)) {
+                        match = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = match ? '' : 'none';
+            }
+        });
+        document.getElementById('lesson-search').addEventListener('keyup', function() {
+            var searchValue = this.value.toLowerCase();
+            var rows = document.getElementById('lessonTable').getElementsByTagName('tr');
             for (var i = 0; i < rows.length; i++) {
                 var cells = rows[i].getElementsByTagName('td');
                 var match = false;

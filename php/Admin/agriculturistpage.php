@@ -29,23 +29,6 @@
 
     $active_section = isset($_GET['section']) ? $_GET['section'] : 'profile';
 
-    if (isset($_POST['add_plant'])) {
-        $plant_name = $_POST['plant_name'];
-        $plant_type = $_POST['plant_type'];
-        $plant_description = $_POST['plant_description'];
-
-        $insert_plant_sql = "INSERT INTO plants (user_id, name, type, description) VALUES (?, ?, ?, ?)";
-        
-        if ($stmt = $conn->prepare($insert_plant_sql)) {
-            $stmt->bind_param("ssss", $_SESSION['user_id'], $plant_name, $plant_type, $plant_description);
-            $stmt->execute();
-            $stmt->close();
-            header("Location: agriculturistpage.php?section=add-plant&status=success");
-            exit();
-        } else {
-            echo "Error adding plant.";
-        }
-    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -113,7 +96,6 @@
         <a class="nav-link<?php echo ($active_section == 'profile') ? ' active' : ''; ?>" href="?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
         <a class="nav-link<?php echo ($active_section == 'settings') ? ' active' : ''; ?>" href="?section=settings"><i class="bi bi-gear"></i> Settings</a>
         <a class="nav-link" href="../Forum/community.php"><i class="bi bi-people"></i> Farming Community</a>
-        <a class="nav-link<?php echo ($active_section == 'add-plant') ? ' active' : ''; ?>" href="?section=add-plant"><i class="bi bi-plus-circle"></i> Add Plant</a>
         <a class="nav-link" href="../logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </nav>
 </div>
@@ -195,27 +177,7 @@
                     </div>
                 </div>
             </div>
-        <?php elseif ($active_section == 'add-plant'): ?>
-            <form action="add_plant.php" method="POST" enctype="multipart/form-data" class="agri-add-plant-form mt-5">
-                <h2 class="fs-3 mb-3 text-white">Enter Plant Details:</h2>
-                <input type="text" class="form-control mb-3" id="name" name="name" required placeholder=" ">
-                <label for="name" class="form-label fw-semibold fs-5 text-white">Plant Name:</label>
-                <textarea class="form-control mb-3" id="description" name="description" rows="3" required placeholder=" "></textarea>
-                <label for="description" class="form-label fw-semibold fs-5 text-white">Description:</label>
-                <input type="file" class="form-control mb-3" id="image" name="image" accept="image/*" required onchange="previewAgriImage(event)">
-                <img id="agri-image-preview" class="agri-image-preview" style="display:none;" alt="Image Preview" />
-                <input type="text" class="form-control mb-3" id="container_soil" name="container_soil" required placeholder=" ">
-                <label for="container_soil" class="form-label fw-semibold fs-5 text-white">Container & Soil:</label>
-                <input type="text" class="form-control mb-3" id="watering" name="watering" required placeholder=" ">
-                <label for="watering" class="form-label fw-semibold fs-5 text-white">Watering:</label>
-                <input type="text" class="form-control mb-3" id="sunlight" name="sunlight" required placeholder=" ">
-                <label for="sunlight" class="form-label fw-semibold fs-5 text-white">Sunlight:</label>
-                <input type="text" class="form-control mb-3" id="tips" name="tips" required placeholder=" ">
-                <label for="tips" class="form-label fw-semibold fs-5 text-white">Tips:</label>
-                <input type="submit" value="Add Plant" class="btn btn-light mt-3">
-                <a href="adminpage.php" class="btn btn-light mt-3">Back</a>
-            </form>
-        <?php endif; ?>
+            <?php endif; ?>
     </div>
 </div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
