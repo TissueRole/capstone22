@@ -16,8 +16,8 @@ if (isset($_POST['add_module'])) {
 
     if ($title != "" && $description != "") {
         $stmt = $conn->prepare("INSERT INTO modules (title, description, image_path, created_at, updated_at) 
-                                VALUES (?, ?, ?, ?, NOW(), NOW())");
-        $stmt->bind_param("ssss", $title, $description, $image_path);
+                                VALUES (?, ?, ?, NOW(), NOW())");
+        $stmt->bind_param("sss", $title, $description, $image_path);
 
         if ($stmt->execute()) {
             $success = "✅ Module added successfully!";
@@ -178,6 +178,14 @@ $modules = $conn->query("SELECT module_id, title FROM modules ORDER BY created_a
                         <div class="mb-3">
                             <label class="form-label">Lesson Content</label>
                             <textarea name="lesson_content" class="form-control" rows="5" placeholder="Lesson details..." required></textarea>
+                            <small class="form-text text-muted">
+                                You can use simple formatting:
+                                <ul>
+                                    <li><code>##</code> for section headers</li>
+                                    <li><code>-</code> for bullet points</li>
+                                    <li>Blank lines for paragraphs</li>
+                                </ul>
+                            </small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Order Index</label>

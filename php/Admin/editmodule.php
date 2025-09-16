@@ -14,10 +14,6 @@
             $row = $result->fetch_assoc();
             $title = $row['title'];
             $description = $row['description'];
-            $type = $row['type'];
-            $category = $row['category'];
-            $content = $row['content'];
-            $current_content = $row['content'];
             $image_path = $row['image_path'];
             $current_image_path = $row['image_path'];
         }
@@ -30,54 +26,7 @@
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $title = mysqli_real_escape_string($conn, $_POST['title']);
         $description = mysqli_real_escape_string($conn, $_POST['description']);
-        $type = mysqli_real_escape_string($conn, $_POST['type']);
-        $category = mysqli_real_escape_string($conn, $_POST['category']);
         $id = $_POST['id'];
-
-        // Handle content input (file upload or URL)
-        $content = $current_content; // Keep current content by default
-        
-        // Check if user provided a content URL
-        if(!empty($_POST['content_url']) && filter_var($_POST['content_url'], FILTER_VALIDATE_URL)) {
-            $content = $_POST['content_url'];
-        }
-        // Check if user uploaded a content file
-        elseif(isset($_FILES['content_file']) && $_FILES['content_file']['error'] == 0) {
-            $allowed_types = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'image/jpeg', 'image/jpg', 'image/png'];
-            $file_type = $_FILES['content_file']['type'];
-            $file_size = $_FILES['content_file']['size'];
-            $file_name = $_FILES['content_file']['name'];
-            
-            // Validate file type
-            if(!in_array($file_type, $allowed_types)) {
-                $message = "<div class='alert alert-danger'>Invalid file type. Only PDF, DOC, DOCX, PPT, PPTX, JPG, and PNG files are allowed.</div>";
-            }
-            // Validate file size (20MB limit)
-            elseif($file_size > 20 * 1024 * 1024) {
-                $message = "<div class='alert alert-danger'>File size too large. Maximum size is 20MB.</div>";
-            }
-            else {
-                // Generate unique filename
-                $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-                $new_filename = 'module_content_' . time() . '_' . rand(1000, 9999) . '.' . $file_extension;
-                $upload_path = '../../html/modulefiles/' . $new_filename;
-                
-                // Upload file
-                if(move_uploaded_file($_FILES['content_file']['tmp_name'], $upload_path)) {
-                    $content = '../html/modulefiles/' . $new_filename;
-                    
-                    // Delete old content file if it exists and is different
-                    if(!empty($current_content) && $current_content != $content && !filter_var($current_content, FILTER_VALIDATE_URL)) {
-                        $old_file_path = '../../' . $current_content;
-                        if(file_exists($old_file_path)) {
-                            unlink($old_file_path);
-                        }
-                    }
-                } else {
-                    $message = "<div class='alert alert-danger'>Failed to upload content file. Please try again.</div>";
-                }
-            }
-        }
 
         // Handle image input (file upload or URL)
         $image_path = $current_image_path; // Keep current image by default
@@ -132,8 +81,8 @@
             }
         }
 
-        if(!empty($title) && !empty($description) && !empty($type) && !empty($category) && empty($message)){
-            $sql = "UPDATE modules SET title='$title', description='$description', content='$content', type='$type', category='$category', image_path='$image_path', updated_at=CURRENT_TIMESTAMP WHERE module_id='$id'";
+        if(!empty($title) && !empty($description) && empty($message)){
+            $sql = "UPDATE modules SET title='$title', description='$description', image_path='$image_path', updated_at=CURRENT_TIMESTAMP WHERE module_id='$id'";
             
             if($conn->query($sql) === TRUE){
                 $message = "<div class='alert alert-success'>Module updated successfully!</div>";
@@ -366,57 +315,6 @@
 
                         <label for="description" class="form-label fw-semibold fs-5 ">Description:</label>
                         <textarea class="form-control mb-3" id="description" name="description" rows="4" required><?php echo htmlspecialchars($description); ?></textarea>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="type" class="form-label fw-semibold fs-5 ">Type:</label>
-                                <input class="form-control mb-3" id="type" name="type" value="<?php echo htmlspecialchars($type); ?>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="category" class="form-label fw-semibold fs-5 ">Category:</label>
-                                <input class="form-control mb-3" id="category" name="category" value="<?php echo htmlspecialchars($category); ?>" required>
-                            </div>
-                        </div>
-
-                        <label for="content" class="form-label fw-semibold fs-5 ">Module Content:</label>
-                        <div class="content-input-tabs mb-2">
-                            <button type="button" class="content-input-tab active" onclick="switchContentInput('upload')">Upload File</button>
-                            <button type="button" class="content-input-tab" onclick="switchContentInput('url')">Use URL</button>
-                        </div>
-                        <!-- Upload File Content -->
-                        <div id="content-upload-content" class="content-input-content active" style="display: block;">
-                            <div class="file-input-wrapper">
-                                <label for="content_file" class="file-input-label">
-                                    <i class="bi bi-upload"></i> Choose Content File
-                                </label>
-                                <input type="file" id="content_file" name="content_file" accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.ppt,.pptx">
-                            </div>
-                            <?php if (!empty($content) && !filter_var($content, FILTER_VALIDATE_URL)): ?>
-                                <div class="current-image-info mt-2">
-                                    <p class="mb-2"><strong>Current Content File:</strong></p>
-                                    <span class="text-muted small">A file is already uploaded for this module.</span>
-                                </div>
-                            <?php endif; ?>
-                            <p class="text-muted small mt-2">
-                                <i class="bi bi-info-circle"></i> Allowed: JPEG, PNG, PDF, DOC, DOCX, PPT, PPTX<br>
-                                Max size: 20MB
-                            </p>
-                        </div>
-                        <!-- URL Input Content -->
-                        <div id="content-url-content" class="content-input-content" style="display: none;">
-                            <input type="url" class="form-control mb-3" id="content_url" name="content_url" placeholder="https://example.com/content or https://drive.google.com/file/d/..." value="<?php echo filter_var($content, FILTER_VALIDATE_URL) ? htmlspecialchars($content) : ''; ?>">
-                            <?php if (!empty($content) && filter_var($content, FILTER_VALIDATE_URL)): ?>
-                                <div class="current-image-info mt-2">
-                                    <p class="mb-2"><strong>Current Content URL:</strong></p>
-                                    <a href="<?php echo htmlspecialchars($content); ?>" target="_blank"><?php echo htmlspecialchars($content); ?></a>
-                                </div>
-                            <?php endif; ?>
-                            <div class="url-example">
-                                <i class="bi bi-info-circle"></i> <strong>Examples:</strong><br>
-                                • Google Drive: <code>https://drive.google.com/file/d/YOUR_FILE_ID/view</code><br>
-                                • External URL: <code>https://example.com/module-content</code>
-                            </div>
-                        </div>
                     </div>
                     
                     <div class="col-md-4">
@@ -479,7 +377,7 @@
                     </div>
                 </div>
 
-                <div class="mt-4">
+                <div class="mt-1">
                     <button type="submit" class="btn btn-success me-2">
                         <i class="bi bi-check-circle"></i> Update Module
                     </button>
@@ -508,24 +406,6 @@
                 document.getElementById('upload-content').style.display = 'none';
                 document.getElementById('url-content').classList.add('active');
                 document.getElementById('url-content').style.display = 'block';
-            }
-        }
-        // Switch between upload and URL input for content
-        function switchContentInput(type) {
-            const tabs = document.querySelectorAll('.content-input-tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            if (type === 'upload') {
-                tabs[0].classList.add('active');
-                document.getElementById('content-upload-content').classList.add('active');
-                document.getElementById('content-upload-content').style.display = 'block';
-                document.getElementById('content-url-content').classList.remove('active');
-                document.getElementById('content-url-content').style.display = 'none';
-            } else {
-                tabs[1].classList.add('active');
-                document.getElementById('content-upload-content').classList.remove('active');
-                document.getElementById('content-upload-content').style.display = 'none';
-                document.getElementById('content-url-content').classList.add('active');
-                document.getElementById('content-url-content').style.display = 'block';
             }
         }
         // Image preview functionality for file upload

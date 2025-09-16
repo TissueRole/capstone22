@@ -33,6 +33,34 @@ class TeenAnimLearning {
         return $modules;
     }
     
+    // ✅ NEW: Get one module with its lessons
+    public function getModuleWithLessons($module_id, $user_id) {
+        $sql = "SELECT m.*, 
+                   (SELECT COUNT(*) FROM lessons l WHERE l.module_id = m.module_id) as total_lessons,
+                   (SELECT COUNT(*) FROM lesson_progress lp 
+                    JOIN lessons l ON lp.lesson_id = l.lesson_id 
+                    WHERE l.module_id = m.module_id AND lp.user_id = ? AND lp.completed = 1) as completed_lessons
+                FROM modules m 
+                WHERE m.module_id = ?
+                LIMIT 1";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $user_id, $module_id);
+        $stmt->execute();
+        $module = $stmt->get_result()->fetch_assoc();
+        
+        if (!$module) {
+            return null; // no module found
+        }
+
+        // attach lessons
+        $module['lessons'] = $this->getLessonsByModule($module['module_id'], $user_id);
+        $module['progress'] = $module['total_lessons'] > 0 ? 
+            round(($module['completed_lessons'] / $module['total_lessons']) * 100) : 0;
+        
+        return $module;
+    }
+    
     // Get lessons for a specific module
     public function getLessonsByModule($module_id, $user_id) {
         $sql = "SELECT l.*, 

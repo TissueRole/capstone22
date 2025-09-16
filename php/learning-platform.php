@@ -15,18 +15,14 @@ $user_id = $_SESSION['user_id'];
 // Get module ID from URL
 $module_id = isset($_GET['module']) ? intval($_GET['module']) : null;
 
-// Get all modules with lessons
-$modules = $learning->getModulesWithLessons($user_id);
-
-// Get current module
-$current_module = null;
 if ($module_id) {
-    foreach ($modules as $module) {
-        if ($module['module_id'] == $module_id) {
-            $current_module = $module;
-            break;
-        }
-    }
+    // ✅ Only load the selected module
+    $modules = [$learning->getModuleWithLessons($module_id, $user_id)];
+    $current_module = $modules[0];
+} else {
+    // ❌ No module selected → redirect back
+    header("Location: ../modulepage.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -48,34 +44,31 @@ if ($module_id) {
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2><i class="bi bi-mortarboard me-2"></i>Interactive Learning</h2>
+            <h2><i class="bi bi-mortarboard me-2"></i><?php echo htmlspecialchars($current_module['title']); ?></h2>
             <div class="progress-overview">
                 <div class="progress-text">
                     <span>Overall Progress</span>
-                    <span id="total-progress">0%</span>
+                    <span id="total-progress"><?php echo $current_module['progress']; ?>%</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" id="total-progress-bar"></div>
+                    <div class="progress-fill" id="total-progress-bar" style="width: <?php echo $current_module['progress']; ?>%"></div>
                 </div>
             </div>
         </div>
         
         <div class="sidebar-content">
-            <?php foreach ($modules as $module): ?>
-                <?php if (!empty($module['lessons'])): ?>
+            <?php if (!empty($current_module['lessons'])): ?>
                 <div class="module-section">
-                    <div class="module-header <?php echo ($current_module && $current_module['module_id'] == $module['module_id']) ? 'active' : ''; ?>" 
-                         data-module-id="<?php echo $module['module_id']; ?>">
-                        <div class="module-title"><?php echo htmlspecialchars($module['title']); ?></div>
+                    <div class="module-header active" data-module-id="<?php echo $current_module['module_id']; ?>">
+                        <div class="module-title"><?php echo htmlspecialchars($current_module['title']); ?></div>
                         <div class="module-meta">
-                            <span><?php echo count($module['lessons']); ?> lessons</span>
-                            <span><?php echo $module['progress']; ?>% complete</span>
+                            <span><?php echo count($current_module['lessons']); ?> lessons</span>
+                            <span><?php echo $current_module['progress']; ?>% complete</span>
                         </div>
                     </div>
                     
-                    <?php if ($current_module && $current_module['module_id'] == $module['module_id']): ?>
                     <div class="lessons-list">
-                        <?php foreach ($module['lessons'] as $lesson): ?>
+                        <?php foreach ($current_module['lessons'] as $lesson): ?>
                         <div class="lesson-item" data-lesson-id="<?php echo $lesson['lesson_id']; ?>">
                             <div class="lesson-status <?php echo $lesson['completed'] ? 'completed' : ''; ?>"></div>
                             <div class="lesson-details">
@@ -89,10 +82,8 @@ if ($module_id) {
                         </div>
                         <?php endforeach; ?>
                     </div>
-                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
-            <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -101,13 +92,11 @@ if ($module_id) {
         <div id="welcome-screen" class="welcome-screen">
             <div>
                 <div class="welcome-icon">🌱</div>
-                <h2>Welcome to Interactive Learning</h2>
-                <p class="text-muted mb-4">Select a module from the sidebar to start your farming education journey</p>
-                <?php if (!$current_module): ?>
+                <h2><?php echo htmlspecialchars($current_module['title']); ?></h2>
+                <p class="text-muted mb-4"><?php echo htmlspecialchars($current_module['description']); ?></p>
                 <a href="../modulepage.php" class="btn btn-outline-success">
                     <i class="bi bi-arrow-left me-1"></i>Back to Modules
                 </a>
-                <?php endif; ?>
             </div>
         </div>
 
@@ -116,7 +105,7 @@ if ($module_id) {
             <div class="lesson-header d-flex justify-content-between align-items-start">
                 <div class="lesson-info">
                     <h1 id="lesson-title"></h1>
-                    <p id="lesson-module"></p>
+                    <p id="lesson-module"><?php echo htmlspecialchars($current_module['title']); ?></p>
                 </div>
                 <button id="complete-btn" class="complete-btn">
                     <span class="complete-icon"><i class="bi bi-circle"></i></span>
@@ -143,8 +132,7 @@ if ($module_id) {
 class TeenAnimLearning {
     constructor() {
         this.currentLesson = null;
-        this.currentModule = <?php echo $current_module ? json_encode($current_module) : 'null'; ?>;
-        this.modules = <?php echo json_encode($modules); ?>;
+        this.currentModule = <?php echo json_encode($current_module); ?>;
         this.userId = <?php echo $_SESSION['user_id']; ?>;
         
         this.init();
@@ -161,13 +149,6 @@ class TeenAnimLearning {
     }
     
     bindEvents() {
-        document.querySelectorAll('.module-header').forEach(header => {
-            header.addEventListener('click', (e) => {
-                const moduleId = parseInt(e.currentTarget.dataset.moduleId);
-                window.location.href = `learning-platform.php?module=${moduleId}`;
-            });
-        });
-        
         document.querySelectorAll('.lesson-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 const lessonId = parseInt(e.currentTarget.dataset.lessonId);
@@ -234,7 +215,6 @@ class TeenAnimLearning {
         document.getElementById('lesson-view').style.display = 'flex';
         
         document.getElementById('lesson-title').textContent = this.currentLesson.title;
-        document.getElementById('lesson-module').textContent = this.currentLesson.module_title;
         document.getElementById('lesson-body').innerHTML = this.currentLesson.content;
         
         this.updateCompleteButton();
@@ -253,7 +233,6 @@ class TeenAnimLearning {
         } else {
             completeBtn.classList.remove('completed');
             completeBtn.querySelector('.complete-icon').innerHTML = '<i class="bi bi-circle"></i>';
-            completeBtn.query
             completeBtn.querySelector('.complete-text').textContent = 'Mark Complete';
             completeBtn.disabled = false;
         }
@@ -270,16 +249,10 @@ class TeenAnimLearning {
     }
     
     updateProgress() {
-        let totalLessons = 0, completedLessons = 0;
-        
-        this.modules.forEach(module => {
-            module.lessons.forEach(lesson => {
-                totalLessons++;
-                if (lesson.completed) completedLessons++;
-            });
-        });
-        
+        const totalLessons = this.currentModule.lessons.length;
+        const completedLessons = this.currentModule.lessons.filter(l => l.completed).length;
         const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+        
         document.getElementById('total-progress').textContent = `${progress}%`;
         document.getElementById('total-progress-bar').style.width = `${progress}%`;
     }
