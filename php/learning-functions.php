@@ -1,6 +1,7 @@
 <?php
 // File: php/learning-functions.php
 require_once 'connection.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 class TeenAnimLearning {
     private $conn;
@@ -80,17 +81,26 @@ class TeenAnimLearning {
     // Get specific lesson with module info
     public function getLesson($lesson_id, $user_id) {
         $sql = "SELECT l.*, m.title as module_title,
-                   COALESCE(lp.completed, 0) as completed,
-                   lp.completed_at
+                    COALESCE(lp.completed, 0) as completed,
+                    lp.completed_at
                 FROM lessons l
                 JOIN modules m ON l.module_id = m.module_id
-                LEFT JOIN lesson_progress lp ON l.lesson_id = lp.lesson_id AND lp.user_id = ?
+                LEFT JOIN lesson_progress lp 
+                    ON l.lesson_id = lp.lesson_id AND lp.user_id = ?
                 WHERE l.lesson_id = ?";
         
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("ii", $user_id, $lesson_id);
         $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
+        $lesson = $stmt->get_result()->fetch_assoc();
+
+        if ($lesson) {
+            // ✅ Use Composer’s Parsedown
+            $Parsedown = new Parsedown();
+            $lesson['content'] = $Parsedown->text($lesson['content']);
+        }
+
+        return $lesson;
     }
     
     // Mark lesson as complete (simplified, no points/time)
