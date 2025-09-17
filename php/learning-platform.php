@@ -94,7 +94,7 @@ if ($module_id) {
                 <div class="welcome-icon">🌱</div>
                 <h2><?php echo htmlspecialchars($current_module['title']); ?></h2>
                 <p class="text-muted mb-4"><?php echo htmlspecialchars($current_module['description']); ?></p>
-                <a href="../modulepage.php" class="btn btn-outline-success">
+                <a href="modulepage.php" class="btn btn-outline-success">
                     <i class="bi bi-arrow-left me-1"></i>Back to Modules
                 </a>
             </div>
