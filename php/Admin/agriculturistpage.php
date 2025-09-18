@@ -96,7 +96,6 @@
         <a class="nav-link<?php echo ($active_section == 'profile') ? ' active' : ''; ?>" href="?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
         <a class="nav-link<?php echo ($active_section == 'settings') ? ' active' : ''; ?>" href="?section=settings"><i class="bi bi-gear"></i> Settings</a>
         <a class="nav-link" href="../Forum/community.php"><i class="bi bi-people"></i> Farming Community</a>
-        <a class="nav-link" href="../logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </nav>
 </div>
 <div class="agri-main-content d-flex justify-content-center">
@@ -205,5 +204,6 @@ function previewAgriImage(event) {
   output.style.display = 'block';
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

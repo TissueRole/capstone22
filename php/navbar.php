@@ -328,7 +328,18 @@ function isActiveLink($link_path, $current_path, $current_page) {
           </div>
         </li>
         <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="<?php echo $base; ?>php/userpage.php">Profile</a></li>
+        <li>
+            <a class="dropdown-item" 
+              href="<?php 
+                    if ($_SESSION['role'] === 'agriculturist') {
+                        echo $base . 'php/Admin/agriculturistpage.php';
+                    } else {
+                        echo $base . 'php/userpage.php';
+                    }
+              ?>">
+              Profile
+            </a>
+        </li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="<?php echo $base; ?>php/logout.php">Logout</a></li>
       </ul>
