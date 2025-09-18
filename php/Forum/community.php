@@ -347,7 +347,6 @@
                             <?= htmlspecialchars(mb_strimwidth($row['body'], 0, 100, '...')) ?>
                           </div>
                           <div class="discussion-actions">
-                            <span class="action-icon"><i class="bi bi-hand-thumbs-up"></i> 1</span>
                             <span class="action-icon"><i class="bi bi-chat"></i> <?= $row['reply_count'] ?></span>
                             <span class="action-icon"><i class="bi bi-clock"></i> <?= date('H:i', strtotime($row['created_at'])) ?></span>
                           </div>
