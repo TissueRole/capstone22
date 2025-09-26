@@ -3,6 +3,16 @@
     font-family: 'Poppins', sans-serif;
 }
 
+.lesson-body img {
+    width: 100%;       
+    max-width: 100%;    
+    height: auto;       
+    display: block;
+    margin: 1.5rem auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .learning-container {
     display: flex;
     height: calc(100vh);

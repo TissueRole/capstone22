@@ -78,7 +78,7 @@ $modules = $conn->query("SELECT module_id, title FROM modules ORDER BY created_a
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Lesson Content</label>
-                    <textarea name="lesson_content" class="form-control" rows="8" placeholder="## Section Title&#10;- Bullet point&#10;Paragraph text..." required></textarea>
+                    <textarea name="lesson_content" class="form-control" rows="15" placeholder="## Section Title&#10;- Bullet point&#10;Paragraph text..." required></textarea>
                     <small class="form-text text-muted">
                         You can use simple formatting:
                         <ul>

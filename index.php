@@ -99,7 +99,7 @@
           <div class="d-flex gap-4 mt-4">
             <div class="text-center">
               <div class="counter" id="membersCounter">0</div>
-              <div>Members</div>
+              <div>Users</div>
             </div>
             <div class="text-center">
               <div class="counter" id="postsCounter">0</div>
