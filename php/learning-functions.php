@@ -36,29 +36,43 @@ class TeenAnimLearning {
     
     // ✅ NEW: Get one module with its lessons
     public function getModuleWithLessons($module_id, $user_id) {
-        $sql = "SELECT m.*, 
-                   (SELECT COUNT(*) FROM lessons l WHERE l.module_id = m.module_id) as total_lessons,
-                   (SELECT COUNT(*) FROM lesson_progress lp 
-                    JOIN lessons l ON lp.lesson_id = l.lesson_id 
-                    WHERE l.module_id = m.module_id AND lp.user_id = ? AND lp.completed = 1) as completed_lessons
-                FROM modules m 
-                WHERE m.module_id = ?
-                LIMIT 1";
-        
+        // Get module
+        $sql = "SELECT * FROM modules WHERE module_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $module_id);
+        $stmt->execute();
+        $module = $stmt->get_result()->fetch_assoc();
+
+        if (!$module) return null;
+
+        // Get lessons
+        $sql = "SELECT l.*, 
+                    (SELECT COUNT(*) FROM lesson_progress p 
+                        WHERE p.lesson_id = l.lesson_id AND p.user_id = ?) AS completed
+                FROM lessons l 
+                WHERE l.module_id = ?
+                ORDER BY l.lesson_order ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("ii", $user_id, $module_id);
         $stmt->execute();
-        $module = $stmt->get_result()->fetch_assoc();
-        
-        if (!$module) {
-            return null; // no module found
-        }
+        $lessons = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-        // attach lessons
-        $module['lessons'] = $this->getLessonsByModule($module['module_id'], $user_id);
-        $module['progress'] = $module['total_lessons'] > 0 ? 
-            round(($module['completed_lessons'] / $module['total_lessons']) * 100) : 0;
-        
+        // Get quiz for this module
+        $sql = "SELECT quiz_id FROM module_quizzes WHERE module_id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $module_id);
+        $stmt->execute();
+        $quiz = $stmt->get_result()->fetch_assoc();
+
+        // Add to module array
+        $module['lessons'] = $lessons;
+        $module['quiz_id'] = $quiz ? $quiz['quiz_id'] : null;
+
+        // Progress calc
+        $totalLessons = count($lessons);
+        $completedLessons = count(array_filter($lessons, fn($l) => $l['completed']));
+        $module['progress'] = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
+
         return $module;
     }
     

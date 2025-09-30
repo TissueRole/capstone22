@@ -40,6 +40,7 @@ include('../connection.php');
         <a class="nav-link" href="#" onclick="showSection('user-management'); setActiveNav(this); return false;" id="nav-user"><i class="bi bi-people"></i>User Management</a>
         <a class="nav-link" href="#" onclick="showSection('module-management'); setActiveNav(this); return false;" id="nav-module"><i class="bi bi-journal-text"></i>Module Management</a>
         <a class="nav-link" href="#" onclick="showSection('lesson-management'); setActiveNav(this); return false;" id="nav-lesson"><i class="bi bi-book"></i>Lesson Management</a>
+        <a class="nav-link" href="#" onclick="showSection('quiz-management'); setActiveNav(this); return false;" id="nav-quiz"><i class="bi bi-question-circle"></i>Quiz Management</a>
         <a class="nav-link" href="#" onclick="showSection('forum-management'); setActiveNav(this); return false;" id="nav-forum"><i class="bi bi-chat-dots"></i>Forum Management</a>
         <a class="nav-link" href="#" onclick="showSection('suggestions'); setActiveNav(this); return false;" id="nav-suggestions"><i class="bi bi-lightbulb"></i>Suggestions</a>
     </nav>
@@ -207,6 +208,44 @@ include('../connection.php');
                 </table>
             </div>
         </section>
+        <section id="quiz-management" class="content-section card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="section-title mb-0"><i class="bi bi-question-circle"></i>Quiz Management</div>
+                <a href="addquiz.php" class="btn btn-dark"><i class="bi bi-plus-circle"></i>Add New Quiz</a>
+            </div>
+            <div class="mb-3">
+                <input type="text" id="quiz-search" class="form-control" placeholder="Search quizzes...">
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Quiz Title</th>
+                        <th>Module</th>
+                        <th>Created At</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                    <tbody id="quizTable">
+                        <?php
+                            $quizzes = $conn->query("
+                                SELECT q.quiz_id, q.title, m.title AS module_title, m.created_at
+                                FROM module_quizzes q
+                                JOIN modules m ON q.module_id = m.module_id
+                            ");
+                            while ($row = $quizzes->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($row['title']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['module_title']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+                            echo "<td><a href='editquiz.php?id=" . $row['quiz_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i>Edit</a></td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
         <section id="forum-management" class="content-section card p-4">
             <div class="section-title"><i class="bi bi-chat-dots"></i>Forum Management</div>
             <h5 class="mb-3"><i class="bi bi-question-circle"></i> Manage Questions</h5>
@@ -364,6 +403,23 @@ include('../connection.php');
                 rows[i].style.display = match ? '' : 'none';
             }
         });
+
+        document.getElementById('quiz-search').addEventListener('keyup', function() {
+        var searchValue = this.value.toLowerCase();
+        var rows = document.getElementById('quizTable').getElementsByTagName('tr');
+        for (var i = 0; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var match = false;
+            for (var j = 0; j < cells.length; j++) {
+                if (cells[j].innerText.toLowerCase().includes(searchValue)) {
+                    match = true;
+                    break;
+                }
+            }
+            rows[i].style.display = match ? '' : 'none';
+        }
+    });
+
         function updateUser(select, userId, field) {
             var value = select.value;
             var xhr = new XMLHttpRequest();

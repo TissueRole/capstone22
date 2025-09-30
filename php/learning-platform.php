@@ -83,6 +83,19 @@ if ($module_id) {
                     </div>
                 </div>
             <?php endif; ?>
+            <?php if (!empty($current_module['quiz_id'])): ?>
+                <div class="lesson-item quiz-item" data-quiz-id="<?php echo $current_module['quiz_id']; ?>">
+                    <div class="lesson-status"></div>
+                    <div class="lesson-details">
+                        <div class="lesson-title">
+                            <i class="bi bi-question-circle me-2"></i> Module Quiz
+                        </div>
+                        <div class="lesson-meta text-muted">
+                            Test your knowledge of this module
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -121,6 +134,26 @@ if ($module_id) {
             <div class="lesson-footer">
                 <button id="prev-btn" class="nav-btn"><i class="bi bi-arrow-left"></i> Previous</button>
                 <button id="next-btn" class="nav-btn next-btn">Next <i class="bi bi-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div id="quiz-view" class="lesson-view" style="display: none;">
+            <!-- Quiz Header -->
+            <div class="lesson-header d-flex justify-content-between align-items-start">
+                <div class="lesson-info">
+                    <h1>Module Quiz</h1>
+                    <p><?php echo htmlspecialchars($current_module['title']); ?></p>
+                </div>
+            </div>
+
+            <!-- Quiz Content -->
+            <div class="lesson-content">
+                <div class="lesson-body" id="quiz-questions"></div>
+            </div>
+
+            <!-- Quiz Footer -->
+            <div class="lesson-footer d-flex justify-content-between">
+                <button id="submit-quiz" class="btn btn-success">Submit Quiz</button>
             </div>
         </div>
     </div>
@@ -287,8 +320,104 @@ class TeenAnimLearning {
             }
         });
     }
+    bindEvents() {
+    // Lessons
+    document.querySelectorAll('.lesson-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const lessonId = parseInt(e.currentTarget.dataset.lessonId);
+            this.loadLesson(lessonId);
+        });
+    });
+
+    // Quiz button
+    const quizBtn = document.querySelector('.quiz-item');
+    if (quizBtn) {
+        quizBtn.addEventListener('click', () => {
+            this.loadQuiz(quizBtn.dataset.quizId);
+        });
+    }
+
+    document.getElementById('complete-btn').addEventListener('click', () => {
+        if (this.currentLesson) {
+            this.markLessonComplete(this.currentLesson.lesson_id);
+        }
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        this.navigateLesson('previous');
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        this.navigateLesson('next');
+    });
 }
 
+async loadQuiz(quizId) {
+    try {
+        const response = await fetch(`learning/api/get_quiz.php?id=${quizId}`);
+        const quiz = await response.json();
+        if (quiz.error) throw new Error(quiz.error);
+
+        this.showQuizView(quiz);
+    } catch (error) {
+        console.error('Failed to load quiz:', error);
+        alert('Failed to load quiz. Please try again.');
+    }
+}
+
+showQuizView(quiz) {
+    document.getElementById('welcome-screen').style.display = 'none';
+    document.getElementById('lesson-view').style.display = 'none';
+    document.getElementById('quiz-view').style.display = 'flex';
+
+    const quizContainer = document.getElementById('quiz-questions');
+    quizContainer.innerHTML = '';
+
+    quiz.questions.forEach((q, index) => {
+        const qEl = document.createElement('div');
+        qEl.classList.add('quiz-question');
+        qEl.innerHTML = `
+            <h5>Q${index + 1}: ${q.question_text}</h5>
+            <div class="option"><input type="radio" name="q${q.question_id}" value="A"> ${q.option_a}</div>
+            <div class="option"><input type="radio" name="q${q.question_id}" value="B"> ${q.option_b}</div>
+            <div class="option"><input type="radio" name="q${q.question_id}" value="C"> ${q.option_c}</div>
+            <div class="option"><input type="radio" name="q${q.question_id}" value="D"> ${q.option_d}</div>
+        `;
+        quizContainer.appendChild(qEl);
+    });
+
+    document.getElementById('submit-quiz').onclick = () => this.submitQuiz(quiz.quiz_id);
+}
+
+
+async submitQuiz(quizId) {
+    const answers = {};
+    document.querySelectorAll('#quiz-questions .quiz-question').forEach((qEl, index) => {
+        const input = qEl.querySelector('input[type="radio"]:checked');
+        if (input) {
+            answers[`q${index+1}`] = input.value;
+        }
+    });
+
+    try {
+        const response = await fetch('learning/api/submit_quiz.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quiz_id: quizId, user_id: this.userId, answers })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert(`Quiz submitted! You scored ${result.score}%`);
+        } else {
+            throw new Error(result.message || 'Failed to submit quiz');
+        }
+    } catch (error) {
+        console.error('Quiz submission failed:', error);
+        alert('Failed to submit quiz. Please try again.');
+    }
+}
+}
 document.addEventListener('DOMContentLoaded', () => {
     new TeenAnimLearning();
 });
