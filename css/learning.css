@@ -347,6 +347,64 @@
     background: #388e3c;
     color: white;
 }
+/* Quiz Styling */
+    .quiz-question {
+        background: #f9fff9;
+        border: 2px solid #d6f5d6;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .quiz-question:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    }
+
+    .quiz-question h5 {
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: #2c662d;
+    }
+
+    .option {
+        margin: 0.5rem 0;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #dcdcdc;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: background 0.2s, border 0.2s;
+    }
+
+    .option:hover {
+        background: #e9fce9;
+        border-color: #a4d8a4;
+    }
+
+    .option input[type="radio"] {
+        margin-right: 10px;
+        accent-color: #28a745; /* Green radio color */
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+
+    #submit-quiz {
+        font-size: 1.1rem;
+        padding: 0.8rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    #submit-quiz:hover {
+        background: #218838;
+        transform: scale(1.05);
+    }
+
 
 @media (max-width: 768px) {
     .learning-container {
