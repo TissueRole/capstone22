@@ -374,40 +374,104 @@ class TeenAnimLearning {
             quizContainer.appendChild(qEl);
         });
 
-        document.getElementById('submit-quiz').onclick = () => this.submitQuiz(quiz.quiz_id);
+        // ✅ Set the submit button handler properly
+        const submitBtn = document.getElementById('submit-quiz');
+        submitBtn.onclick = () => this.submitQuiz(quiz.quiz_id);
     }
 
     async submitQuiz(quizId) {
-        const answers = {};
-        document.querySelectorAll('#quiz-questions .quiz-question').forEach((qEl, index) => {
-            const input = qEl.querySelector('input[type="radio"]:checked');
+        const answers = [];
+
+        // ✅ Collect selected answers
+        document.querySelectorAll('.quiz-question').forEach(q => {
+            const input = q.querySelector('input[type="radio"]:checked');
             if (input) {
-                answers[`q${index+1}`] = input.value;
+                const questionId = input.name.replace('q', '');
+                answers.push({
+                    question_id: questionId,
+                    selected_option: input.value
+                });
             }
         });
 
+        if (answers.length === 0) {
+            alert('⚠️ Please answer all questions before submitting.');
+            return;
+        }
+
         try {
+            // ✅ Send quiz answers
             const response = await fetch('learning/api/submit_quiz.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quiz_id: quizId, user_id: this.userId, answers })
+                body: JSON.stringify({ quiz_id: quizId, answers })
             });
 
             const result = await response.json();
+            console.log('Quiz result:', result);
+
+            const quizView = document.getElementById('quiz-view');
+
+            // ✅ Handle success
             if (result.success) {
-                alert(`Quiz submitted! You scored ${result.score}%`);
+                if (result.score >= 70) {
+                    quizView.innerHTML = `
+                        <div class="text-center p-5">
+                            <h3 class="text-success">🎉 Congratulations!</h3>
+                            <p>You passed with a score of <strong>${result.score}%</strong>.</p>
+                            <p>This quiz is now <strong>locked</strong>.</p>
+                        </div>
+                    `;
+                } else {
+                    // ✅ include data-quiz-id to preserve reference
+                    quizView.innerHTML = `
+                        <div class="text-center p-5">
+                            <h3 class="text-danger">You scored ${result.score}%</h3>
+                            <p>You need at least 70% to pass.</p>
+                            <button id="retry-quiz" data-quiz-id="${quizId}" class="btn btn-outline-success mt-3">🔁 Try Again</button>
+                        </div>
+                    `;
+
+                    // ✅ Retry button now safely reads quizId from data attribute
+                    document.getElementById('retry-quiz').addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-quiz-id');
+                        this.loadQuizById(id);
+                    });
+                }
             } else {
-                throw new Error(result.message || 'Failed to submit quiz');
+                alert(result.message || '⚠️ Failed to evaluate quiz. Please try again.');
             }
         } catch (error) {
-            console.error('Quiz submission failed:', error);
-            alert('Failed to submit quiz. Please try again.');
+            console.error('Quiz submission error:', error);
+            alert('⚠️ Network or server error. Please try again.');
+        }
+    }
+
+
+
+    async loadQuizById(quizId) {
+        try {
+            const response = await fetch(`learning/api/get_quiz.php?quiz_id=${quizId}`);
+            const quiz = await response.json();
+
+            if (quiz.success) {
+                this.showQuizView(quiz.data);
+            } else {
+                alert('Failed to reload quiz.');
+            }
+        } catch (err) {
+            console.error('Error reloading quiz:', err);
         }
     }
 }
+    document.getElementById('quiz-view').classList.add('hidden');
+    setTimeout(() => {
+        this.loadQuizById(quizId);
+        document.getElementById('quiz-view').classList.remove('hidden');
+    }, 300);
 
-document.addEventListener('DOMContentLoaded', () => {
-    new TeenAnimLearning();
+    document.addEventListener('DOMContentLoaded', () => {
+        new TeenAnimLearning();
 });
 </script>
 
