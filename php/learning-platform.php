@@ -153,6 +153,7 @@ if ($module_id) {
 
             <!-- Quiz Footer -->
             <div class="lesson-footer d-flex justify-content-between">
+                <div id="quiz-questions"></div>
                 <button id="submit-quiz" class="btn btn-success">Submit Quiz</button>
             </div>
         </div>
@@ -345,20 +346,34 @@ class TeenAnimLearning {
         try {
             const response = await fetch(`learning/api/get_quiz.php?id=${quizId}`);
             const quiz = await response.json();
-            if (quiz.error) throw new Error(quiz.error);
 
-            this.showQuizView(quiz);
+            if (!quiz || quiz.error) throw new Error(quiz.error || "Failed to load quiz data.");
+
+            // ✅ Show result if user already took it
+            if (quiz.user_result) {
+                this.showQuizResult(quiz.user_result, quizId);
+            } else {
+                this.showQuizView(quiz);
+            }
+
         } catch (error) {
             console.error('Failed to load quiz:', error);
-            alert('Failed to load quiz. Please try again.');
+            alert('Failed to load quiz. Try again.');
         }
     }
 
     showQuizView(quiz) {
         this.hideAllViews();
-        document.getElementById('quiz-view').style.display = 'flex';
 
+        const quizView = document.getElementById('quiz-view');
         const quizContainer = document.getElementById('quiz-questions');
+        if (!quizView || !quizContainer) {
+            console.error("Quiz elements not found in DOM.");
+            alert("Something went wrong loading the quiz view.");
+            return;
+        }
+
+        quizView.style.display = 'flex';
         quizContainer.innerHTML = '';
 
         quiz.questions.forEach((q, index) => {
@@ -374,7 +389,6 @@ class TeenAnimLearning {
             quizContainer.appendChild(qEl);
         });
 
-        // ✅ Set the submit button handler properly
         const submitBtn = document.getElementById('submit-quiz');
         submitBtn.onclick = () => this.submitQuiz(quiz.quiz_id);
     }
@@ -382,7 +396,6 @@ class TeenAnimLearning {
     async submitQuiz(quizId) {
         const answers = [];
 
-        // ✅ Collect selected answers
         document.querySelectorAll('.quiz-question').forEach(q => {
             const input = q.querySelector('input[type="radio"]:checked');
             if (input) {
@@ -400,7 +413,6 @@ class TeenAnimLearning {
         }
 
         try {
-            // ✅ Send quiz answers
             const response = await fetch('learning/api/submit_quiz.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -410,36 +422,10 @@ class TeenAnimLearning {
             const result = await response.json();
             console.log('Quiz result:', result);
 
-            const quizView = document.getElementById('quiz-view');
-
-            // ✅ Handle success
             if (result.success) {
-                if (result.score >= 70) {
-                    quizView.innerHTML = `
-                        <div class="text-center p-5">
-                            <h3 class="text-success">🎉 Congratulations!</h3>
-                            <p>You passed with a score of <strong>${result.score}%</strong>.</p>
-                            <p>This quiz is now <strong>locked</strong>.</p>
-                        </div>
-                    `;
-                } else {
-                    // ✅ include data-quiz-id to preserve reference
-                    quizView.innerHTML = `
-                        <div class="text-center p-5">
-                            <h3 class="text-danger">You scored ${result.score}%</h3>
-                            <p>You need at least 70% to pass.</p>
-                            <button id="retry-quiz" data-quiz-id="${quizId}" class="btn btn-outline-success mt-3">🔁 Try Again</button>
-                        </div>
-                    `;
-
-                    // ✅ Retry button now safely reads quizId from data attribute
-                    document.getElementById('retry-quiz').addEventListener('click', (e) => {
-                        const id = e.target.getAttribute('data-quiz-id');
-                        this.loadQuizById(id);
-                    });
-                }
+                this.showQuizResult(result, quizId);
             } else {
-                alert(result.message || '⚠️ Failed to evaluate quiz. Please try again.');
+                alert(result.message || '⚠️ Failed to evaluate quiz.');
             }
         } catch (error) {
             console.error('Quiz submission error:', error);
@@ -447,28 +433,95 @@ class TeenAnimLearning {
         }
     }
 
+    // ✅ Show result screen (after submission or reload)
+    // ✅ Show result screen (after submission or reload)
+    showQuizResult(result, quizId) {
+        this.hideAllViews();
+        const quizView = document.getElementById('quiz-view');
+        quizView.style.display = 'flex';
+
+        // Clear current content
+        quizView.innerHTML = '';
+
+        // 🎉 Passed
+        if (result.score >= 70) {
+            quizView.innerHTML = `
+                <div class="text-center p-5 w-100">
+                    <h3 class="text-success">🎉 Congratulations!</h3>
+                    <p>You passed with a score of <strong>${result.score}%</strong>.</p>
+                    <p>This quiz is now <strong>locked</strong>.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // ❌ Failed — show retry option
+        quizView.innerHTML = `
+            <div class="text-center p-5 w-100">
+                <h3 class="text-danger">You scored ${result.score}%</h3>
+                <p>You need at least 70% to pass.</p>
+                <button id="retry-quiz" class="btn btn-outline-success mt-3">🔁 Try Again</button>
+            </div>
+        `;
+
+        // ✅ Add retry event handler safely
+        const retryBtn = document.getElementById('retry-quiz');
+        retryBtn.addEventListener('click', async () => {
+            // Hide the retry screen instantly
+            quizView.style.opacity = '0';
+
+            // Wait a short moment for a smoother transition
+            setTimeout(async () => {
+                quizView.innerHTML = `
+                    <div class="lesson-body" id="quiz-questions"></div>
+                    <div class="lesson-footer d-flex justify-content-between">
+                        <button id="submit-quiz" class="btn btn-success" style="display:none;">Submit Quiz</button>
+                    </div>
+                `;
+
+                try {
+                    // Load the quiz questions again
+                    await this.loadQuiz(quizId, true);
+
+                    // ✅ Show submit button only after questions are ready
+                    const submitBtn = document.getElementById('submit-quiz');
+                    if (submitBtn) submitBtn.style.display = 'inline-block';
+
+                    quizView.style.opacity = '1';
+                } catch (error) {
+                    console.error('Failed to reload quiz:', error);
+                    alert('Failed to reload quiz. Please try again.');
+                }
+            }, 150);
+        });
+    }
 
 
-    async loadQuizById(quizId) {
+    // ✅ Reload quiz data (used by Try Again)
+    async loadQuiz(quizId, forceRetake = false) {
         try {
-            const response = await fetch(`learning/api/get_quiz.php?quiz_id=${quizId}`);
+            const url = forceRetake 
+                ? `learning/api/get_quiz.php?id=${quizId}&forceRetake=1` 
+                : `learning/api/get_quiz.php?id=${quizId}`;
+            const response = await fetch(url);
             const quiz = await response.json();
 
-            if (quiz.success) {
-                this.showQuizView(quiz.data);
+            if (!quiz || quiz.error) throw new Error(quiz.error || "Failed to load quiz data.");
+
+            if (quiz.user_result && !forceRetake) {
+                this.showQuizResult(quiz.user_result, quizId);
             } else {
-                alert('Failed to reload quiz.');
+                this.showQuizView(quiz);
             }
-        } catch (err) {
-            console.error('Error reloading quiz:', err);
+
+        } catch (error) {
+            console.error('Failed to load quiz:', error);
+            alert('Failed to load quiz. Try again.');
         }
     }
+
+
 }
-    document.getElementById('quiz-view').classList.add('hidden');
-    setTimeout(() => {
-        this.loadQuizById(quizId);
-        document.getElementById('quiz-view').classList.remove('hidden');
-    }, 300);
 
     document.addEventListener('DOMContentLoaded', () => {
         new TeenAnimLearning();

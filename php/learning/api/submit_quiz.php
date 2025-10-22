@@ -1,18 +1,27 @@
 <?php
+session_start();
 require_once '../../connection.php';
 header('Content-Type: application/json');
 
-$input = json_decode(file_get_contents("php://input"), true);
+// ✅ Ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(["success" => false, "message" => "User not logged in"]);
+    exit;
+}
 
+$user_id = $_SESSION['user_id'];
+
+// ✅ Read JSON input
+$input = json_decode(file_get_contents("php://input"), true);
 if (!$input) {
     echo json_encode(["success" => false, "message" => "No JSON data received"]);
     exit;
 }
 
-$user_id = 1; // Replace with $_SESSION['user_id']
-$quiz_id = $input['quiz_id'];
-$answers = $input['answers'];
+$quiz_id = intval($input['quiz_id']);
+$answers = $input['answers'] ?? [];
 
+// ✅ Check if already passed
 $stmt = $conn->prepare("SELECT score FROM quiz_results WHERE user_id = ? AND quiz_id = ?");
 $stmt->bind_param("ii", $user_id, $quiz_id);
 $stmt->execute();
@@ -35,6 +44,7 @@ if ($alreadyPassed) {
     exit;
 }
 
+// ✅ Compute score
 $total_questions = count($answers);
 $correct = 0;
 
@@ -52,20 +62,24 @@ foreach ($answers as $ans) {
 
 $score = ($total_questions > 0) ? round(($correct / $total_questions) * 100) : 0;
 
-// Save result
-$stmt = $conn->prepare("INSERT INTO quiz_results (user_id, quiz_id, score, taken_at)
-                        VALUES (?, ?, ?, NOW())
-                        ON DUPLICATE KEY UPDATE score = VALUES(score), taken_at = NOW()");
+// ✅ Save result
+$stmt = $conn->prepare("
+    INSERT INTO quiz_results (user_id, quiz_id, score, taken_at)
+    VALUES (?, ?, ?, NOW())
+    ON DUPLICATE KEY UPDATE score = VALUES(score), taken_at = NOW()
+");
 $stmt->bind_param("iid", $user_id, $quiz_id, $score);
 $stmt->execute();
 
-// ✅ If passed, mark module completed
+// ✅ Mark module as completed if passed
 if ($score >= 70) {
-    $stmt = $conn->prepare("UPDATE module_progress 
-                            SET completed = 1, completed_at = NOW() 
-                            WHERE user_id = ? AND module_id = (
-                                SELECT module_id FROM quizzes WHERE quiz_id = ?
-                            )");
+    $stmt = $conn->prepare("
+        UPDATE module_progress 
+        SET completed = 1, completed_at = NOW() 
+        WHERE user_id = ? AND module_id = (
+            SELECT module_id FROM module_quizzes WHERE quiz_id = ?
+        )
+    ");
     $stmt->bind_param("ii", $user_id, $quiz_id);
     $stmt->execute();
 }
