@@ -1,26 +1,28 @@
 <?php
 session_start();
-
 include "../connection.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php"); 
+    header("Location: ../login.php");
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $_POST['title'];
-    $body = $_POST['body'];
-    $user_id = $_SESSION['user_id'];
-    $stmt = $conn->prepare("INSERT INTO Questions (user_id, title, body) VALUES (?, ?, ?)");
-    $stmt->bind_param("iss", $user_id, $title, $body); 
-    if ($stmt->execute()) {
-        header("Location: community.php");
-        exit;
-    } else {
-        echo "Error: " . $conn->error;
-    }
-    $stmt->close();
+$title = $_POST['title'];
+$body = $_POST['body'];
+$user_id = $_SESSION['user_id'];
+
+// Default new question to "pending"
+$stmt = $conn->prepare("INSERT INTO questions (user_id, title, body, status, created_at) VALUES (?, ?, ?, 'pending', NOW())");
+$stmt->bind_param("iss", $user_id, $title, $body);
+
+if ($stmt->execute()) {
+    echo "<script>
+        alert('Your question has been submitted for admin approval.');
+        window.location.href = 'community.php';
+    </script>";
+} else {
+    echo "Error: " . $conn->error;
 }
+$stmt->close();
 $conn->close();
 ?>

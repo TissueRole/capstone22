@@ -10,13 +10,15 @@
   include "../connection.php"; 
 
   $sql = "SELECT q.question_id, q.title, q.body, q.created_at, u.username, u.name, u.profile_picture, u.role,
-          COUNT(r.reply_id) as reply_count
-          FROM questions q
-          JOIN users u ON q.user_id = u.user_id
-          LEFT JOIN reply r ON q.question_id = r.question_id
-          GROUP BY q.question_id, q.title, q.body, q.created_at, u.username, u.name, u.profile_picture, u.role
-          ORDER BY q.created_at DESC
-          LIMIT 10";
+        COUNT(r.reply_id) as reply_count
+        FROM questions q
+        JOIN users u ON q.user_id = u.user_id
+        LEFT JOIN reply r ON q.question_id = r.question_id
+        WHERE q.status = 'approved'
+        GROUP BY q.question_id, q.title, q.body, q.created_at, u.username, u.name, u.profile_picture, u.role
+        ORDER BY q.created_at DESC
+        LIMIT 10";
+
   $result = $conn->query($sql);
   
   

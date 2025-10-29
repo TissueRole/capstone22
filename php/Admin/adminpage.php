@@ -247,61 +247,98 @@ include('../connection.php');
             </div>
         </section>
         <section id="forum-management" class="content-section card p-4">
-            <div class="section-title"><i class="bi bi-chat-dots"></i>Forum Management</div>
+            <div class="section-title"><i class="bi bi-chat-dots"></i> Forum Management</div>
+
+            <!-- ===== Manage Questions ===== -->
             <h5 class="mb-3"><i class="bi bi-question-circle"></i> Manage Questions</h5>
             <div class="mb-3">
                 <input type="text" id="question-search" class="form-control" placeholder="Search questions...">
             </div>
+
             <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Body</th>
-                        <th>User</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="questionTable">
-                    <?php
-                    $questions = $conn->query("SELECT q.*, u.username FROM questions q JOIN users u ON q.user_id = u.user_id");
-                    while ($row = $questions->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['question_id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['title']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['body']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['username']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
-                        echo "<td>
-                                <a href='deletequestions.php?id=" . $row['question_id'] . "' class='btn btn-sm btn-danger'><i class='bi bi-trash'></i>Delete</a>
-                            </td>";
-                        echo "</tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Body</th>
+                            <th>User</th>
+                            <th>Created At</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionTable">
+                        <?php
+                        // Fetch all questions with user data and status
+                        $questions = $conn->query("
+                            SELECT q.*, u.username 
+                            FROM questions q 
+                            JOIN users u ON q.user_id = u.user_id 
+                            ORDER BY q.created_at DESC
+                        ");
+
+                        while ($row = $questions->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($row['question_id']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['title']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['body']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['username']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+
+                            // Status badge
+                            $status = $row['status'] ?? 'pending';
+                            $badgeClass = $status === 'approved' ? 'success' : ($status === 'rejected' ? 'danger' : 'warning text-dark');
+                            echo "<td><span class='badge bg-$badgeClass text-uppercase'>" . htmlspecialchars($status) . "</span></td>";
+
+                            // Actions
+                            echo "<td>";
+                            if ($status === 'pending') {
+                                echo "
+                                    <button class='btn btn-sm btn-success me-1' onclick='updateQuestionStatus(" . $row['question_id'] . ", \"approved\")'>
+                                        <i class='bi bi-check-circle'></i> Approve
+                                    </button>
+                                ";
+                            }
+                            echo "
+                                <a href='deletequestions.php?id=" . $row['question_id'] . "' class='btn btn-sm btn-outline-danger'>
+                                    <i class='bi bi-trash'></i> Delete
+                                </a>
+                            ";
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
             </div>
+
+            <!-- ===== Manage Replies ===== -->
             <h5 class="mb-3 mt-4"><i class="bi bi-reply"></i> Manage Replies</h5>
             <div class="mb-3">
                 <input type="text" id="reply-search" class="form-control" placeholder="Search replies...">
             </div>
+
             <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Question ID</th>
-                        <th>Body</th>
-                        <th>User</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="replyTable">
-                    <?php
-                        $replies = $conn->query("SELECT r.*, u.username FROM reply r JOIN users u ON r.user_id = u.user_id");
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Question ID</th>
+                            <th>Body</th>
+                            <th>User</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="replyTable">
+                        <?php
+                        $replies = $conn->query("
+                            SELECT r.*, u.username 
+                            FROM reply r 
+                            JOIN users u ON r.user_id = u.user_id 
+                            ORDER BY r.created_at DESC
+                        ");
                         while ($row = $replies->fetch_assoc()) {
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($row['reply_id']) . "</td>";
@@ -310,13 +347,15 @@ include('../connection.php');
                             echo "<td>" . htmlspecialchars($row['username']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
                             echo "<td>
-                                    <a href='deletereply.php?id=" . $row['reply_id'] . "' class='btn btn-sm btn-danger'><i class='bi bi-trash'></i>Delete</a>
+                                    <a href='deletereply.php?id=" . $row['reply_id'] . "' class='btn btn-sm btn-outline-danger'>
+                                        <i class='bi bi-trash'></i> Delete
+                                    </a>
                                 </td>";
                             echo "</tr>";
                         }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
             </div>
         </section>
         <section id="suggestions" class="content-section card p-4">
@@ -481,6 +520,36 @@ include('../connection.php');
                 rows[i].style.display = match ? '' : 'none';
             }
         });
+        function updateQuestionStatus(questionId, status) {
+            if (!confirm(`Are you sure you want to mark this question as "${status}"?`)) return;
+
+            fetch('../learning/api/update_question_status.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: questionId, status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ Question has been ${status}.`);
+
+                    // If approved, go back to Forum Management section
+                    if (status === 'approved') {
+                        window.location.href = 'adminpage.php#forum-management';
+                        setTimeout(() => location.reload(), 300);
+                    } else {
+                        location.reload();
+                    }
+
+                } else {
+                    alert('❌ Failed to update question status.\n' + (data.message || 'Unknown error.'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('⚠️ Network error.');
+            });
+        }
         function showSection(sectionId) {
             var sections = document.querySelectorAll('.content-section');
             sections.forEach(function(section) {
