@@ -1,28 +1,41 @@
 <?php
 session_start();
+header('Content-Type: application/json'); // ensure JSON output
+
 include "../connection.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
+    echo json_encode(['success' => false, 'message' => 'Not logged in']);
     exit;
 }
 
-$title = $_POST['title'];
-$body = $_POST['body'];
-$user_id = $_SESSION['user_id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $title = trim($_POST['title'] ?? '');
+    $body = trim($_POST['body'] ?? '');
+    $user_id = $_SESSION['user_id'];
 
-// Default new question to "pending"
-$stmt = $conn->prepare("INSERT INTO questions (user_id, title, body, status, created_at) VALUES (?, ?, ?, 'pending', NOW())");
-$stmt->bind_param("iss", $user_id, $title, $body);
+    if ($title === '' || $body === '') {
+        echo json_encode(['success' => false, 'message' => 'Title and body are required']);
+        exit;
+    }
 
-if ($stmt->execute()) {
-    echo "<script>
-        alert('Your question has been submitted for admin approval.');
-        window.location.href = 'community.php';
-    </script>";
-} else {
-    echo "Error: " . $conn->error;
+    $stmt = $conn->prepare("INSERT INTO questions (user_id, title, body, status) VALUES (?, ?, ?, 'pending')");
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+        exit;
+    }
+
+    $stmt->bind_param("iss", $user_id, $title, $body);
+    $success = $stmt->execute();
+
+    if ($success) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to insert record']);
+    }
+    exit;
 }
-$stmt->close();
-$conn->close();
+
+// fallback
+echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 ?>

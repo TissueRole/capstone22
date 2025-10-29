@@ -311,7 +311,7 @@
               <i class="bi bi-chat-dots me-2"></i>Start a New Discussion
             </div>
             <div class="card-body">
-              <form method="POST" action="addquestion.php">
+              <form id="questionForm" method="POST" action="addquestion.php">
                 <div class="mb-3">
                     <label for="threadTitle" class="form-label">Thread Title</label>
                     <input type="text" id="threadTitle" name="title" class="form-control" placeholder="Enter title" required>
@@ -325,6 +325,7 @@
             </div>
           </div>
         </div>
+        <div id="questionMessage" class="alert d-none mt-3" role="alert"></div>
         <div class="card discussion-list-card" data-aos="fade-up" data-aos-delay="100">
           <div class="card-header">
             <i class="bi bi-clock-history me-2"></i>Recent Discussions
@@ -378,8 +379,50 @@
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-AOS.init();
-</script>
+  <script>
+  AOS.init();
+  document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById('questionForm');
+      const messageBox = document.getElementById('questionMessage');
+
+      form.addEventListener('submit', function(e) {
+          e.preventDefault(); // Stop full-page reload
+
+          const formData = new FormData(form);
+
+          fetch('addquestion.php', {
+              method: 'POST',
+              body: formData
+          })
+          .then(res => res.json())
+          .then(data => {
+              messageBox.classList.remove('d-none', 'alert-danger', 'alert-success');
+              if (data.success) {
+                  messageBox.classList.add('alert-success');
+                  messageBox.innerHTML = '🕓 Your question has been submitted and is awaiting admin approval.';
+                  form.reset();
+
+                  // Optional: collapse the form again
+                  const collapseEl = document.getElementById('newDiscussionForm');
+                  const bsCollapse = bootstrap.Collapse.getInstance(collapseEl);
+                  bsCollapse.hide();
+
+                  // Auto-hide the message after 5 seconds
+                  setTimeout(() => messageBox.classList.add('d-none'), 10000);
+              } else {
+                  messageBox.classList.add('alert-danger');
+                  messageBox.innerHTML = '❌ Failed to submit your question. Please try again.';
+              }
+          })
+          .catch(err => {
+              console.error(err);
+              messageBox.classList.remove('d-none');
+              messageBox.classList.add('alert-danger');
+              messageBox.innerHTML = '⚠️ Network error. Please check your connection.';
+          });
+      });
+  });
+  </script>
+
 </body>
 </html>

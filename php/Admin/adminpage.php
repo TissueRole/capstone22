@@ -531,8 +531,6 @@ include('../connection.php');
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert(`✅ Question has been ${status}.`);
-
                     // If approved, go back to Forum Management section
                     if (status === 'approved') {
                         window.location.href = 'adminpage.php#forum-management';
