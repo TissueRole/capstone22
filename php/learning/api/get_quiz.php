@@ -13,7 +13,7 @@ $user_id = $_SESSION['user_id'] ?? 1; // fallback for testing
 $forceRetake = isset($_GET['forceRetake']) && $_GET['forceRetake'] == '1';
 
 try {
-    // ✅ Fetch quiz
+    // ✅ Fetch quiz and module
     $quiz_sql = "SELECT * FROM module_quizzes WHERE quiz_id = ?";
     $stmt = $conn->prepare($quiz_sql);
     $stmt->bind_param("i", $quiz_id);
@@ -22,6 +22,37 @@ try {
 
     if (!$quiz) {
         echo json_encode(['error' => 'Quiz not found']);
+        exit();
+    }
+
+    $module_id = $quiz['module_id'];
+
+    // ✅ Check if all lessons in this module are completed by the user
+    $progress_sql = "
+        SELECT COUNT(*) AS total_lessons,
+               SUM(CASE WHEN lp.completed = 1 THEN 1 ELSE 0 END) AS completed_lessons
+        FROM lessons l
+        LEFT JOIN lesson_progress lp
+            ON l.lesson_id = lp.lesson_id AND lp.user_id = ?
+        WHERE l.module_id = ?
+    ";
+    $stmt = $conn->prepare($progress_sql);
+    $stmt->bind_param("ii", $user_id, $module_id);
+    $stmt->execute();
+    $progress = $stmt->get_result()->fetch_assoc();
+
+    $total_lessons = (int)$progress['total_lessons'];
+    $completed_lessons = (int)$progress['completed_lessons'];
+
+    // ✅ If not all lessons completed, block quiz access
+    if ($total_lessons > 0 && $completed_lessons < $total_lessons) {
+        echo json_encode([
+            'error' => 'You must complete all lessons in this module before taking the quiz.',
+            'progress' => [
+                'completed' => $completed_lessons,
+                'total' => $total_lessons
+            ]
+        ]);
         exit();
     }
 

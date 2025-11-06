@@ -190,14 +190,36 @@ class TeenAnimLearning {
             });
         });
 
-        // Quiz button
+        // Quiz button with Bootstrap modal alert
         const quizBtn = document.querySelector('.quiz-item');
         if (quizBtn) {
-            quizBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent triggering lesson clicks
-                this.loadQuiz(quizBtn.dataset.quizId);
+            quizBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+
+                const quizId = quizBtn.dataset.quizId;
+                const moduleId = this.currentModule.module_id;
+
+                try {
+                    const res = await fetch(`learning/api/check_progress.php?module_id=${moduleId}`);
+                    const data = await res.json();
+
+                    if (data.status === 'incomplete') {
+                        const warningModal = new bootstrap.Modal(document.getElementById('lessonWarningModal'));
+                        warningModal.show();
+                        return;
+                    }
+
+                    this.loadQuiz(quizId);
+                } catch (error) {
+                    console.error('Error checking progress:', error);
+                    const warningModal = new bootstrap.Modal(document.getElementById('lessonWarningModal'));
+                    document.querySelector('#lessonWarningModal .modal-body').textContent =
+                        'Please finish all lessons in this module before you can take the quiz.';
+                    warningModal.show();
+                }
             });
         }
+
 
         // Complete lesson button
         document.getElementById('complete-btn').addEventListener('click', () => {
@@ -252,7 +274,7 @@ class TeenAnimLearning {
                 this.updateCompleteButton();
                 this.updateLessonStatus(lessonId);
                 this.updateProgress();
-                setTimeout(() => this.navigateLesson('next'), 2000);
+
             } else {
                 throw new Error(result.message || 'Failed to mark lesson as complete');
             }
@@ -527,6 +549,23 @@ class TeenAnimLearning {
         new TeenAnimLearning();
 });
 </script>
+<!-- Modal: Quiz Access Warning -->
+<div class="modal fade" id="lessonWarningModal" tabindex="-1" aria-labelledby="lessonWarningLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-warning">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="lessonWarningLabel">Finish Lessons First</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        You need to finish all lessons in this module before you can take the quiz.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Okay</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
