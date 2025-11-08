@@ -21,25 +21,34 @@ if (!$input) {
 $quiz_id = intval($input['quiz_id']);
 $answers = $input['answers'] ?? [];
 
-// ✅ Check if already passed
-$stmt = $conn->prepare("SELECT score FROM quiz_results WHERE user_id = ? AND quiz_id = ?");
+// ✅ Fetch attempt count & previous score
+$stmt = $conn->prepare("SELECT attempt_count, score FROM quiz_results WHERE user_id = ? AND quiz_id = ?");
 $stmt->bind_param("ii", $user_id, $quiz_id);
 $stmt->execute();
-$res = $stmt->get_result();
+$result = $stmt->get_result();
+$existing = $result->fetch_assoc();
 
-$alreadyPassed = false;
-if ($res->num_rows > 0) {
-    $existing = $res->fetch_assoc();
-    if ((float)$existing['score'] >= 70) {
-        $alreadyPassed = true;
-    }
-}
+$attempt_count = $existing['attempt_count'] ?? 0;
+$alreadyPassed = isset($existing['score']) && (float)$existing['score'] >= 70;
 
+// ✅ Check if already passed
 if ($alreadyPassed) {
     echo json_encode([
         "success" => false,
         "message" => "✅ You already passed this quiz. Retakes are disabled.",
-        "locked" => true
+        "locked" => true,
+        "attempts" => $attempt_count
+    ]);
+    exit;
+}
+
+// ✅ Check attempt limit (3 max)
+if ($attempt_count >= 3) {
+    echo json_encode([
+        "success" => false,
+        "message" => "❌ You have reached the maximum of 3 attempts for this quiz.",
+        "locked" => true,
+        "attempts" => $attempt_count
     ]);
     exit;
 }
@@ -62,13 +71,21 @@ foreach ($answers as $ans) {
 
 $score = ($total_questions > 0) ? round(($correct / $total_questions) * 100) : 0;
 
-// ✅ Save result
-$stmt = $conn->prepare("
-    INSERT INTO quiz_results (user_id, quiz_id, score, taken_at)
-    VALUES (?, ?, ?, NOW())
-    ON DUPLICATE KEY UPDATE score = VALUES(score), taken_at = NOW()
-");
-$stmt->bind_param("iid", $user_id, $quiz_id, $score);
+// ✅ Update or insert quiz result
+if ($existing) {
+    $stmt = $conn->prepare("
+        UPDATE quiz_results 
+        SET score = ?, taken_at = NOW(), attempt_count = attempt_count + 1 
+        WHERE user_id = ? AND quiz_id = ?
+    ");
+    $stmt->bind_param("dii", $score, $user_id, $quiz_id);
+} else {
+    $stmt = $conn->prepare("
+        INSERT INTO quiz_results (user_id, quiz_id, score, taken_at, attempt_count)
+        VALUES (?, ?, ?, NOW(), 1)
+    ");
+    $stmt->bind_param("iid", $user_id, $quiz_id, $score);
+}
 $stmt->execute();
 
 // ✅ Mark module as completed if passed
@@ -84,11 +101,13 @@ if ($score >= 70) {
     $stmt->execute();
 }
 
+// ✅ Return quiz result summary
 echo json_encode([
     "success" => true,
     "correct" => $correct,
     "total" => $total_questions,
     "score" => $score,
+    "attempts" => $attempt_count + 1,
     "passed" => $score >= 70
 ]);
 ?>
