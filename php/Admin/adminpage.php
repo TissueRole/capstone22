@@ -54,13 +54,6 @@ include('../connection.php');
         <?php endif; ?>
         <section id="user-management" class="content-section card p-4">
             <div class="section-title"><i class="bi bi-people"></i>User Management</div>
-            <?php
-            // Notification for new users
-            $new_users_result = $conn->query("SELECT * FROM users WHERE role = 'new user'");
-            if ($new_users_result && $new_users_result->num_rows > 0) {
-                echo '<div class="alert alert-warning d-flex align-items-center" role="alert" style="font-size:1.1em;"><i class="bi bi-exclamation-triangle-fill me-2"></i> There are&nbsp;<b>' . $new_users_result->num_rows . '</b>&nbsp;new user(s) awaiting role assignment. Please set their role below.</div>';
-            }
-            ?>
             <div class="mb-3">
                 <input type="text" id="search" class="form-control" placeholder="Search user profiles...">
             </div>
@@ -72,35 +65,33 @@ include('../connection.php');
                         <th>Username</th>
                         <th>Role</th>
                         <th>Date Created</th>
-                        <th>Status</th>
+                        <th>Forum Restriction</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="userTable">
                     <?php
-                    $result = $conn->query("SELECT * FROM users");
+                    $result = $conn->query("SELECT * FROM users WHERE role != 'admin'");
                     while ($row = $result->fetch_assoc()) {
                         $is_new_user = ($row['role'] === 'new user');
                         echo "<tr" . ($is_new_user ? " style='background:#fffbe6;'" : "") . ">";
                         echo "<td>" . htmlspecialchars($row['name']);
-                        if ($is_new_user) {
-                            echo " <span class='badge bg-warning text-dark ms-2'>New User</span>";
-                        }
+                        //if ($is_new_user) {
+                        //    echo " <span class='badge bg-warning text-dark ms-2'>New User</span>";
+                        //}
                         echo "</td>";
                         echo "<td>" . htmlspecialchars($row['username']) . "</td>";
                         echo "<td>
                                     <select class='form-select' onchange='updateUser(this, " . $row['user_id'] . ", \"role\")'>
-                                        <option value='admin'" . ($row['role'] == 'admin' ? ' selected' : '') . ">Admin</option>
-                                        <option value='student'" . ($row['role'] == 'student' ? ' selected' : '') . ">Student</option>
+                                        <option value='student'" . ($row['role'] == 'student' ? ' selected' : '') . ">User</option>
                                         <option value='agriculturist'" . ($row['role'] == 'agriculturist' ? ' selected' : '') . ">Agriculturist</option>
-                                        <option value='new user'" . ($row['role'] == 'new user' ? ' selected' : '') . ">New User</option>
                                     </select>
                                 </td>";
                         echo "<td>" . htmlspecialchars($row['date_created']) . "</td>";
                         echo "<td>
                             <select class='form-select' onchange='updateUser(this, " . $row['user_id'] . ", \"status\")'>
-                                <option value='active'" . ($row['status'] == 'active' ? ' selected' : '') . ">Active</option>
-                                <option value='inactive'" . ($row['status'] == 'inactive' ? ' selected' : '') . ">Inactive</option>
+                                <option value='active'" . ($row['status'] == 'active' ? ' selected' : '') . ">None</option>
+                                <option value='inactive'" . ($row['status'] == 'inactive' ? ' selected' : '') . ">Forum Restricted</option>
                             </select>
                         </td>";
                         echo "<td>";
