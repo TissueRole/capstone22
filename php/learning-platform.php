@@ -21,7 +21,7 @@ if ($module_id) {
     $current_module = $modules[0];
 } else {
     // ❌ No module selected → redirect back
-    header("Location: ../modulepage.php");
+    header("Location: modulepage.php");
     exit();
 }
 ?>
@@ -436,7 +436,6 @@ class TeenAnimLearning {
         }
     }
 
-
     showQuizView(quiz) {
         this.hideAllViews();
 
@@ -514,19 +513,26 @@ class TeenAnimLearning {
         const quizView = document.getElementById('quiz-view');
         quizView.style.display = 'flex';
         quizView.innerHTML = ''; // clear current content
+        const currentModuleId = this.currentModule;
 
         // 🎉 Passed
         if (result.score >= 70) {
             quizView.innerHTML = `
                 <div class="text-center p-5 w-100">
-                    <h3 class="text-success">🎉 Congratulations!</h3>
-                    <p>You passed with a score of <strong>${result.score}%</strong>.</p>
-                    <p>This quiz is now <strong>locked</strong>.</p>
+                    <h3 class="text-success fw-bold">🎉 Congratulations!</h3>
+                    <p>You passed with a score of <strong>${result.score}%</strong>!</p>
+                    <p class="mt-3 text-success fw-semibold">🏆 Certificate Unlocked!</p>
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="learning/api/certificate.php?module_id=${quizId}" 
+                            class="btn btn-primary px-4 py-2">
+                            📄 View Certificate
+                        </a>
+                    </div>
+                    <p class="text-muted mt-4 mb-0">This quiz is now <strong>locked</strong>.</p>
                 </div>
             `;
             return;
         }
-
         // ❌ Failed — show retry option or locked message
         // IMPORTANT: default attempts to 0 (not 1) when server didn't provide it
         const attempts = (typeof result.attempts !== 'undefined') ? Number(result.attempts) : 0;

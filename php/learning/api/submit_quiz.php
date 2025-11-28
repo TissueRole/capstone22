@@ -90,16 +90,31 @@ $stmt->execute();
 
 // ✅ Mark module as completed if passed
 if ($score >= 70) {
-    $stmt = $conn->prepare("
-        UPDATE module_progress 
-        SET completed = 1, completed_at = NOW() 
-        WHERE user_id = ? AND module_id = (
-            SELECT module_id FROM module_quizzes WHERE quiz_id = ?
-        )
-    ");
-    $stmt->bind_param("ii", $user_id, $quiz_id);
+    // Fetch module id from quiz_id
+    $stmt = $conn->prepare("SELECT module_id FROM module_quizzes WHERE quiz_id = ?");
+    $stmt->bind_param("i", $quiz_id);
     $stmt->execute();
+    $moduleResult = $stmt->get_result()->fetch_assoc();
+    $module_id = $moduleResult['module_id'];
+
+    // Insert certificate entry if not yet generated
+    $stmt = $conn->prepare("SELECT id FROM certificates WHERE user_id = ? AND module_id = ?");
+    $stmt->bind_param("ii", $user_id, $module_id);
+    $stmt->execute();
+    $certExist = $stmt->get_result()->fetch_assoc();
+
+    if (!$certExist) {
+        $certificateFile = "certs/cert_" . $user_id . "_" . $module_id . ".pdf";
+
+        $stmt = $conn->prepare("
+            INSERT INTO certificates (user_id, module_id, certificate_path)
+            VALUES (?, ?, ?)
+        ");
+        $stmt->bind_param("iis", $user_id, $module_id, $certificateFile);
+        $stmt->execute();
+    }
 }
+
 
 // ✅ Return quiz result summary
 echo json_encode([
