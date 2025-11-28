@@ -257,7 +257,7 @@ function isActiveLink($link_path, $current_path, $current_page) {
           TEEN-ANIM
         </a>
         <?php if (!$is_login_page): ?>
-        <div class="flex-grow-1 d-flex justify-content-center">
+        <div class="ms-auto">
           <a href="<?php echo $base; ?>php/login.php" class="btn btn-signin">Sign In</a>
         </div>
         <div style="width: 120px;"></div>
