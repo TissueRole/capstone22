@@ -77,7 +77,7 @@ if (!$lesson) {
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Lesson Content</label>
-                    <textarea name="lesson_content" class="form-control" rows="8" required><?= htmlspecialchars($lesson['content']) ?></textarea>
+                    <textarea name="lesson_content" class="form-control" rows="12" required><?= htmlspecialchars($lesson['content']) ?></textarea>
                     <small class="form-text text-muted">
                         You can use simple formatting:
                         <ul>
