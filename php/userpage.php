@@ -34,6 +34,13 @@
     $active_section = isset($_GET['section']) ? $_GET['section'] : 'profile'; 
 
     $profile_pic = !empty($user['profile_picture']) ? '../images/profile_pics/' . htmlspecialchars($user['profile_picture']) : '../images/clearteenalogo.png';
+
+    $cert_sql = "SELECT c.*, m.title FROM certificates c
+                JOIN modules m ON c.module_id = m.module_id
+                WHERE c.user_id = {$_SESSION['user_id']}
+                ORDER BY completion_date DESC";
+    $cert_result = $conn->query($cert_sql);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -200,6 +207,9 @@
     <nav class="nav flex-column w-100 mt-4">
         <a class="nav-link <?php echo ($active_section == 'profile') ? 'active' : ''; ?>" href="?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
         <a class="nav-link <?php echo ($active_section == 'settings') ? 'active' : ''; ?>" href="?section=settings"><i class="bi bi-gear"></i> Settings</a>
+        <a class="nav-link <?php echo ($active_section == 'certificates') ? 'active' : ''; ?>" href="?section=certificates">
+            <i class="bi bi-award"></i> Certificates
+        </a>
         <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </nav>
 </div>
@@ -318,6 +328,39 @@
                     <?php endif; ?>
                 </div>
             </div>
+        <?php elseif ($active_section == 'certificates'): ?>
+            <div class="card shadow-sm mb-4" data-aos="fade-up">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="bi bi-award me-2"></i>Your Certificates</h5>
+                </div>
+                <div class="card-body">
+
+                    <?php if ($cert_result->num_rows > 0): ?>
+                        <div class="row">
+                            <?php while ($cert = $cert_result->fetch_assoc()): ?>
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-patch-check-fill text-success" style="font-size: 3rem;"></i>
+                                            <h5 class="mt-3 fw-bold"><?php echo htmlspecialchars($cert['title']); ?></h5>
+                                            <p class="text-muted">
+                                                Completed on: <?php echo date('F j, Y', strtotime($cert['completion_date'])); ?>
+                                            </p>
+
+                                            <a href="learning/api/download_cert.php?module_id=<?php echo $cert['module_id']; ?>"
+                                            class="btn btn-success mt-2">
+                                                <i class="bi bi-download"></i> Download Certificate
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted">You have no certificates yet.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
         <?php elseif ($active_section == 'settings'): ?>
             <div class="card shadow-sm mb-4" data-aos="fade-up">
                 <div class="card-header bg-success text-white">
@@ -366,8 +409,6 @@
                     </div>
                 </div>
             </div>
-        <?php elseif ($active_section == 'favorites'): ?>
-            
         <?php endif; ?>
     </div>
 </div>
