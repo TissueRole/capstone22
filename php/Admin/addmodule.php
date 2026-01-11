@@ -107,7 +107,7 @@ if (isset($_POST['add_module'])) {
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Image Path (URL)</label>
-                    <input type="text" name="image_path" class="form-control" placeholder="Optional: Image URL">
+                    <input type="text" name="image_path" class="form-control" placeholder="Enter image URL (optional)">
                 </div>
                 <button type="submit" name="add_module" class="btn btn-success w-100">
                     <i class="bi bi-plus-circle me-1"></i> Add Module
