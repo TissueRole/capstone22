@@ -28,25 +28,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($user_id, $hashed_password, $role, $status);
         $stmt->fetch();
-        
-        if ($status == 'inactive') {
-            $error_message = "Your account is deactivated. Please contact the administrator.";
-        } elseif (password_verify($password, $hashed_password)) {
+
+        if (password_verify($password, $hashed_password)) {
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $role;
+            $_SESSION['status'] = $status; // REQUIRED
             $_SESSION['logged_in'] = true;
 
-            if ($role == 'admin') {
+            if ($role === 'admin') {
                 header("Location: Admin/adminpage.php");
-                exit();
-            } elseif ($role == 'agriculturist') {
+            } elseif ($role === 'agriculturist') {
                 header("Location: Admin/agriculturistpage.php");
-                exit();
-            }else {
+            } else {
                 header("Location: ../index.php");
-                exit();
             }
+            exit();
         } else {
             $error_message = "Invalid password.";
         }

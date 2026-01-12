@@ -1,0 +1,253 @@
+html, body {
+      height: 100%;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    }
+    .main-content {
+      flex: 1 0 auto;
+    }
+    footer {
+      flex-shrink: 0;
+    }
+    .community-header {
+      background: linear-gradient(90deg, #43a047 0%, #66bb6a 100%);
+      color: #fff;
+      border-radius: 1rem;
+      padding: 1.5rem 2rem 1rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 24px rgba(76,175,80,0.08);
+      width: 100%;
+    }
+    .discussion-form-card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 24px rgba(76,175,80,0.10);
+      margin-bottom: 2rem;
+      overflow: hidden;
+      min-height: 300px;
+      max-height: 1000px;
+      width: 100%;
+    }
+    .discussion-form-card .card-header {
+      background: #388e3c;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.2rem;
+      border-radius: 1rem 1rem 0 0;
+    }
+    .discussion-form-card .btn-success {
+      border-radius: 2rem;
+      font-weight: 600;
+      padding: 0.5rem 2rem;
+    }
+    .discussion-form-card .form-control {
+      font-size: 1.2rem;
+      min-height: 3rem;
+    }
+    .discussion-form-card textarea.form-control {
+      min-height: 200px;
+    }
+    .discussion-list-card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 24px rgba(76,175,80,0.10);
+      overflow: hidden;
+      min-height: 500px;
+      width: 100%;
+      /* max-height: 900px; */
+    }
+    .discussion-list-card .list-group {
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .discussion-list-card .list-group::-webkit-scrollbar {
+      width: 8px;
+    }
+    .discussion-list-card .list-group::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    .discussion-list-card .list-group::-webkit-scrollbar-thumb {
+      background: #43a047;
+      border-radius: 10px;
+    }
+    .discussion-list-card .list-group::-webkit-scrollbar-thumb:hover {
+      background: #388e3c;
+    }
+    .discussion-list-card .card-header {
+      background: #18804b;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border-radius: 1rem 1rem 0 0;
+    }
+    .discussion-item {
+      transition: background 0.15s, box-shadow 0.15s;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      background: #fff;
+    }
+    .discussion-item:last-child {
+      border-bottom: none;
+    }
+    .discussion-item:hover {
+      background: #f1f8e9;
+      box-shadow: 0 2px 12px rgba(76,175,80,0.08);
+    }
+    .discussion-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #388e3c;
+      margin-bottom: 0.2rem;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .discussion-title:hover {
+      color: #256029;
+      text-decoration: underline;
+    }
+    .discussion-meta {
+      font-size: 0.95rem;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .discussion-delete {
+      margin-left: auto;
+      color: #e53935;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: background 0.2s;
+    }
+    .discussion-delete:hover {
+      background: #e53935;
+      color: #fff;
+    }
+    @media (max-width: 767.98px) {
+      .community-header {
+        padding: 1rem 0.5rem 0.7rem 0.5rem;
+      }
+      .discussion-item {
+        flex-direction: column;
+        gap: 0.3rem;
+        padding: 0.8rem 0.5rem;
+      }
+    }
+    .new-discussion-layout {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.2rem 1.2rem 1rem 1.2rem;
+      background: #fff;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(76,175,80,0.07);
+      margin-bottom: 1.1rem;
+      position: relative;
+    }
+    .discussion-avatar img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #c8e6c9;
+    }
+    .discussion-avatar {
+      flex-shrink: 0;
+    }
+    .discussion-content {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .discussion-meta-top {
+      font-size: 0.97rem;
+      color: #388e3c;
+      margin-bottom: 0.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .discussion-username {
+      font-weight: 600;
+    }
+    .discussion-meta-text {
+      color: #888;
+      font-weight: 400;
+    }
+    .role-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-student {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+    .role-admin {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+    .role-agriculturist {
+      background: #e8f5e8;
+      color: #388e3c;
+    }
+    .new-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #256029;
+      margin-bottom: 0.2rem;
+      display: block;
+      text-decoration: none;
+    }
+    .new-title:hover {
+      color: #18804b;
+      text-decoration: underline;
+    }
+    .discussion-body-preview {
+      color: #666;
+      font-size: 0.98rem;
+      margin-bottom: 0.5rem;
+      margin-top: 0.1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .discussion-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      font-size: 1.05rem;
+      color: #888;
+      margin-top: 0.2rem;
+    }
+    .action-icon {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    @media (max-width: 767.98px) {
+      .new-discussion-layout {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.8rem 0.5rem 0.7rem 0.5rem;
+      }
+      .discussion-avatar img {
+        width: 36px;
+        height: 36px;
+      }
+    }
