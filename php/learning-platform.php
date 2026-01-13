@@ -153,7 +153,7 @@ if ($module_id) {
 
             <!-- Quiz Footer -->
             <div class="lesson-footer d-flex justify-content-between">
-                <div id="quiz-questions"></div>
+
                 <button id="submit-quiz" class="btn btn-success">Submit Quiz</button>
             </div>
         </div>
@@ -364,12 +364,16 @@ class TeenAnimLearning {
     }
 
     // ---- QUIZ ----
-    async loadQuiz(quizId) {
+    async loadQuiz(quizId, forceRetake = false) {
         try {
-            const response = await fetch(`learning/api/get_quiz.php?id=${quizId}`);
+            const url = forceRetake
+                ? `learning/api/get_quiz.php?id=${quizId}&forceRetake=1`
+                : `learning/api/get_quiz.php?id=${quizId}`;
+
+            const response = await fetch(url);
             const quiz = await response.json();
 
-            // 🛑 Handle locked quizzes (3 attempts reached)
+            // 🔒 LOCKED QUIZ (refresh-safe)
             if (quiz.locked === true) {
                 this.hideAllViews();
                 const quizView = document.getElementById('quiz-view');
@@ -377,66 +381,47 @@ class TeenAnimLearning {
                 quizView.innerHTML = `
                     <div class="text-center p-5 w-100">
                         <h3 class="text-danger">❌ Quiz Locked</h3>
-                        <p>${quiz.message || 'You have reached the maximum of 3 attempts for this quiz.'}</p>
+                        <p>${quiz.message || 'You have reached the maximum of 3 attempts.'}</p>
                         <p><strong>Attempts Used:</strong> ${quiz.attempts || 3}/3</p>
-                        <button class="btn btn-secondary mt-3" onclick="location.reload()">Go Back</button>
+                        <button class="btn btn-secondary mt-3" onclick="location.href='modulepage.php'">
+                            Go Back
+                        </button>
                     </div>
                 `;
-                return; // ⛔ STOP EXECUTION
+                return;
             }
 
-            // 🛑 Handle legacy error structure
-            if (quiz.error === 'limit_reached') {
-                this.hideAllViews();
-                const quizView = document.getElementById('quiz-view');
-                quizView.style.display = 'flex';
-                quizView.innerHTML = `
-                    <div class="text-center p-5 w-100">
-                        <h3 class="text-danger">❌ Quiz Locked</h3>
-                        <p>${quiz.message || 'You can no longer retake this quiz.'}</p>
-                        <p><strong>Attempts Used:</strong> 3/3</p>
-                        <button class="btn btn-secondary mt-3" onclick="location.reload()">Go Back</button>
-                    </div>
-                `;
-                return; // ⛔ STOP EXECUTION
-            }
-
-            // 🛑 Handle general errors
+            // ❌ Real backend error
             if (!quiz || quiz.error) {
-                throw new Error(quiz.error || "Failed to load quiz data.");
+                throw new Error(quiz.error || "Quiz data invalid");
             }
 
-            // 🛑 Prevent showQuizView() if questions missing
-            if (!quiz.questions || !Array.isArray(quiz.questions) || quiz.questions.length === 0) {
+            // ⚠️ No questions
+            if (!quiz.questions || quiz.questions.length === 0) {
                 this.hideAllViews();
-                const quizView = document.getElementById('quiz-view');
-                quizView.style.display = 'flex';
-                quizView.innerHTML = `
+                document.getElementById('quiz-view').innerHTML = `
                     <div class="text-center p-5 w-100">
                         <h3 class="text-warning">⚠️ Quiz Not Available</h3>
-                        <p>No questions were found for this quiz.</p>
-                        <button class="btn btn-secondary mt-3" onclick="location.reload()">Go Back</button>
+                        <p>No questions were found.</p>
                     </div>
                 `;
-                return; // ⛔ STOP EXECUTION
+                return;
             }
 
             // ✅ Show result or quiz
-            if (quiz.user_result) {
+            if (quiz.user_result && !forceRetake) {
                 this.showQuizResult(quiz.user_result, quizId);
             } else {
-                this.showQuizView(quiz);
+                this.showQuizView(quiz, quizId);
             }
 
         } catch (error) {
             console.error('Failed to load quiz:', error);
-            document.getElementById('lessonWarningLabel').textContent = 'Error';
-            document.getElementById('lessonWarningBody').textContent = 'Something went wrong while loading the quiz.';
-            new bootstrap.Modal(document.getElementById('lessonWarningModal')).show();
+            alert('Failed to load quiz. Try again.');
         }
     }
 
-    showQuizView(quiz) {
+    showQuizView(quiz, quizId) {
         this.hideAllViews();
 
         const quizView = document.getElementById('quiz-view');
@@ -464,7 +449,7 @@ class TeenAnimLearning {
         });
 
         const submitBtn = document.getElementById('submit-quiz');
-        submitBtn.onclick = () => this.submitQuiz(quiz.quiz_id);
+        submitBtn.onclick = () => this.submitQuiz(quizId);
     }
 
     async submitQuiz(quizId) {
@@ -473,7 +458,7 @@ class TeenAnimLearning {
         document.querySelectorAll('.quiz-question').forEach(q => {
             const input = q.querySelector('input[type="radio"]:checked');
             if (input) {
-                const questionId = input.name.replace('q', '');
+                const questionId = parseInt(input.name.replace('q', '')); // ✅ Convert to integer
                 answers.push({
                     question_id: questionId,
                     selected_option: input.value
@@ -592,35 +577,6 @@ class TeenAnimLearning {
             });
         }
     }
-
-
-
-
-    // ✅ Reload quiz data (used by Try Again)
-    async loadQuiz(quizId, forceRetake = false) {
-        try {
-            const url = forceRetake 
-                ? `learning/api/get_quiz.php?id=${quizId}&forceRetake=1` 
-                : `learning/api/get_quiz.php?id=${quizId}`;
-            const response = await fetch(url);
-            const quiz = await response.json();
-
-            if (!quiz || quiz.error) throw new Error(quiz.error || "Failed to load quiz data.");
-
-            if (quiz.user_result && !forceRetake) {
-                this.showQuizResult(quiz.user_result, quizId);
-            } else {
-                this.showQuizView(quiz);
-            }
-
-        } catch (error) {
-            console.error('Failed to load quiz:', error);
-            alert('Failed to load quiz. Try again.');
-        }
-    }
-    
-
-
 }
 
     document.addEventListener('DOMContentLoaded', () => {
