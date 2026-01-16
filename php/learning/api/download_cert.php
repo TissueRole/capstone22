@@ -12,16 +12,10 @@ $module_id = (int) ($_GET['module_id'] ?? 0);
 
 
 $user = $conn->query("SELECT name FROM users WHERE user_id = $user_id")->fetch_assoc();
-if (!$user) {
-    die("User not found");
-}
-
+if (!$user) die("User not found");
 
 $module = $conn->query("SELECT title FROM modules WHERE module_id = $module_id")->fetch_assoc();
-if (!$module) {
-    die("Module not found");
-}
-
+if (!$module) die("Module not found");
 
 $cert = $conn->query("
     SELECT completion_date
@@ -29,31 +23,40 @@ $cert = $conn->query("
     WHERE user_id = $user_id AND module_id = $module_id
 ")->fetch_assoc();
 
-if (!empty($cert['completion_date'])) {
-    $completion_date = date('F d, Y', strtotime($cert['completion_date']));
-} else {
-    $completion_date = date('F d, Y');
-}
-
+$completion_date = !empty($cert['completion_date'])
+    ? date('F d, Y', strtotime($cert['completion_date']))
+    : date('F d, Y');
 
 $bg_path = realpath(__DIR__ . '/cert_template/Certificate.jpg');
-if (!$bg_path) {
-    die("Certificate background not found");
-}
+if (!$bg_path) die("Certificate background not found");
 
+
+$fontDir = __DIR__ . '/fonts';
 
 $mpdf = new \Mpdf\Mpdf([
-    'format'        => 'A4-L',
-    'margin_left'   => 0,
-    'margin_right'  => 0,
-    'margin_top'    => 0,
+    'mode' => 'utf-8',
+    'format' => 'A4-L',
+    'margin_left' => 0,
+    'margin_right' => 0,
+    'margin_top' => 0,
     'margin_bottom' => 0,
-    'autoPageBreak' => false
+    'autoPageBreak' => false,
+    'fontDir' => [$fontDir],
+    'fontdata' => [
+        'cormorant' => [
+            'R' => 'CormorantGaramond-Regular.ttf',
+            'B' => 'CormorantGaramond-Bold.ttf',
+        ],
+        'playfair' => [
+            'R' => 'PlayfairDisplay-Regular.ttf',
+            'B' => 'PlayfairDisplay-Bold.ttf',
+        ],
+    ],
+    'default_font' => 'cormorant'
 ]);
 
-
 $mpdf->SetDefaultBodyCSS('background', "url('$bg_path')");
-$mpdf->SetDefaultBodyCSS('background-image-resize', 6); // FIT PAGE
+$mpdf->SetDefaultBodyCSS('background-image-resize', 6);
 
 
 $html = '
@@ -64,29 +67,29 @@ $html = '
 body {
     margin: 0;
     padding: 0;
-    position: relative;
-    font-family: "Times New Roman", serif;
 }
 
-/* Student name */
+/* Student Name */
 .student-name {
     position: absolute;
     top: 78mm;
     left: 0;
     right: 0;
     text-align: center;
+    font-family: cormorant;
     font-size: 52px;
     font-weight: bold;
     font-style: italic;
 }
 
-/* Module title */
+/* Module Name */
 .module-name {
     position: absolute;
     top: 108mm;
     left: 0;
     right: 0;
     text-align: center;
+    font-family: playfair;
     font-size: 34px;
     font-style: italic;
 }
