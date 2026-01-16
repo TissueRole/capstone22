@@ -15,10 +15,12 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int)$_SESSION['user_id'];
 $quiz_id = (int)$_GET['id'];
 
-// Fetch quiz
+/* ===========================
+   FETCH QUIZ
+=========================== */
 $stmt = $conn->prepare("SELECT * FROM module_quizzes WHERE quiz_id = ?");
 $stmt->bind_param("i", $quiz_id);
 $stmt->execute();
@@ -29,7 +31,9 @@ if (!$quiz) {
     exit;
 }
 
-// Fetch attempt info
+/* ===========================
+   FETCH USER RESULT
+=========================== */
 $stmt = $conn->prepare("
     SELECT attempt_count, score 
     FROM quiz_results 
@@ -40,23 +44,12 @@ $stmt->execute();
 $result = $stmt->get_result()->fetch_assoc();
 
 $attempts = $result ? (int)$result['attempt_count'] : 0;
-$passed   = $result && (float)$result['score'] >= 70;
+$score    = $result ? (float)$result['score'] : null;
+$passed   = $score !== null && $score >= 70;
 
-// 🔒 LOCKED STATE
-if ($passed || $attempts >= 3) {
-    echo json_encode([
-        'locked' => true,
-        'passed' => $passed,
-        'attempts' => $attempts,
-        'questions' => [], // 🔑 IMPORTANT
-        'message' => $passed
-            ? '✅ You already passed this quiz.'
-            : '❌ You have reached the maximum of 3 attempts.'
-    ]);
-    exit;
-}
-
-// Fetch questions
+/* ===========================
+   FETCH QUESTIONS
+=========================== */
 $stmt = $conn->prepare("
     SELECT question_id, question_text, option_a, option_b, option_c, option_d
     FROM quiz_questions
@@ -67,8 +60,24 @@ $stmt->bind_param("i", $quiz_id);
 $stmt->execute();
 $questions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+/* ===========================
+   RESPONSE (IMPORTANT)
+=========================== */
 echo json_encode([
-    'locked' => false,
-    'attempts' => $attempts,
-    'questions' => $questions
+    'quiz_id'     => $quiz_id,
+    'locked'      => ($attempts >= 3 || $passed), // locked means no retake
+    'attempts'    => $attempts,
+
+    // ✅ ALWAYS SEND RESULT IF EXISTS
+    'user_result' => $result ? [
+        'score'    => $score,
+        'attempts' => $attempts
+    ] : null,
+
+    // ✅ QUESTIONS ONLY WHEN RETAKE IS ALLOWED
+    'questions'   => ($passed || $attempts >= 3) ? [] : $questions,
+
+    'message' => $passed
+        ? '✅ You already passed this quiz.'
+        : ($attempts >= 3 ? '❌ You have reached the maximum of 3 attempts.' : null)
 ]);

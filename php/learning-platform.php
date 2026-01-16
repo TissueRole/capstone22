@@ -366,14 +366,20 @@ class TeenAnimLearning {
     // ---- QUIZ ----
     async loadQuiz(quizId, forceRetake = false) {
         try {
-            const url = forceRetake
-                ? `learning/api/get_quiz.php?id=${quizId}&forceRetake=1`
-                : `learning/api/get_quiz.php?id=${quizId}`;
-
-            const response = await fetch(url);
+            const response = await fetch(`learning/api/get_quiz.php?id=${quizId}`);
             const quiz = await response.json();
 
-            // 🔒 LOCKED QUIZ (refresh-safe)
+            if (!quiz || quiz.error) {
+                throw new Error(quiz.error || 'Quiz error');
+            }
+
+            // ✅ 1. ALWAYS SHOW PASSED RESULT FIRST
+            if (quiz.user_result && quiz.user_result.score >= 70) {
+                this.showQuizResult(quiz.user_result, quizId);
+                return;
+            }
+
+            // 🔒 2. Locked (only if NOT passed)
             if (quiz.locked === true) {
                 this.hideAllViews();
                 const quizView = document.getElementById('quiz-view');
@@ -381,8 +387,8 @@ class TeenAnimLearning {
                 quizView.innerHTML = `
                     <div class="text-center p-5 w-100">
                         <h3 class="text-danger">❌ Quiz Locked</h3>
-                        <p>${quiz.message || 'You have reached the maximum of 3 attempts.'}</p>
-                        <p><strong>Attempts Used:</strong> ${quiz.attempts || 3}/3</p>
+                        <p>You have reached the maximum number of attempts.</p>
+                        <p><strong>Attempts Used:</strong> ${quiz.attempts}/3</p>
                         <button class="btn btn-secondary mt-3" onclick="location.href='modulepage.php'">
                             Go Back
                         </button>
@@ -391,33 +397,18 @@ class TeenAnimLearning {
                 return;
             }
 
-            // ❌ Real backend error
-            if (!quiz || quiz.error) {
-                throw new Error(quiz.error || "Quiz data invalid");
-            }
-
             // ⚠️ No questions
             if (!quiz.questions || quiz.questions.length === 0) {
-                this.hideAllViews();
-                document.getElementById('quiz-view').innerHTML = `
-                    <div class="text-center p-5 w-100">
-                        <h3 class="text-warning">⚠️ Quiz Not Available</h3>
-                        <p>No questions were found.</p>
-                    </div>
-                `;
+                alert('Quiz has no questions.');
                 return;
             }
 
-            // ✅ Show result or quiz
-            if (quiz.user_result && !forceRetake) {
-                this.showQuizResult(quiz.user_result, quizId);
-            } else {
-                this.showQuizView(quiz, quizId);
-            }
+            // ▶️ Show quiz
+            this.showQuizView(quiz, quizId);
 
         } catch (error) {
             console.error('Failed to load quiz:', error);
-            alert('Failed to load quiz. Try again.');
+            alert('Failed to load quiz.');
         }
     }
 
@@ -506,14 +497,23 @@ class TeenAnimLearning {
                 <div class="text-center p-5 w-100">
                     <h3 class="text-success fw-bold">🎉 Congratulations!</h3>
                     <p>You passed with a score of <strong>${result.score}%</strong>!</p>
+
                     <p class="mt-3 text-success fw-semibold">🏆 Certificate Unlocked!</p>
+
                     <div class="d-flex justify-content-center gap-3 mt-4">
-                        <a href="learning/api/certificate.php?module_id=${quizId}" 
-                            class="btn btn-primary px-4 py-2">
+                        <a href="learning/api/certificate.php?module_id=${this.currentModule.module_id}" 
+                        class="btn btn-primary px-4 py-2">
                             📄 View Certificate
                         </a>
+
+                        <a href="modulepage.php" class="btn btn-outline-secondary px-4 py-2">
+                            Back to Modules
+                        </a>
                     </div>
-                    <p class="text-muted mt-4 mb-0">This quiz is now <strong>locked</strong>.</p>
+
+                    <p class="text-muted mt-4 mb-0">
+                        This quiz is <strong>completed</strong> and cannot be retaken.
+                    </p>
                 </div>
             `;
             return;
