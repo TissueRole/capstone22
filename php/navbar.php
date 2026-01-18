@@ -280,7 +280,7 @@ function isActiveLink($link_path, $current_path, $current_page) {
             <a class="nav-link <?php echo isActiveLink('community.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/Forum/community.php">Farming Community</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link <?php echo isActiveLink('simulator.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/simulator.php">Simulation</a>
+            <a class="nav-link <?php echo isActiveLink('simulation.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/simulation.php">Simulation</a>
           </li>
           <li class="nav-item">
             <a class="nav-link <?php echo isActiveLink('modulepage.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/modulepage.php">Module</a>
