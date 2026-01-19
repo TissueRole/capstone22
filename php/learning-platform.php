@@ -484,7 +484,7 @@ class TeenAnimLearning {
     }
 
     // ✅ Show result screen (after submission or reload)
-    showQuizResult(result, quizId) {
+     async showQuizResult(result, quizId) {
         this.hideAllViews();
         const quizView = document.getElementById('quiz-view');
         quizView.style.display = 'flex';
@@ -493,19 +493,56 @@ class TeenAnimLearning {
 
         // 🎉 Passed
         if (result.score >= 70) {
+            // ✅ SAVE CERTIFICATE TO DATABASE (ONCE)
+            if (this.currentModule.module_id !== 1) {
+                try {
+                    console.log('🔄 Attempting to save certificate for module:', this.currentModule.module_id);
+                    
+                    const response = await fetch('learning/api/award_certificate.php', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `module_id=${this.currentModule.module_id}`
+                    });
+                    
+                    const responseText = await response.text();
+                    console.log('📥 Server response:', responseText);
+                    console.log('📊 Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        console.error('❌ Certificate save failed:', response.status, responseText);
+                        alert('⚠️ Failed to save certificate. Please contact support.');
+                    } else {
+                        console.log('✅ Certificate saved successfully!');
+                    }
+                } catch (err) {
+                    console.error('❌ Certificate save network error:', err);
+                    alert('⚠️ Network error while saving certificate. Please check your connection.');
+                }
+            } else {
+                console.log('ℹ️ Module 1 - No certificate issued (by design)');
+            }
+
             quizView.innerHTML = `
                 <div class="text-center p-5 w-100">
                     <h3 class="text-success fw-bold">🎉 Congratulations!</h3>
                     <p>You passed with a score of <strong>${result.score}%</strong>!</p>
 
-                    <p class="mt-3 text-success fw-semibold">🏆 Certificate Unlocked!</p>
+                    <p class="mt-3 text-success fw-semibold">
+                        ${this.currentModule.module_id === 1 
+                            ? 'ℹ️ This introductory module does not include a certificate.'
+                            : '🏆 Certificate Unlocked!'}
+                    </p>
 
                     <div class="d-flex justify-content-center gap-3 mt-4">
-                        <a href="learning/api/certificate.php?module_id=${this.currentModule.module_id}" 
+                         ${this.currentModule.module_id !== 1 ? `
+                        <a href="learning/api/certificate.php?module_id=${this.currentModule.module_id}&from=quiz" 
+                        target="_blank"
                         class="btn btn-primary px-4 py-2">
                             📄 View Certificate
-                        </a>
-
+                        </a>` : ``}
+                        
                         <a href="modulepage.php" class="btn btn-outline-secondary px-4 py-2">
                             Back to Modules
                         </a>

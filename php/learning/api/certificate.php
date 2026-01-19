@@ -7,6 +7,9 @@ if (!isset($_SESSION['user_id'])) die("Not logged in");
 $user_id = $_SESSION['user_id'];
 $module_id = intval($_GET['module_id'] ?? 0);
 
+// Get the referrer to determine where user came from
+$from = $_GET['from'] ?? 'quiz'; // default to 'quiz'
+
 // Fetch student
 $user = $conn->query("SELECT name FROM users WHERE user_id=$user_id")->fetch_assoc();
 if (!$user) die("❗User not found in database.");
@@ -20,6 +23,13 @@ $cert = $conn->query("
     SELECT completion_date FROM certificates 
     WHERE user_id=$user_id AND module_id=$module_id
 ")->fetch_assoc();
+
+// Determine close URL based on where they came from
+if ($from === 'profile' || $from === 'userpage') {
+    $closeUrl = "../../userpage.php#certificates";
+} else {
+    $closeUrl = "../../learning-platform.php?module=$module_id";
+}
 ?>
 
 <!DOCTYPE html>
@@ -131,9 +141,9 @@ $cert = $conn->query("
     <a href="download_cert.php?module_id=<?= $module_id ?>" class="btn">
         📄 Download Certificate (PDF)
     </a>
-    <a href="../../learning-platform.php?module=<?= $module_id ?>" class="btn" style="background:#444">
+    <button onclick="window.close()" class="btn" style="background:#444; border:none; cursor:pointer;">
         Close
-    </a>
+    </button>
 </div>
 
 

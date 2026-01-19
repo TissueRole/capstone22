@@ -36,9 +36,10 @@
     $profile_pic = !empty($user['profile_picture']) ? '../images/profile_pics/' . htmlspecialchars($user['profile_picture']) : '../images/clearteenalogo.png';
 
     $cert_sql = "SELECT c.*, m.title FROM certificates c
-                JOIN modules m ON c.module_id = m.module_id
-                WHERE c.user_id = {$_SESSION['user_id']}
-                ORDER BY completion_date DESC";
+            JOIN modules m ON c.module_id = m.module_id
+            WHERE c.user_id = {$_SESSION['user_id']}
+              AND c.module_id != 1
+            ORDER BY c.completion_date DESC";
     $cert_result = $conn->query($cert_sql);
 
 ?>
@@ -52,152 +53,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/userpage.css">
     <link rel="stylesheet" href="../css/homepage.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-        }
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
-            color: #fff;
-            padding-top: 2rem;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 250px;
-            z-index: 100;
-            box-shadow: 2px 0 12px rgba(60,120,60,0.08);
-            margin-top: 80px;
-        }
-        .sidebar .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #fff;
-            margin-bottom: 1rem;
-        }
-        .sidebar .username {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-        .sidebar .nav-link {
-            color: #fff;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 30px;
-            padding: 0.7rem 1.2rem;
-            transition: background 0.2s, color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-        }
-        .sidebar .nav-link.active, .sidebar .nav-link:hover {
-            background: #fff;
-            color: #388e3c !important;
-        }
-        .main-content {
-            margin-left: 270px;
-            padding: 2rem 1rem 1rem 1rem;
-        }
-        @media (max-width: 991.98px) {
-            .sidebar {
-                position: static;
-                width: 100%;
-                min-height: auto;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                padding: 1rem 1rem 0.5rem 1rem;
-            }
-            .sidebar .avatar {
-                width: 50px;
-                height: 50px;
-                margin-bottom: 0;
-            }
-            .sidebar .username {
-                margin-bottom: 0;
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-        }
-        .card {
-            border-radius: 1rem;
-            box-shadow: 0 4px 24px rgba(76,175,80,0.08);
-        }
-        .favorite-plant-card {
-            min-width: 220px;
-            max-width: 250px;
-            margin: 0.5rem;
-            display: inline-block;
-            vertical-align: top;
-        }
-        .favorite-plant-img {
-            height: 120px;
-            object-fit: cover;
-            border-radius: 0.7rem 0.7rem 0 0;
-        }
-        .remove-fav-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #e53935;
-            color: #fff;
-            border-radius: 50%;
-            border: none;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: background 0.2s;
-        }
-        .remove-fav-btn:hover {
-            background: #b71c1c;
-        }
-        /* Responsive profile card and content */
-        @media (max-width: 700px) {
-            .main-content {
-                padding: 0.5rem;
-            }
-            .card {
-                border-radius: 0.7rem;
-                padding: 0.5rem;
-            }
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start !important;
-                padding: 1rem 1rem 0.5rem 1rem;
-            }
-            .d-flex.align-items-center.mb-3 {
-                flex-direction: column !important;
-                align-items: center !important;
-                text-align: center;
-            }
-            .d-flex.align-items-center.mb-3 img.avatar {
-                width: 120px;
-                height: 120px;
-                margin-bottom: 1rem;
-            }
-            .d-flex.align-items-center.mb-3 > div {
-                margin-left: 0 !important;
-            }
-            .accordion-item, .accordion-button, .accordion-body {
-                font-size: 1rem;
-            }
-            .sidebar {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 0.5rem 1rem;
-            }
-        }
-    </style>
 </head>
 <body>
 <?php include 'navbar.php'; ?>
@@ -329,7 +186,7 @@
                 </div>
             </div>
         <?php elseif ($active_section == 'certificates'): ?>
-            <div class="card shadow-sm mb-4" data-aos="fade-up">
+            <div class="card shadow-sm mb-4" data-aos="fade-up" id="certificates">
                 <div class="card-header bg-success text-white">
                     <h5><i class="bi bi-award me-2"></i>Your Certificates</h5>
                 </div>
@@ -338,22 +195,30 @@
                     <?php if ($cert_result->num_rows > 0): ?>
                         <div class="row">
                             <?php while ($cert = $cert_result->fetch_assoc()): ?>
-                                <div class="col-md-6 col-lg-4 mb-4">
-                                    <div class="card h-100 shadow-sm">
-                                        <div class="card-body text-center">
-                                            <i class="bi bi-patch-check-fill text-success" style="font-size: 3rem;"></i>
-                                            <h5 class="mt-3 fw-bold"><?php echo htmlspecialchars($cert['title']); ?></h5>
-                                            <p class="text-muted">
-                                                Completed on: <?php echo date('F j, Y', strtotime($cert['completion_date'])); ?>
-                                            </p>
-
-                                            <a href="learning/api/download_cert.php?module_id=<?php echo $cert['module_id']; ?>"
-                                            class="btn btn-success mt-2">
-                                                <i class="bi bi-download"></i> Download Certificate
-                                            </a>
+                                <?php if ((int)$cert['module_id'] === 1) continue; ?>
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card h-100 shadow-sm">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-patch-check-fill text-success" style="font-size: 3rem;"></i>
+                                                <h5 class="mt-3 fw-bold"><?php echo htmlspecialchars($cert['title']); ?></h5>
+                                                <p class="text-muted">
+                                                    Completed on: <?php echo date('F j, Y', strtotime($cert['completion_date'])); ?>
+                                                </p>
+                                                <div class="d-flex justify-content-center gap-2 mt-3">
+                                                <a href="learning/api/certificate.php?module_id=<?= $cert['module_id'] ?>&from=profile" 
+                                                class="btn btn-primary px-3 py-2"
+                                                target="_blank">
+                                                    📄 View Certificate
+                                                </a>
+                                                
+                                                <a href="learning/api/download_cert.php?module_id=<?php echo $cert['module_id']; ?>"
+                                                class="btn btn-success px-3 py-2">
+                                                    <i class="bi bi-download"></i> Download
+                                                </a>
+                                            </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                             <?php endwhile; ?>
                         </div>
                     <?php else: ?>
