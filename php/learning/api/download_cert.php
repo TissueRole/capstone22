@@ -17,6 +17,10 @@ if (!$user) die("User not found");
 $module = $conn->query("SELECT title FROM modules WHERE module_id = $module_id")->fetch_assoc();
 if (!$module) die("Module not found");
 
+// ✅ Keep the title as-is but remove any unwanted line breaks from database
+$module_title = trim($module['title']);
+$module_title = preg_replace('/[\r\n]+/', ' ', $module_title); // Remove hard line breaks from DB
+
 $cert = $conn->query("
     SELECT completion_date
     FROM certificates
@@ -86,12 +90,14 @@ body {
 .module-name {
     position: absolute;
     top: 108mm;
-    left: 0;
-    right: 0;
+    left: 80mm;
+    right: 80mm;
     text-align: center;
     font-family: playfair;
     font-size: 34px;
     font-style: italic;
+    line-height: 1.4;
+    word-wrap: break-word;
 }
 
 /* Date */
@@ -108,7 +114,7 @@ body {
 
 <body>
     <div class="student-name">' . htmlspecialchars($user['name']) . '</div>
-    <div class="module-name">' . htmlspecialchars($module['title']) . '</div>
+    <div class="module-name">' . htmlspecialchars($module_title) . '</div>
     <div class="completion-date">Completed on: ' . $completion_date . '</div>
 </body>
 </html>
@@ -116,5 +122,5 @@ body {
 
 $mpdf->WriteHTML($html);
 
-$filename = 'Certificate_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $module['title']) . '.pdf';
+$filename = 'Certificate_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $module_title) . '.pdf';
 $mpdf->Output($filename, 'D');
