@@ -4,11 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Simulation</title>
-  <link rel="stylesheet" href="simulation/sim/styles.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="simulation/sims/styles.css" />
 </head>
 <body>
-  
-  <div class="header">
+  <?php include 'navbar.php'; ?>
+
+  <header class="header">
     <div>
       <h1>Tomato Growth Simulator</h1>
       <p class="sub">Original simulation using your tomato animation. Water/light/temperature affect growth + health.</p>
@@ -17,7 +20,7 @@
       <button id="btnReset" class="btn">Reset</button>
       <button id="btnPlayPause" class="btn btn--primary">Play</button>
     </div>
-</div>
+  </header>
 
   <main class="layout">
     <section class="panel">
