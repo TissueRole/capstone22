@@ -4,16 +4,61 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Simulation</title>
-  
   <link rel="stylesheet" href="simulation/sims/styles.css" />
+  <link rel="stylesheet" href="simulation/sims/navbar-simulation.css" />
 </head>
 <body>
-  <?php include 'navbar.php'; ?>
+  <!-- Standalone Navbar for Simulation (No Bootstrap) -->
+  <nav class="navbar-simulation">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.php">
+        <img src="../images/clearteenalogo.png" class="teenanimlogo" alt="home logo">
+        TEEN-ANIM
+      </a>
+      <button class="navbar-toggler" id="navToggle" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <ul class="navbar-menu" id="navMenu">
+        <li class="nav-item">
+          <a class="nav-link" href="Forum/community.php">Farming Community</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="simulation.php">Simulation</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="modulepage.php">Module</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Profile Dropdown (only if logged in) -->
+  <div class="profile-dropdown-sim">
+    <div class="dropdown">
+      <button class="dropdown-toggle" id="profileDropdownSim" aria-expanded="false">
+        <img src="../images/clearteenalogo.png" alt="Profile" class="profile-pic-navbar-sim">
+      </button>
+      <ul class="dropdown-menu" id="profileMenu">
+        <li class="dropdown-header">
+          <img src="../images/clearteenalogo.png" alt="Profile">
+          <div style="font-weight: 600;">User Name</div>
+          <div style="font-size: 0.95em; color: #388e3c; margin-top: 2px; font-weight: 500;">
+            Student
+          </div>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <a class="dropdown-item" href="php/userpage.php">Profile</a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="php/logout.php">Logout</a></li>
+      </ul>
+    </div>
+  </div>
 
   <header class="header">
     <div>
-      <h1>Tomato Growth Simulator</h1>
-      <p class="sub">Original simulation using your tomato animation. Water/light/temperature affect growth + health.</p>
+      <p class="sub">Original simulation that shows how Water/light/temperature affect growth + health.</p>
     </div>
     <div class="header__actions">
       <button id="btnReset" class="btn">Reset</button>
@@ -119,10 +164,43 @@
     <span class="muted">Tip: keep water ~50%, light ~70%, temp ~24°C for best growth.</span>
   </footer>
 
-  <!-- Load Lottie (avoid SRI mismatch issues by not pinning an integrity hash) -->
+  <!-- Vanilla JS for dropdown and mobile menu -->
+  <script>
+    // Mobile menu toggle
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    
+    if (navToggle) {
+      navToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('show');
+      });
+    }
+    
+    // Profile dropdown toggle
+    const profileDropdown = document.getElementById('profileDropdownSim');
+    const profileMenu = document.getElementById('profileMenu');
+    
+    if (profileDropdown) {
+      profileDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileMenu.classList.toggle('show');
+      });
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (profileMenu && !e.target.closest('.dropdown')) {
+        profileMenu.classList.remove('show');
+      }
+      if (navMenu && !e.target.closest('.navbar-simulation') && window.innerWidth < 992) {
+        navMenu.classList.remove('show');
+      }
+    });
+  </script>
+  
+  <!-- Load Lottie -->
   <script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
   <script>
-    // Basic guard to make failures obvious
     if (!window.lottie || typeof window.lottie.loadAnimation !== 'function') {
       console.error('Lottie failed to load. window.lottie=', window.lottie);
     }
