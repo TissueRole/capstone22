@@ -20,13 +20,13 @@
       </button>
       <ul class="navbar-menu" id="navMenu">
         <li class="nav-item">
+          <a class="nav-link" href="modulepage.php">Module</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="Forum/community.php">Farming Community</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" href="simulation.php">Simulation</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="modulepage.php">Module</a>
         </li>
       </ul>
     </div>

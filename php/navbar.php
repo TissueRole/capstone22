@@ -277,13 +277,13 @@ function isActiveLink($link_path, $current_path, $current_page) {
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav justify-content-center w-100 align-items-lg-center">
           <li class="nav-item">
+            <a class="nav-link <?php echo isActiveLink('modulepage.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/modulepage.php">Module</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link <?php echo isActiveLink('community.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/Forum/community.php">Farming Community</a>
           </li>
           <li class="nav-item">
             <a class="nav-link <?php echo isActiveLink('simulation.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/simulation.php">Simulation</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link <?php echo isActiveLink('modulepage.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/modulepage.php">Module</a>
           </li>
         </ul>
       </div>
