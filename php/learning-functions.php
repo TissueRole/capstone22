@@ -18,7 +18,7 @@ class TeenAnimLearning {
                     JOIN lessons l ON lp.lesson_id = l.lesson_id 
                     WHERE l.module_id = m.module_id AND lp.user_id = ? AND lp.completed = 1) as completed_lessons
                 FROM modules m 
-                ORDER BY m.module_id";
+                ORDER BY m.created_at DESC, m.module_id DESC";
         
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $user_id);

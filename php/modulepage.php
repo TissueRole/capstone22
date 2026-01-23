@@ -46,12 +46,14 @@ if ($Category != '') {
     $params[] = $Category;
     $param_types .= "s";
 }
-if ($sortOption != '') {
-    if ($sortOption == 'title') {
-        $sql .= " ORDER BY title ASC";
-    } elseif ($sortOption == 'date') {
-        $sql .= " ORDER BY created_at DESC";
-    }
+
+// Add default sorting - newest modules first
+if ($sortOption == 'title') {
+    $sql .= " ORDER BY title ASC";
+} elseif ($sortOption == 'date') {
+    $sql .= " ORDER BY created_at DESC";
+} else {
+    $sql .= " ORDER BY created_at DESC";
 }
 
 $stmt = $conn->prepare($sql);
