@@ -42,6 +42,23 @@
             ORDER BY c.completion_date DESC";
     $cert_result = $conn->query($cert_sql);
 
+    $reward_sql = "
+        SELECT 
+            m.module_id,
+            m.title AS module_title,
+            m.rewards,
+            qr.taken_at AS completion_date
+        FROM quiz_results qr
+        JOIN module_quizzes mq ON qr.quiz_id = mq.quiz_id
+        JOIN modules m ON mq.module_id = m.module_id
+        WHERE qr.user_id = {$_SESSION['user_id']}
+        AND qr.score >= 75
+        AND m.rewards IS NOT NULL
+        AND m.rewards != ''
+        ORDER BY qr.taken_at DESC
+    ";
+    $reward_result = $conn->query($reward_sql);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,9 +81,8 @@
     <nav class="nav flex-column w-100 mt-4">
         <a class="nav-link <?php echo ($active_section == 'profile') ? 'active' : ''; ?>" href="?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
         <a class="nav-link <?php echo ($active_section == 'settings') ? 'active' : ''; ?>" href="?section=settings"><i class="bi bi-gear"></i> Settings</a>
-        <a class="nav-link <?php echo ($active_section == 'certificates') ? 'active' : ''; ?>" href="?section=certificates">
-            <i class="bi bi-award"></i> Certificates
-        </a>
+        <a class="nav-link <?php echo ($active_section == 'certificates') ? 'active' : ''; ?>" href="?section=certificates"><i class="bi bi-award"></i> Certificates</a>
+        <a class="nav-link <?php echo ($active_section == 'rewards') ? 'active' : ''; ?>" href="?section=rewards"><i class="bi bi-gift"></i> Rewards</a>
         <a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </nav>
 </div>
@@ -191,7 +207,6 @@
                     <h5><i class="bi bi-award me-2"></i>Your Certificates</h5>
                 </div>
                 <div class="card-body">
-
                     <?php if ($cert_result->num_rows > 0): ?>
                         <div class="row">
                             <?php while ($cert = $cert_result->fetch_assoc()): ?>
@@ -226,6 +241,48 @@
                     <?php endif; ?>
                 </div>
             </div>
+            <?php elseif ($active_section == 'rewards'): ?>
+                <div class="card shadow-sm mb-4" data-aos="fade-up">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="bi bi-gift me-2"></i>Your Rewards</h5>
+                    </div>
+                    <div class="card-body">
+
+                        <?php if ($reward_result && $reward_result->num_rows > 0): ?>
+                            <div class="row">
+                                <?php while ($reward = $reward_result->fetch_assoc()): ?>
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card h-100 shadow-sm border-success">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-gift-fill text-success" style="font-size: 3rem;"></i>
+
+                                                <h5 class="mt-3 fw-bold">
+                                                    <?php echo htmlspecialchars($reward['module_title']); ?>
+                                                </h5>
+
+                                                <p class="mt-2">
+                                                    🎁 <strong><?php echo htmlspecialchars($reward['rewards']); ?></strong>
+                                                </p>
+
+                                                <p class="text-muted small">
+                                                    Earned on:
+                                                    <?php echo date('F j, Y', strtotime($reward['completion_date'])); ?>
+                                                </p>
+
+                                                <span class="badge bg-success">Unlocked</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endwhile; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted text-center mb-0">
+                                You haven’t unlocked any rewards yet. Complete a module quiz to earn rewards 🌱
+                            </p>
+                        <?php endif; ?>
+
+                    </div>
+                </div>
         <?php elseif ($active_section == 'settings'): ?>
             <div class="card shadow-sm mb-4" data-aos="fade-up">
                 <div class="card-header bg-success text-white">
@@ -331,36 +388,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 AOS.init();
-
-// AJAX remove favorite
-$(function() {
-    $('.remove-fav-btn').on('click', function() {
-        var card = $(this).closest('.favorite-plant-card');
-        var plantId = card.data('plant-id');
-        var container = card.parent();
-        $.ajax({
-            url: 'remove_favorite.php',
-            method: 'POST',
-            data: { plant_id: plantId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    card.fadeOut(300, function() {
-                        $(this).remove();
-                        if (container.find('.favorite-plant-card').length === 0) {
-                            container.parent().append('<p>No favorite plants yet.</p>');
-                        }
-                    });
-                } else {
-                    alert(response.message || 'Failed to remove favorite.');
-                }
-            },
-            error: function() {
-                alert('Failed to remove favorite.');
-            }
-        });
-    });
-});
 </script>
 </body>
 </html>

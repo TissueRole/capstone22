@@ -13,17 +13,23 @@ if (isset($_POST['add_module'])) {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $image_path = trim($_POST['image_path']);
+    $rewards = trim($_POST['rewards'] ?? '');
 
-    if ($title != "" && $description != "") {
-        $stmt = $conn->prepare("INSERT INTO modules (title, description, image_path, created_at, updated_at) 
-                                VALUES (?, ?, ?, NOW(), NOW())");
-        $stmt->bind_param("sss", $title, $description, $image_path);
+    if ($title !== "" && $description !== "") {
+
+        $stmt = $conn->prepare("
+            INSERT INTO modules (title, description, image_path, rewards, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, NOW(), NOW())
+        ");
+
+        $stmt->bind_param("ssss", $title, $description, $image_path, $rewards);
 
         if ($stmt->execute()) {
             $success = "✅ Module added successfully!";
         } else {
             $error = "❌ Error adding module: " . $stmt->error;
         }
+
     } else {
         $error = "❌ Title and Description are required.";
     }
@@ -104,6 +110,18 @@ if (isset($_POST['add_module'])) {
                 <div class="mb-3">
                     <label class="form-label">Module Description</label>
                     <textarea name="description" class="form-control" rows="5" placeholder="Brief module description..." required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Module Rewards</label>
+                    <textarea 
+                        name="rewards" 
+                        class="form-control" 
+                        rows="1"
+                        placeholder="Enter Reward"
+                    ></textarea>
+                    <small class="text-muted">
+                        These rewards will be shown after the user passes the quiz.
+                    </small>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Image Path (URL)</label>

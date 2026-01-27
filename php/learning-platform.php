@@ -528,11 +528,13 @@ class TeenAnimLearning {
                 <div class="text-center p-5 w-100">
                     <h3 class="text-success fw-bold">🎉 Congratulations!</h3>
                     <p>You passed with a score of <strong>${result.score}%</strong>!</p>
-
+                     <h5 class="fw-bold mb-1">🎁 Reward Unlocked!</h5>
+                     <p class="mb-0">${this.currentModule.rewards}</p>
                     <p class="mt-3 text-success fw-semibold">
                         ${this.currentModule.module_id === 1 
                             ? 'ℹ️ This introductory module does not include a certificate.'
-                            : '🏆 Certificate Unlocked!'}
+                            : '🏆 Certificate Unlocked!'
+                            }
                     </p>
 
                     <div class="d-flex justify-content-center gap-3 mt-4">
@@ -549,7 +551,8 @@ class TeenAnimLearning {
                     </div>
 
                     <p class="text-muted mt-4 mb-0">
-                        This quiz is <strong>completed</strong> and cannot be retaken.
+                        This quiz is <strong>completed</strong> and cannot be retaken. <br>
+                        You can view your certificates and rewards in your profile.
                     </p>
                 </div>
             `;

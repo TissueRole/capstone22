@@ -16,6 +16,7 @@
             $description = $row['description'];
             $image_path = $row['image_path'];
             $current_image_path = $row['image_path'];
+            $rewards = $row['rewards']; 
         }
         else{
             echo "No module found";
@@ -26,6 +27,7 @@
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $title = mysqli_real_escape_string($conn, $_POST['title']);
         $description = mysqli_real_escape_string($conn, $_POST['description']);
+        $rewards = mysqli_real_escape_string($conn, $_POST['rewards'] ?? '');
         $id = $_POST['id'];
 
         // Handle image input (file upload or URL)
@@ -82,8 +84,15 @@
         }
 
         if(!empty($title) && !empty($description) && empty($message)){
-            $sql = "UPDATE modules SET title='$title', description='$description', image_path='$image_path', updated_at=CURRENT_TIMESTAMP WHERE module_id='$id'";
-            
+            $sql = "UPDATE modules 
+                SET 
+                    title='$title',
+                    description='$description',
+                    rewards='$rewards',
+                    image_path='$image_path',
+                    updated_at=CURRENT_TIMESTAMP 
+                WHERE module_id='$id'";
+
             if($conn->query($sql) === TRUE){
                 $message = "<div class='alert alert-success'>Module updated successfully!</div>";
                 // No redirect; stay on the edit page and show the success message
@@ -315,29 +324,12 @@
 
                         <label for="description" class="form-label fw-semibold fs-5 ">Description:</label>
                         <textarea class="form-control mb-3" id="description" name="description" rows="4" required><?php echo htmlspecialchars($description); ?></textarea>
+
+                        <label class="form-label">Module Rewards</label>
+                        <textarea name="rewards" class="form-control" rows="4"><?php echo htmlspecialchars($rewards ?? ''); ?></textarea>
                     </div>
                     
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold fs-5 ">Module Image:</label>
-                        <?php if(!empty($current_image_path)): ?>
-                            <div class="current-image-info">
-                                <p class="mb-2"><strong>Current Image:</strong></p>
-                                <?php if(filter_var($current_image_path, FILTER_VALIDATE_URL)): ?>
-                                    <img src="<?php echo htmlspecialchars($current_image_path); ?>" alt="Current module image" class="image-preview mb-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                    <p class="text-muted small" style="display: none;">External URL: <?php echo htmlspecialchars($current_image_path); ?></p>
-                                <?php else: ?>
-                                    <?php
-                                        $img_src = $current_image_path;
-                                        if (!filter_var($current_image_path, FILTER_VALIDATE_URL)) {
-                                            $img_src = preg_replace('/^(\.\.\/)+/', '', $current_image_path);
-                                            $img_src = '/' . $img_src;
-                                        }
-                                    ?>
-                                    <img src="<?php echo htmlspecialchars($img_src); ?>" alt="Current module image" class="image-preview mb-2">
-                                    <p class="text-muted small"><?php echo basename($current_image_path); ?></p>
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
                         <div class="image-input-tabs">
                             <button type="button" class="image-input-tab active" onclick="switchImageInput('upload')">Upload Image</button>
                             <button type="button" class="image-input-tab" onclick="switchImageInput('url')">Use URL</button>
