@@ -42,6 +42,7 @@ include('../connection.php');
         <a class="nav-link" href="#" onclick="showSection('lesson-management'); setActiveNav(this); return false;" id="nav-lesson"><i class="bi bi-book"></i>Lesson Management</a>
         <a class="nav-link" href="#" onclick="showSection('quiz-management'); setActiveNav(this); return false;" id="nav-quiz"><i class="bi bi-question-circle"></i>Quiz Management</a>
         <a class="nav-link" href="#" onclick="showSection('forum-management'); setActiveNav(this); return false;" id="nav-forum"><i class="bi bi-chat-dots"></i>Forum Management</a>
+        <a class="nav-link" href="#" onclick="showSection('reward-management'); setActiveNav(this); return false;" id="nav-reward"><i class="bi bi-gift"></i> Reward Management</a>
         <a class="nav-link" href="#" onclick="showSection('suggestions'); setActiveNav(this); return false;" id="nav-suggestions"><i class="bi bi-lightbulb"></i>Suggestions</a>
     </nav>
     <div class="content">
@@ -343,6 +344,81 @@ include('../connection.php');
                                     </a>
                                 </td>";
                             echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section id="reward-management" class="content-section card p-4">
+            <div class="section-title">
+                <i class="bi bi-gift"></i> Reward Management
+            </div>
+
+            <div class="mb-3">
+                <input type="text" id="reward-search" class="form-control" placeholder="Search rewards...">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Module</th>
+                            <th>Reward</th>
+                            <th>Status</th>
+                            <th>Unlocked At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rewardTable">
+                        <?php
+                        $rewards = $conn->query("
+                            SELECT 
+                                ur.reward_id,
+                                ur.reward_text,
+                                ur.status,
+                                ur.unlocked_at,
+                                ur.claimed_at,
+                                u.name AS user_name,
+                                m.title AS module_title
+                            FROM user_rewards ur
+                            JOIN users u ON ur.user_id = u.user_id
+                            JOIN modules m ON ur.module_id = m.module_id
+                            ORDER BY ur.unlocked_at DESC
+                        ");
+
+                        while ($row = $rewards->fetch_assoc()) {
+                            echo '<tr>';
+
+                            echo '<td>' . htmlspecialchars($row['user_name']) . '</td>';
+                            echo '<td>' . htmlspecialchars($row['module_title']) . '</td>';
+                            echo '<td>' . htmlspecialchars($row['reward_text']) . '</td>';
+
+                            if ($row['status'] === 'claimed') {
+                                echo "<td><span class='badge bg-secondary'>Claimed</span></td>";
+                            } else {
+                                echo "<td><span class='badge bg-warning text-dark'>Unclaimed</span></td>";
+                            }
+
+                            echo '<td>' . date('F j, Y', strtotime($row['unlocked_at'])) . '</td>';
+
+                            echo '<td>';
+                            if ($row['status'] === 'unclaimed') {
+                                echo "
+                                    <form method='POST' action='mark_reward_claimed.php' class='d-inline'>
+                                        <input type='hidden' name='reward_id' value='{$row['reward_id']}'>
+                                        <button class='btn btn-sm btn-success'>
+                                            <i class='bi bi-check-circle'></i> Mark Claimed
+                                        </button>
+                                    </form>
+                                ";
+                            } else {
+                                echo "<small class='text-muted'>✔ Claimed</small>";
+                            }
+                            echo '</td>';
+
+                            echo '</tr>';
                         }
                         ?>
                     </tbody>

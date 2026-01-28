@@ -523,7 +523,26 @@ class TeenAnimLearning {
             } else {
                 console.log('ℹ️ Module 1 - No certificate issued (by design)');
             }
+            if (this.currentModule.rewards) {
+                try {
+                    const rewardResponse = await fetch('learning/api/award_reward.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `module_id=${this.currentModule.module_id}`
+                    });
 
+                    const rewardText = await rewardResponse.text();
+                    console.log('🎁 Reward response:', rewardText);
+
+                    if (!rewardResponse.ok) {
+                        console.error('❌ Failed to save reward');
+                    }
+                } catch (err) {
+                    console.error('❌ Reward save error:', err);
+                }
+            }
             quizView.innerHTML = `
                 <div class="text-center p-5 w-100">
                     <h3 class="text-success fw-bold">🎉 Congratulations!</h3>

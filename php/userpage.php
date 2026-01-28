@@ -44,18 +44,16 @@
 
     $reward_sql = "
         SELECT 
-            m.module_id,
-            m.title AS module_title,
-            m.rewards,
-            qr.taken_at AS completion_date
-        FROM quiz_results qr
-        JOIN module_quizzes mq ON qr.quiz_id = mq.quiz_id
-        JOIN modules m ON mq.module_id = m.module_id
-        WHERE qr.user_id = {$_SESSION['user_id']}
-        AND qr.score >= 75
-        AND m.rewards IS NOT NULL
-        AND m.rewards != ''
-        ORDER BY qr.taken_at DESC
+            ur.reward_id,
+            ur.reward_text,
+            ur.status,
+            ur.unlocked_at,
+            ur.claimed_at,
+            m.title AS module_title
+        FROM user_rewards ur
+        JOIN modules m ON ur.module_id = m.module_id
+        WHERE ur.user_id = {$_SESSION['user_id']}
+        ORDER BY ur.unlocked_at DESC
     ";
     $reward_result = $conn->query($reward_sql);
 
@@ -247,34 +245,46 @@
                         <h5><i class="bi bi-gift me-2"></i>Your Rewards</h5>
                     </div>
                     <div class="card-body">
-
                         <?php if ($reward_result && $reward_result->num_rows > 0): ?>
-                            <div class="row">
-                                <?php while ($reward = $reward_result->fetch_assoc()): ?>
-                                    <div class="col-md-6 col-lg-4 mb-4">
-                                        <div class="card h-100 shadow-sm border-success">
-                                            <div class="card-body text-center">
-                                                <i class="bi bi-gift-fill text-success" style="font-size: 3rem;"></i>
+                        <div class="row">
+                            <?php while ($reward = $reward_result->fetch_assoc()): ?>
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 shadow-sm 
+                                        <?php echo $reward['status'] === 'claimed' ? 'border-success' : 'border-warning'; ?>">
+                                        
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-gift-fill 
+                                                <?php echo $reward['status'] === 'claimed' ? 'text-success' : 'text-warning'; ?>" 
+                                                style="font-size: 3rem;"></i>
 
-                                                <h5 class="mt-3 fw-bold">
-                                                    <?php echo htmlspecialchars($reward['module_title']); ?>
-                                                </h5>
+                                            <h5 class="mt-3 fw-bold">
+                                                <?php echo htmlspecialchars($reward['module_title']); ?>
+                                            </h5>
 
-                                                <p class="mt-2">
-                                                    🎁 <strong><?php echo htmlspecialchars($reward['rewards']); ?></strong>
+                                            <p class="mt-2">
+                                                🎁 <strong><?php echo htmlspecialchars($reward['reward_text']); ?></strong>
+                                            </p>
+
+                                            <p class="text-muted small">
+                                                Unlocked on:
+                                                <?php echo date('F j, Y', strtotime($reward['unlocked_at'])); ?>
+                                            </p>
+
+                                            <?php if ($reward['status'] === 'claimed'): ?>
+                                                <span class="badge bg-success">Claimed</span>
+                                                <p class="text-muted small mt-2">
+                                                    Claimed on:
+                                                    <?php echo date('F j, Y', strtotime($reward['claimed_at'])); ?>
                                                 </p>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning text-dark">Unclaimed</span>
+                                            <?php endif; ?>
 
-                                                <p class="text-muted small">
-                                                    Earned on:
-                                                    <?php echo date('F j, Y', strtotime($reward['completion_date'])); ?>
-                                                </p>
-
-                                                <span class="badge bg-success">Unlocked</span>
-                                            </div>
                                         </div>
                                     </div>
-                                <?php endwhile; ?>
-                            </div>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
                         <?php else: ?>
                             <p class="text-muted text-center mb-0">
                                 You haven’t unlocked any rewards yet. Complete a module quiz to earn rewards 🌱
