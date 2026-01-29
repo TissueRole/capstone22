@@ -48,10 +48,10 @@
         </li>
         <li><hr class="dropdown-divider"></li>
         <li>
-          <a class="dropdown-item" href="php/userpage.php">Profile</a>
+          <a class="dropdown-item" href="../php/userpage.php">Profile</a>
         </li>
         <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="php/logout.php">Logout</a></li>
+        <li><a class="dropdown-item" href="../php/logout.php">Logout</a></li>
       </ul>
     </div>
   </div>
