@@ -245,6 +245,22 @@
                         <h5><i class="bi bi-gift me-2"></i>Your Rewards</h5>
                     </div>
                     <div class="card-body">
+                        <div class="alert alert-info small mb-4">
+                            <strong>How to claim rewards:</strong>
+                            <ol class="mb-0 mt-2">
+                                <li>Complete a module and pass its quiz.</li>
+                                <li>Wait for the reward to unlock automatically.</li>
+                                <li>
+                                    Go to 
+                                    <a href="https://www.google.com/maps/search/?api=1&query=City+Veterinary+and+Agriculture+Office"
+                                    target="_blank"
+                                    class="fw-bold text-decoration-underline">
+                                        City Veterinary and Agriculture Office (CVAO)
+                                    </a>
+                                    to get your rewards and your certificate signed.
+                                </li>
+                            </ol>
+                        </div>
                         <?php if ($reward_result && $reward_result->num_rows > 0): ?>
                         <div class="row">
                             <?php while ($reward = $reward_result->fetch_assoc()): ?>
@@ -290,7 +306,6 @@
                                 You haven’t unlocked any rewards yet. Complete a module quiz to earn rewards 🌱
                             </p>
                         <?php endif; ?>
-
                     </div>
                 </div>
         <?php elseif ($active_section == 'settings'): ?>
