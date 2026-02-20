@@ -59,7 +59,6 @@ const UI = {
   btnOpenControls: el('btnOpenControls'),
   btnCloseControls: el('btnCloseControls'),
   controlsDrawer: el('controlsDrawer'),
-  controlsDrawer: el('controlsDrawer'),
   drawerBackdrop: el('drawerBackdrop'),
 
   // Scenario elements (header dropdown only)
@@ -794,7 +793,7 @@ function initializePlant() {
 // Load Lottie animation
 async function loadLottie() {
   try {
-    const res = await fetch('./tomato-plant.json');
+    const res = await fetch('simulation/sims/tomato-plant.json');
     if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
     const data = await res.json();
 
@@ -918,7 +917,7 @@ function bindUI() {
 // Load scenarios from JSON
 async function loadScenarios() {
   try {
-    const response = await fetch('data/scenarios.json');
+    const response = await fetch('simulation/sims/data/scenarios.json');
     state.scenarios = await response.json();
     populateScenarioSelector();
     console.log(`✅ Loaded ${state.scenarios.length} scenarios`);
@@ -930,7 +929,7 @@ async function loadScenarios() {
 // Load amendments from JSON
 async function loadAmendments() {
   try {
-    const response = await fetch('data/amendments.json');
+    const response = await fetch('simulation/sims/data/amendments.json');
     AMENDMENTS = await response.json();
     console.log(`✅ Loaded ${Object.keys(AMENDMENTS).length} soil amendments`);
   } catch (error) {
@@ -941,7 +940,7 @@ async function loadAmendments() {
 // Load varieties from JSON
 async function loadVarieties() {
   try {
-    const response = await fetch('data/varieties.json');
+    const response = await fetch('simulation/sims/data/varieties.json');
     VARIETIES = await response.json();
     console.log(`✅ Loaded ${VARIETIES.length} varieties`);
   } catch (error) {
@@ -954,7 +953,7 @@ async function loadVarieties() {
 // Load personalities from JSON
 async function loadPersonalities() {
   try {
-    const response = await fetch('data/personalities.json');
+    const response = await fetch('simulation/sims/data/personalities.json');
     PERSONALITIES = await response.json();
     console.log(`✅ Loaded ${PERSONALITIES.length} personalities`);
   } catch (error) {
@@ -967,7 +966,7 @@ async function loadPersonalities() {
 // Load motivational content
 async function loadMotivational() {
   try {
-    const response = await fetch('data/motivational-content.json');
+    const response = await fetch('simulation/sims/data/motivational-content.json');
     MOTIVATIONAL = await response.json();
     console.log(`✅ Loaded ${MOTIVATIONAL.quotes ? MOTIVATIONAL.quotes.length : 0} quotes`);
   } catch (error) {
