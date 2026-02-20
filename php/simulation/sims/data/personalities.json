@@ -1,0 +1,32 @@
+[
+    {
+        "id": "cheerful",
+        "name": "Cheerful",
+        "icon": "😊",
+        "dialogueStyle": "optimistic"
+    },
+    {
+        "id": "stoic",
+        "name": "Stoic",
+        "icon": "😐",
+        "dialogueStyle": "formal"
+    },
+    {
+        "id": "dramatic",
+        "name": "Dramatic",
+        "icon": "🎭",
+        "dialogueStyle": "emotional"
+    },
+    {
+        "id": "zen",
+        "name": "Zen",
+        "icon": "🧘",
+        "dialogueStyle": "calm"
+    },
+    {
+        "id": "energetic",
+        "name": "Energetic",
+        "icon": "⚡",
+        "dialogueStyle": "excited"
+    }
+]

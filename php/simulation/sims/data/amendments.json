@@ -1,0 +1,34 @@
+{
+    "LIME": {
+        "name": "Calcium Carbonate (Lime)",
+        "effect": "raises_ph",
+        "phChangePerDay": 0.15,
+        "maxApplications": 3,
+        "description": "Raises pH in acidic soil. Provides calcium.",
+        "cost": 10
+    },
+    "DOLOMITE": {
+        "name": "Dolomitic Lime (Ca+Mg)",
+        "effect": "raises_ph",
+        "phChangePerDay": 0.12,
+        "maxApplications": 3,
+        "description": "Raises pH and adds magnesium. Slower than lime but provides more nutrients.",
+        "cost": 15
+    },
+    "SULFUR": {
+        "name": "Elemental Sulfur",
+        "effect": "lowers_ph",
+        "phChangePerDay": -0.15,
+        "maxApplications": 3,
+        "description": "Lowers pH in alkaline soil. Takes time to work.",
+        "cost": 10
+    },
+    "IRON_CHELATE": {
+        "name": "Iron Chelate",
+        "effect": "treats_lockout",
+        "phChangePerDay": -0.05,
+        "maxApplications": 2,
+        "description": "Treats iron deficiency from high pH. Slightly lowers pH.",
+        "cost": 20
+    }
+}

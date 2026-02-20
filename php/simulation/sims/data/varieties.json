@@ -1,0 +1,38 @@
+[
+    {
+        "id": "cherry",
+        "name": "Cherry Tomato",
+        "description": "Small, sweet, and grows fast. Great for beginners.",
+        "icon": "🍒",
+        "totalDays": 55,
+        "yieldMultiplier": 1.0,
+        "resilience": 0.8
+    },
+    {
+        "id": "roma",
+        "name": "Roma Tomato",
+        "description": "Oval-shaped, meaty, and excellent for sauces.",
+        "icon": "🍅",
+        "totalDays": 75,
+        "yieldMultiplier": 1.2,
+        "resilience": 0.6
+    },
+    {
+        "id": "beefsteak",
+        "name": "Beefsteak",
+        "description": "Huge, juicy, and perfect for slicing.",
+        "icon": "🥩",
+        "totalDays": 85,
+        "yieldMultiplier": 1.5,
+        "resilience": 0.5
+    },
+    {
+        "id": "heirloom",
+        "name": "Heirloom",
+        "description": "Unique colors and flavors, but sensitive.",
+        "icon": "🎨",
+        "totalDays": 80,
+        "yieldMultiplier": 1.1,
+        "resilience": 0.4
+    }
+]

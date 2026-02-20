@@ -1,0 +1,337 @@
+[
+  {
+    "id": "scenario_001",
+    "title": "Nitrogen Deficiency Crisis",
+    "description": "Your tomato plant's lower leaves are turning yellow and growth has slowed. The plant is showing classic signs of nitrogen deficiency. Can you diagnose and fix the problem?",
+    "difficulty": "beginner",
+    "lockedControls": {
+      "water": true,
+      "light": true,
+      "temp": true,
+      "soilPh": true,
+      "phosphorus": true,
+      "potassium": true,
+      "containerSize": true
+    },
+    "initialConditions": {
+      "nitrogen": 25,
+      "phosphorus": 60,
+      "potassium": 75,
+      "soilPh": 6.5,
+      "water": 60,
+      "light": 70,
+      "temp": 25,
+      "containerSize": "LARGE_POT",
+      "health": 65,
+      "day": 30
+    },
+    "objectives": [
+      "Identify the nutrient deficiency",
+      "Restore nitrogen to optimal levels (60-80%)",
+      "Bring plant health above 80%"
+    ],
+    "successCriteria": {
+      "nitrogen": {
+        "min": 60,
+        "max": 100
+      },
+      "health": {
+        "min": 80
+      }
+    },
+    "hints": [
+      "Check the lower leaves - yellowing indicates nitrogen deficiency",
+      "Nitrogen is essential for leaf growth and green color",
+      "Optimal nitrogen range is 60-80%"
+    ],
+    "educationalContent": {
+      "topic": "Nitrogen Deficiency",
+      "explanation": "Nitrogen is crucial for vegetative growth and chlorophyll production. Deficiency shows as yellowing of older leaves first, as the plant moves nitrogen to new growth.",
+      "solution": "Apply nitrogen-rich fertilizer or compost to restore levels."
+    }
+  },
+  {
+    "id": "scenario_002",
+    "title": "Overwatering Recovery",
+    "description": "Your plant is wilting despite wet soil. The roots are struggling due to overwatering and lack of oxygen. Can you save the plant?",
+    "difficulty": "beginner",
+    "lockedControls": {
+      "light": true,
+      "temp": true,
+      "soilPh": true,
+      "nitrogen": true,
+      "phosphorus": true,
+      "potassium": true
+    },
+    "initialConditions": {
+      "nitrogen": 70,
+      "phosphorus": 60,
+      "potassium": 75,
+      "soilPh": 6.5,
+      "water": 95,
+      "light": 70,
+      "temp": 25,
+      "containerSize": "SMALL_POT",
+      "health": 55,
+      "day": 20
+    },
+    "objectives": [
+      "Reduce water to optimal levels (50-75%)",
+      "Increase container size to Medium or Large",
+      "Restore plant health above 75%"
+    ],
+    "successCriteria": {
+      "water": {
+        "min": 50,
+        "max": 75
+      },
+      "health": {
+        "min": 75
+      }
+    },
+    "hints": [
+      "Too much water drowns roots and prevents oxygen uptake",
+      "Reduce watering and allow soil to dry slightly",
+      "Larger containers provide better drainage",
+      "Optimal water range is 50-75%"
+    ],
+    "educationalContent": {
+      "topic": "Water Management",
+      "explanation": "Overwatering is one of the most common mistakes. Roots need oxygen as well as water. Waterlogged soil prevents gas exchange and can lead to root rot.",
+      "solution": "Allow soil to dry between waterings. Ensure good drainage with larger containers."
+    }
+  },
+  {
+    "id": "scenario_003_acidic",
+    "title": "Acidic Soil Recovery",
+    "description": "Your tomato plant shows yellowing leaves and stunted growth. Calcium and magnesium deficiency symptoms are visible. The soil pH is too low (acidic). Diagnose the problem and apply the correct treatment!",
+    "difficulty": "intermediate",
+    "phProblem": "acidic",
+    "phLocked": true,
+    "lockedControls": {
+      "water": true,
+      "light": true,
+      "temp": true,
+      "soilPh": true,
+      "nitrogen": true,
+      "phosphorus": true,
+      "potassium": true,
+      "containerSize": true
+    },
+    "lockedAmendments": {
+      "SULFUR": true,
+      "IRON_CHELATE": true
+    },
+    "initialConditions": {
+      "nitrogen": 70,
+      "phosphorus": 60,
+      "potassium": 75,
+      "soilPh": "random_acidic",
+      "water": 65,
+      "light": 75,
+      "temp": 24,
+      "containerSize": "LARGE_POT",
+      "health": 60,
+      "day": 30
+    },
+    "objectives": [
+      "Identify that pH is too low (acidic)",
+      "Apply appropriate amendment (Lime or Dolomite)",
+      "Restore pH to optimal range (6.0-6.8)",
+      "Recover plant health above 80%"
+    ],
+    "successCriteria": {
+      "soilPh": {
+        "min": 6.0,
+        "max": 6.8
+      },
+      "health": {
+        "min": 80
+      }
+    },
+    "hints": [
+      "Yellowing leaves can indicate calcium/magnesium deficiency",
+      "Check the pH value - is it below 6.0?",
+      "Lime raises pH in acidic soil",
+      "Dolomite provides both calcium and magnesium"
+    ],
+    "educationalContent": {
+      "topic": "Acidic Soil Management",
+      "explanation": "When soil pH is too low (acidic), calcium and magnesium become less available, causing deficiency symptoms. Tomatoes prefer pH 6.0-6.8.",
+      "solution": "Apply lime (calcium carbonate) or dolomite (calcium + magnesium) to raise pH gradually."
+    }
+  },
+  {
+    "id": "scenario_003_alkaline",
+    "title": "Alkaline Soil & Nutrient Lockout",
+    "description": "Your plant shows iron deficiency (yellowing between leaf veins) despite adequate nutrients. High pH is causing nutrient lockout. Diagnose and fix the problem!",
+    "difficulty": "intermediate",
+    "phProblem": "alkaline",
+    "phLocked": true,
+    "lockedControls": {
+      "water": true,
+      "light": true,
+      "temp": true,
+      "soilPh": true,
+      "nitrogen": true,
+      "phosphorus": true,
+      "potassium": true,
+      "containerSize": true
+    },
+    "lockedAmendments": {
+      "LIME": true,
+      "DOLOMITE": true
+    },
+    "initialConditions": {
+      "nitrogen": 70,
+      "phosphorus": 60,
+      "potassium": 75,
+      "soilPh": "random_alkaline",
+      "water": 65,
+      "light": 75,
+      "temp": 24,
+      "containerSize": "LARGE_POT",
+      "health": 55,
+      "day": 35
+    },
+    "objectives": [
+      "Identify that pH is too high (alkaline)",
+      "Apply sulfur to lower pH",
+      "Apply iron chelate to treat deficiency",
+      "Restore pH to optimal range (6.0-6.8)",
+      "Recover plant health above 80%"
+    ],
+    "successCriteria": {
+      "soilPh": {
+        "min": 6.0,
+        "max": 6.8
+      },
+      "health": {
+        "min": 80
+      }
+    },
+    "hints": [
+      "Yellowing between veins indicates iron deficiency",
+      "High pH (alkaline) locks out iron and micronutrients",
+      "Sulfur lowers pH in alkaline soil",
+      "Iron chelate treats symptoms while pH adjusts"
+    ],
+    "educationalContent": {
+      "topic": "Alkaline Soil & Nutrient Lockout",
+      "explanation": "At high pH (above 7.0), iron, manganese, and phosphorus become unavailable even if present in soil. This is called nutrient lockout.",
+      "solution": "Apply elemental sulfur to lower pH. Use iron chelate for immediate symptom relief."
+    }
+  },
+  {
+    "id": "scenario_004",
+    "title": "Small Space Optimization",
+    "description": "You're growing tomatoes on a small balcony with limited space. Your plant is in a small pot and struggling. Can you optimize the conditions despite space constraints?",
+    "difficulty": "intermediate",
+    "lockedControls": {
+      "water": true,
+      "light": true,
+      "temp": true,
+      "soilPh": true,
+      "containerSize": true
+    },
+    "initialConditions": {
+      "nitrogen": 50,
+      "phosphorus": 45,
+      "potassium": 60,
+      "soilPh": 6.2,
+      "water": 40,
+      "light": 55,
+      "temp": 25,
+      "containerSize": "SMALL_POT",
+      "health": 50,
+      "day": 25
+    },
+    "objectives": [
+      "Optimize all nutrient levels for small container",
+      "Maximize light exposure",
+      "Bring health above 75% despite small pot"
+    ],
+    "successCriteria": {
+      "nitrogen": {
+        "min": 60
+      },
+      "phosphorus": {
+        "min": 50
+      },
+      "potassium": {
+        "min": 65
+      },
+      "health": {
+        "min": 75
+      }
+    },
+    "hints": [
+      "Small containers dry out faster and have limited nutrients",
+      "Fertilize more frequently in small pots",
+      "Focus on optimizing nitrogen, phosphorus, and potassium"
+    ],
+    "educationalContent": {
+      "topic": "Urban Container Gardening",
+      "explanation": "Small containers limit root growth and nutrient reserves. They require more frequent watering and fertilization. However, they're perfect for balconies and small spaces.",
+      "solution": "Use high-quality potting mix, fertilize regularly, and monitor moisture closely."
+    }
+  },
+  {
+    "id": "scenario_005",
+    "title": "Balanced Nutrition Challenge",
+    "description": "Your plant is entering the flowering stage and needs balanced NPK nutrition. Too much nitrogen will promote leaves over flowers. Can you achieve the perfect balance?",
+    "difficulty": "advanced",
+    "lockedControls": {
+      "water": true,
+      "light": true,
+      "temp": true,
+      "soilPh": true,
+      "containerSize": true
+    },
+    "initialConditions": {
+      "nitrogen": 85,
+      "phosphorus": 40,
+      "potassium": 50,
+      "soilPh": 6.4,
+      "water": 65,
+      "light": 75,
+      "temp": 26,
+      "containerSize": "RAISED_BED",
+      "health": 70,
+      "day": 45
+    },
+    "objectives": [
+      "Reduce nitrogen to 60-70% (avoid excess vegetative growth)",
+      "Increase phosphorus to 50-70% (promote flowering)",
+      "Increase potassium to 70-85% (fruit development)",
+      "Achieve health above 90%"
+    ],
+    "successCriteria": {
+      "nitrogen": {
+        "min": 60,
+        "max": 70
+      },
+      "phosphorus": {
+        "min": 50,
+        "max": 70
+      },
+      "potassium": {
+        "min": 70,
+        "max": 85
+      },
+      "health": {
+        "min": 90
+      }
+    },
+    "hints": [
+      "During flowering, reduce N and increase P and K",
+      "Phosphorus promotes root and flower development",
+      "Potassium improves fruit quality and disease resistance"
+    ],
+    "educationalContent": {
+      "topic": "Stage-Specific Nutrition",
+      "explanation": "Plant nutrient needs change through growth stages. Flowering and fruiting plants need less nitrogen (which promotes leaves) and more phosphorus and potassium for flowers and fruits.",
+      "solution": "Use bloom fertilizers (lower N, higher P-K ratio) during flowering stage."
+    }
+  }
+]

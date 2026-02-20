@@ -1,210 +1,304 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simulation</title>
-  <link rel="stylesheet" href="simulation/sims/styles.css" />
-  <link rel="stylesheet" href="simulation/sims/navbar-simulation.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🍅 Tomato Growth Simulator</title>
+  <link rel="stylesheet" href="simulation/sims/styles.css?v=4" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 </head>
+
 <body>
-  <!-- Standalone Navbar for Simulation (No Bootstrap) -->
-  <nav class="navbar-simulation">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.php">
-        <img src="../images/clearteenalogo.png" class="teenanimlogo" alt="home logo">
-        TEEN-ANIM
-      </a>
-      <button class="navbar-toggler" id="navToggle" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <ul class="navbar-menu" id="navMenu">
-        <li class="nav-item">
-          <a class="nav-link" href="modulepage.php">Module</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="Forum/community.php">Farming Community</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="simulation.php">Simulation</a>
-        </li>
-      </ul>
+  <!-- Fixed Header -->
+  <header class="sim-header">
+    <div class="header-left">
+      <h1>🍅 Tomato Simulator</h1>
     </div>
-  </nav>
-
-  <!-- Profile Dropdown (only if logged in) -->
-  <div class="profile-dropdown-sim">
-    <div class="dropdown">
-      <button class="dropdown-toggle" id="profileDropdownSim" aria-expanded="false">
-        <img src="../images/clearteenalogo.png" alt="Profile" class="profile-pic-navbar-sim">
-      </button>
-      <ul class="dropdown-menu" id="profileMenu">
-        <li class="dropdown-header">
-          <img src="../images/clearteenalogo.png" alt="Profile">
-          <div style="font-weight: 600;">User Name</div>
-          <div style="font-size: 0.95em; color: #388e3c; margin-top: 2px; font-weight: 500;">
-            Student
-          </div>
-        </li>
-        <li><hr class="dropdown-divider"></li>
-        <li>
-          <a class="dropdown-item" href="../php/userpage.php">Profile</a>
-        </li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="../php/logout.php">Logout</a></li>
-      </ul>
+    <div class="header-center">
+      <button id="btnPlayPause" class="btn btn-icon">▶️</button>
+      <button id="btnReset" class="btn btn-icon">🔄</button>
+      <div class="time-scrubber-compact">
+        <input type="range" id="timeScrub" min="0" max="100" value="0" class="scrubber-input" />
+        <span id="timePct" class="time-label">0%</span>
+      </div>
+      <div class="speed-control-compact">
+        <label>Speed:</label>
+        <input type="range" id="speed" min="0.1" max="5" step="0.1" value="1" class="speed-input" />
+        <span id="speedLabel" class="speed-label">1.00×</span>
+      </div>
     </div>
-  </div>
-
-  <header class="header">
-    <div>
-      <p class="sub">Original simulation that shows how Water/light/temperature affect growth + health.</p>
+    <div class="header-scenario">
+      <select id="scenarioSelectHeader" class="scenario-select-header">
+        <option value="">🎯 Select Scenario</option>
+      </select>
     </div>
-    <div class="header__actions">
-      <button id="btnReset" class="btn">Reset</button>
-      <button id="btnPlayPause" class="btn btn--primary">Play</button>
+    <div class="header-right">
+      <button id="btnToggleControls" class="btn btn-icon" title="Environmental Controls">⚙️</button>
     </div>
   </header>
 
-  <main class="layout">
-    <section class="panel">
-      <div class="card">
-        <h2 class="card__title">Plant</h2>
-        <div class="stageRow">
-          <div class="badge" id="stageBadge">Stage: —</div>
-          <div class="badge" id="statusBadge">Status: —</div>
-        </div>
-
-        <div class="viewer">
-          <div id="lottie"></div>
-          <div class="overlay">
-            <div class="overlay__bar">
-              <div class="overlay__barFill" id="healthBar"></div>
-            </div>
-            <div class="overlay__label" id="healthLabel">Health: 100%</div>
-          </div>
-        </div>
-
-        <div class="progress">
-          <div class="progress__row">
-            <label for="timeScrub">Time</label>
-            <input id="timeScrub" type="range" min="0" max="100" step="0.1" value="0" />
-            <span id="timePct" class="mono">0%</span>
-          </div>
-          <div class="progress__row">
-            <label for="speed">Speed</label>
-            <input id="speed" type="range" min="0" max="3" step="0.05" value="1" />
-            <span id="speedLabel" class="mono">1.00×</span>
-          </div>
+  <!-- Main Simulation Canvas -->
+  <main class="sim-canvas">
+    <!-- Floating Status Cards -->
+    <div class="status-cards">
+      <div class="status-card status-card-health">
+        <span class="status-emoji" id="statusEmoji">🌟</span>
+        <div class="status-content">
+          <span class="status-value" id="healthValue">100%</span>
+          <span class="status-label">Health</span>
         </div>
       </div>
-
-      <div class="card">
-        <h2 class="card__title">Environment Inputs</h2>
-
-        <div class="control">
-          <div class="control__top">
-            <label for="water">Water</label>
-            <span class="mono" id="waterLabel">50%</span>
-          </div>
-          <input id="water" type="range" min="0" max="100" step="1" value="50" />
-          <small class="hint">Too low dries out. Too high can cause root stress.</small>
-        </div>
-
-        <div class="control">
-          <div class="control__top">
-            <label for="light">Light</label>
-            <span class="mono" id="lightLabel">60%</span>
-          </div>
-          <input id="light" type="range" min="0" max="100" step="1" value="60" />
-          <small class="hint">More light increases growth, up to an optimal point.</small>
-        </div>
-
-        <div class="control">
-          <div class="control__top">
-            <label for="temp">Temperature</label>
-            <span class="mono" id="tempLabel">24°C</span>
-          </div>
-          <input id="temp" type="range" min="5" max="40" step="1" value="24" />
-          <small class="hint">Tomatoes prefer warm conditions; extremes slow growth and reduce health.</small>
-        </div>
-
-        <div class="card__footer">
-          <div class="kpi">
-            <div class="kpi__label">Growth rate</div>
-            <div class="kpi__value mono" id="growthRate">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi__label">Health change</div>
-            <div class="kpi__value mono" id="healthDelta">—</div>
-          </div>
+      <!-- Health Bar (inline in status column) -->
+      <div class="status-card status-card-healthbar">
+        <div class="health-bar-inline">
+          <div id="healthBarFill" class="health-bar-fill"></div>
+          <div id="healthBarText" class="health-bar-text">100%</div>
         </div>
       </div>
-    </section>
-
-    <aside class="panel">
-      <div class="card">
-        <h2 class="card__title">How it works</h2>
-        <ul class="bullets">
-          <li>Growth is simulated as a <strong>progress value</strong> (0–100%).</li>
-          <li>Inputs change <strong>growth rate</strong> and <strong>health</strong> continuously.</li>
-          <li>The tomato animation is scrubbed to the corresponding frame.</li>
-        </ul>
-        <p class="note">This is an original implementation (not copied from any site). You can tune the formulas in <code>sim.js</code>.</p>
+      <div class="status-card status-card-stage">
+        <span class="status-emoji">🌱</span>
+        <div class="status-content">
+          <span class="status-value" id="stageValue">Seed</span>
+          <span class="status-label">Stage</span>
+        </div>
       </div>
-
-      <div class="card">
-        <h2 class="card__title">Stages</h2>
-        <div class="stages" id="stageList"></div>
+      <div class="status-card status-card-day">
+        <span class="status-emoji">📅</span>
+        <div class="status-content">
+          <span class="status-value" id="dayValue">Day 0</span>
+        </div>
       </div>
-    </aside>
+      <!-- Metrics -->
+      <div class="status-card status-card-metric">
+        <span class="status-emoji">📈</span>
+        <div class="status-content">
+          <span class="status-value" id="growthRate">0.00 d/s</span>
+          <span class="status-label">Growth</span>
+        </div>
+      </div>
+      <div class="status-card status-card-metric">
+        <span class="status-emoji">💚</span>
+        <div class="status-content">
+          <span class="status-value" id="healthDelta">+0.00%/s</span>
+          <span class="status-label">Health Δ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plant Viewer (Center) -->
+    <div class="plant-viewer-canvas">
+      <div id="lottie" class="lottie-container"></div>
+    </div>
   </main>
 
-  <footer class="footer">
-    <span class="muted">Tip: keep water ~50%, light ~70%, temp ~24°C for best growth.</span>
-  </footer>
+  <!-- Drawer Backdrop -->
+  <div id="drawerBackdrop" class="drawer-backdrop"></div>
 
-  <!-- Vanilla JS for dropdown and mobile menu -->
-  <script>
-    // Mobile menu toggle
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
-    
-    if (navToggle) {
-      navToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('show');
-      });
-    }
-    
-    // Profile dropdown toggle
-    const profileDropdown = document.getElementById('profileDropdownSim');
-    const profileMenu = document.getElementById('profileMenu');
-    
-    if (profileDropdown) {
-      profileDropdown.addEventListener('click', (e) => {
-        e.stopPropagation();
-        profileMenu.classList.toggle('show');
-      });
-    }
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (profileMenu && !e.target.closest('.dropdown')) {
-        profileMenu.classList.remove('show');
-      }
-      if (navMenu && !e.target.closest('.navbar-simulation') && window.innerWidth < 992) {
-        navMenu.classList.remove('show');
-      }
-    });
-  </script>
-  
-  <!-- Load Lottie -->
-  <script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
-  <script>
-    if (!window.lottie || typeof window.lottie.loadAnimation !== 'function') {
-      console.error('Lottie failed to load. window.lottie=', window.lottie);
-    }
-  </script>
-  <script type="module" src="simulation/sims/sim.js"></script>
+  <!-- Side Drawer (Controls) -->
+  <div id="controlsDrawer" class="side-drawer">
+    <div class="drawer-header">
+      <h3>⚙️ Environmental Controls</h3>
+      <button id="btnCloseControls" class="close-btn">✕</button>
+    </div>
+    <div class="drawer-body">
+      <!-- Water -->
+      <div class="control-section">
+        <div class="control-header">
+          <span class="control-icon">💧</span>
+          <span class="control-title">Water</span>
+          <span id="waterLabel" class="control-value">50%</span>
+        </div>
+        <input type="range" id="water" min="0" max="100" value="60" class="control-slider" />
+        <div class="control-hint">Optimal: 50-75%</div>
+      </div>
+
+      <!-- Light -->
+      <div class="control-section">
+        <div class="control-header">
+          <span class="control-icon">☀️</span>
+          <span class="control-title">Light Intensity</span>
+          <span id="lightLabel" class="control-value">50%</span>
+        </div>
+        <input type="range" id="light" min="0" max="100" value="75" class="control-slider" />
+        <div class="control-hint">Optimal: varies by stage</div>
+      </div>
+
+      <!-- Temperature -->
+      <div class="control-section">
+        <div class="control-header">
+          <span class="control-icon">🌡️</span>
+          <span class="control-title">Temperature</span>
+          <span id="tempLabel" class="control-value">25°C</span>
+        </div>
+        <input type="range" id="temp" min="10" max="40" value="25" class="control-slider" />
+        <div class="control-hint">Optimal: 21-29°C</div>
+      </div>
+
+      <!-- Soil & Nutrients -->
+      <div class="control-section-group">
+        <h4 class="section-group-title">🧪 Soil & Nutrients</h4>
+
+        <!-- pH -->
+        <div class="control-section">
+          <div class="control-header">
+            <span class="control-title">Soil pH</span>
+            <span id="phLabel" class="control-value">6.5</span>
+          </div>
+          <input type="range" id="soilPh" min="4.0" max="9.0" step="0.1" value="6.5" class="control-slider" />
+          <div class="control-hint">Optimal: 6.0-6.8</div>
+        </div>
+
+        <!-- Nitrogen -->
+        <div class="control-section">
+          <div class="control-header">
+            <span class="control-title">Nitrogen (N)</span>
+            <span id="nitrogenLabel" class="control-value">70%</span>
+          </div>
+          <input type="range" id="nitrogen" min="0" max="100" value="70" class="control-slider" />
+          <div class="control-hint">Optimal: 60-80%</div>
+        </div>
+
+        <!-- Phosphorus -->
+        <div class="control-section">
+          <div class="control-header">
+            <span class="control-title">Phosphorus (P)</span>
+            <span id="phosphorusLabel" class="control-value">60%</span>
+          </div>
+          <input type="range" id="phosphorus" min="0" max="100" value="60" class="control-slider" />
+          <div class="control-hint">Optimal: 50-70%</div>
+        </div>
+
+        <!-- Potassium -->
+        <div class="control-section">
+          <div class="control-header">
+            <span class="control-title">Potassium (K)</span>
+            <span id="potassiumLabel" class="control-value">75%</span>
+          </div>
+          <input type="range" id="potassium" min="0" max="100" value="75" class="control-slider" />
+          <div class="control-hint">Optimal: 65-85%</div>
+        </div>
+
+        <!-- Container Size -->
+        <div class="control-section">
+          <div class="control-header">
+            <span class="control-title">Container Size</span>
+          </div>
+          <select id="containerSize" class="control-select">
+            <option value="SMALL">Small (1-2 gal)</option>
+            <option value="MEDIUM" selected>Medium (3-5 gal)</option>
+            <option value="LARGE">Large (7-10 gal)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Soil Amendments (shown during pH scenarios) -->
+      <div id="amendmentsPanel" class="control-section-group" style="display: none;">
+        <h4 class="section-group-title">🧪 Soil Amendments</h4>
+        <p class="amendment-hint">Diagnose the pH problem and apply appropriate treatments</p>
+        <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-secondary);">
+          Current pH: <span id="phDisplay">6.5</span> | Target: 6.0-6.8
+        </p>
+
+        <div class="amendment-buttons-grid">
+          <button id="btnApplyLime" class="btn btn-treatment-compact" title="Raises pH">
+            <span class="treatment-icon">🟢</span>
+            <span>Lime</span>
+          </button>
+          <button id="btnApplyDolomite" class="btn btn-treatment-compact" title="Raises pH + Mg">
+            <span class="treatment-icon">🟢</span>
+            <span>Dolomite</span>
+          </button>
+          <button id="btnApplySulfur" class="btn btn-treatment-compact" title="Lowers pH">
+            <span class="treatment-icon">🔴</span>
+            <span>Sulfur</span>
+          </button>
+          <button id="btnApplyIron" class="btn btn-treatment-compact" title="Lowers pH + Fe">
+            <span class="treatment-icon">🔴</span>
+            <span>Iron</span>
+          </button>
+        </div>
+
+        <div class="amendment-log-container">
+          <div class="amendment-log-header" id="amendmentLogHeader">
+            <strong>Treatment Log</strong>
+            <span class="toggle-icon">▼</span>
+          </div>
+          <div id="amendmentLog" class="amendment-log collapsed"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Drawer (Scenarios) -->
+  <div id="scenarioBottomSheet" class="bottom-sheet">
+    <div class="bottom-sheet-backdrop" id="bottomSheetBackdrop"></div>
+    <div class="bottom-sheet-content" id="bottomSheetContent">
+      <div class="bottom-sheet-handle"></div>
+      <!-- Issue #2 & #9: Left drag handle for expand/collapse -->
+      <div class="bottom-sheet-drag-handle-left" id="bottomSheetDragHandleLeft" title="Drag to expand/collapse">⇅</div>
+
+      <!-- Collapsed Header (always visible) -->
+      <div class="bottom-sheet-header" id="bottomSheetHeader">
+        <div class="scenario-title-compact">
+          <h4 id="scenarioTitleCompact"></h4>
+          <span id="scenarioCurrentObjective" class="current-objective"></span>
+        </div>
+        <div class="scenario-progress-compact">
+          <div class="progress-bar-mini">
+            <div id="scenarioProgressFillMini" class="progress-fill-mini"></div>
+          </div>
+          <span id="scenarioProgressPercent" class="progress-percent">0%</span>
+        </div>
+        <button id="btnCancelScenarioCompact" class="btn-cancel-compact" title="Cancel Scenario">✕</button>
+      </div>
+
+      <!-- Expanded Body (hidden by default) -->
+      <div class="bottom-sheet-body" id="bottomSheetBody">
+        <!-- Scenario Details (shown when scenario is active) -->
+        <div id="scenarioDetails" style="display: none; margin-top: var(--spacing-lg);">
+          <h3 id="scenarioTitle"></h3>
+          <p id="scenarioDescription"></p>
+
+          <div class="scenario-objectives">
+            <strong>📋 Objectives:</strong>
+            <ul id="scenarioObjectives"></ul>
+          </div>
+
+          <div class="scenario-hints" style="margin-top: var(--spacing-md);">
+            <strong>💡 Hints:</strong>
+            <ul id="scenarioHints"></ul>
+          </div>
+
+          <div class="scenario-educational" style="margin-top: var(--spacing-md);">
+            <strong>📚 Educational Content:</strong>
+            <p id="scenarioEducational"></p>
+          </div>
+
+          <div class="scenario-success" style="margin-top: var(--spacing-md);">
+            <strong>✅ Success Criteria:</strong>
+            <ul id="scenarioSuccessCriteria"></ul>
+          </div>
+
+          <div class="scenario-progress" style="margin-top: var(--spacing-md);">
+            <strong>Progress:</strong>
+            <div id="scenarioProgressBar" class="progress-bar">
+              <div id="scenarioProgressFill" class="progress-fill"></div>
+            </div>
+            <p id="scenarioStatus"></p>
+          </div>
+
+          <div class="bottom-sheet-actions">
+            <button id="btnCompleteScenario" class="btn btn-success" disabled>Complete Scenario</button>
+            <button id="btnCancelScenario" class="btn btn-secondary">Cancel Scenario</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="simulation/sims/config.js"></script>
+  <script src="simulation/sims/sim.js?v=4"></script>
 </body>
+
 </html>
