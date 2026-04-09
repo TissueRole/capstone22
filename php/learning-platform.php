@@ -128,7 +128,7 @@ if ($module_id) {
             <!-- Lesson Content -->
             <div class="lesson-content">
                 <div id="lesson-read-hint" class="lesson-read-hint">
-                    Scroll to the end of this lesson to unlock completion.
+                    Read at your own pace and ENJOY!
                 </div>
                 <div class="lesson-body" id="lesson-body"></div>
             </div>
@@ -355,18 +355,18 @@ class TeenAnimLearning {
 
         if (!this.currentLessonCheckpointsPassed) {
             hint.classList.remove('ready');
-            hint.textContent = 'Answer all checkpoint questions correctly to unlock completion.';
+            //hint.textContent = 'Answer all checkpoint questions correctly to unlock completion.';
             return;
         }
 
         if (this.lessonReachedEnd) {
             hint.classList.add('ready');
-            hint.textContent = 'Completion unlocked. You reached the end of the lesson.';
+            //hint.textContent = 'Completion unlocked. You reached the end of the lesson.';
             return;
         }
 
         hint.classList.remove('ready');
-        hint.textContent = 'Scroll to the end of this lesson to unlock completion.';
+        //hint.textContent = 'Scroll to the end of this lesson to unlock completion.';
     }
 
     handleLessonScroll() {
