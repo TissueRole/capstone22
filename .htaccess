@@ -1,0 +1,8 @@
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} !=localhost
+RewriteCond %{HTTP_HOST} !=127.0.0.1
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+php_value auto_prepend_file "C:/xampp/htdocs/capstone22/php/bootstrap.php"
+php_value session.save_path "C:/xampp/htdocs/capstone22/tmp/sessions"

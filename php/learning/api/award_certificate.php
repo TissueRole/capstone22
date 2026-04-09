@@ -1,6 +1,7 @@
 <?php
 require '../../connection.php';
 session_start();
+include '../../notifications/notifications_helper.php';
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
@@ -83,6 +84,13 @@ if (!$insert->execute()) {
 
 $certificate_id = $conn->insert_id;
 $insert->close();
+create_notification(
+    $conn,
+    $user_id,
+    'certificate_earned',
+    'A new certificate is now available for one of your completed modules.',
+    '../../userpage.php?section=certificates'
+);
 
 /* ✅ Success */
 http_response_code(200);

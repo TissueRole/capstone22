@@ -41,7 +41,7 @@
           <p class="lead my-2 fs-3" data-aos="fade-up">Empowering the next generation of farmers</p>
           <p class="mb-4 fs-4" data-aos="fade-up" data-aos-delay="100">Join us in exploring the exciting world of agriculture. Learn, grow, and connect with fellow young farmers. Together, we can cultivate a sustainable future.</p>
           <?php if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true): ?>
-              <a href="php/signup.php" class="btn btn-lg btn-warning px-5 py-2" data-aos="zoom-in" data-aos-delay="200">Get Started</a>
+              <a href="php/signup.php" class="btn btn-lg btn-warning px-5 py-2 mb-4" data-aos="zoom-in" data-aos-delay="200">Get Started</a>
           <?php endif; ?>
         </div>
         

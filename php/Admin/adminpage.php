@@ -5,6 +5,14 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
     exit();
 }
 include('../connection.php');
+include('../Forum/forum_reports_bootstrap.php');
+
+// Auto-add 'seen' column if it doesn't exist (safe to run every time)
+$conn->query("ALTER TABLE suggestions ADD COLUMN IF NOT EXISTS seen TINYINT(1) DEFAULT 0");
+
+// Count unseen suggestions for the badge
+$unseenResult = $conn->query("SELECT COUNT(*) as cnt FROM suggestions WHERE seen = 0");
+$unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +51,12 @@ include('../connection.php');
         <a class="nav-link" href="#" onclick="showSection('quiz-management'); setActiveNav(this); return false;" id="nav-quiz"><i class="bi bi-question-circle"></i>Quiz Management</a>
         <a class="nav-link" href="#" onclick="showSection('forum-management'); setActiveNav(this); return false;" id="nav-forum"><i class="bi bi-chat-dots"></i>Forum Management</a>
         <a class="nav-link" href="#" onclick="showSection('reward-management'); setActiveNav(this); return false;" id="nav-reward"><i class="bi bi-gift"></i> Reward Management</a>
-        <a class="nav-link" href="#" onclick="showSection('suggestions'); setActiveNav(this); return false;" id="nav-suggestions"><i class="bi bi-lightbulb"></i>Suggestions</a>
+        <a class="nav-link" href="#" onclick="showSection('suggestions'); setActiveNav(this); markSuggestionsSeen(); return false;" id="nav-suggestions">
+            <i class="bi bi-lightbulb"></i>Suggestions
+            <?php if ($unseenCount > 0): ?>
+                <span id="suggestion-badge" class="badge bg-danger rounded-pill ms-1" style="font-size:0.75rem;"><?php echo $unseenCount; ?></span>
+            <?php endif; ?>
+        </a>
     </nav>
     <div class="content">
         <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
@@ -127,7 +140,7 @@ include('../connection.php');
                         <th>Image</th>
                         <th>Created_at</th>
                         <th>Updated_at</th>
-                        <th>Edit</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="moduleTable">
@@ -154,8 +167,9 @@ include('../connection.php');
                         }
                         echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['updated_at']) . "</td>";
-                        echo "<td>
-                                <a href='editmodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i>Edit</a>
+                        echo "<td class='d-flex gap-1'>
+                                <a href='editmodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i> Edit</a>
+                                <a href='deletemodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Are you sure you want to delete the module: &quot;" . htmlspecialchars(addslashes($row['title'])) . "&quot;?\\n\\nThis will also delete all its lessons and cannot be undone.')\"><i class='bi bi-trash'></i> Delete</a>
                               </td>";
                         echo "</tr>";
                     }
@@ -240,6 +254,7 @@ include('../connection.php');
         </section>
         <section id="forum-management" class="content-section card p-4">
             <div class="section-title"><i class="bi bi-chat-dots"></i> Forum Management</div>
+            <p class="text-muted mb-4">Use this section to approve new threads, remove inappropriate replies, and review content reported by users.</p>
 
             <!-- ===== Manage Questions ===== -->
             <h5 class="mb-3"><i class="bi bi-question-circle"></i> Manage Questions</h5>
@@ -349,6 +364,55 @@ include('../connection.php');
                     </tbody>
                 </table>
             </div>
+
+            <h5 class="mb-3 mt-4"><i class="bi bi-flag"></i> Reported Content</h5>
+            <div class="mb-3">
+                <input type="text" id="report-search" class="form-control" placeholder="Search reports...">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Target ID</th>
+                            <th>Reason</th>
+                            <th>Reporter</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTable">
+                        <?php
+                        $reports = $conn->query("
+                            SELECT fr.*, u.username
+                            FROM forum_reports fr
+                            JOIN users u ON fr.reporter_user_id = u.user_id
+                            ORDER BY fr.created_at DESC
+                        ");
+                        while ($row = $reports->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($row['report_id']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['target_type']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['target_id']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['reason']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['username']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+                            echo "<td>";
+                            if ($row['target_type'] === 'question') {
+                                echo "<a href='deletequestions.php?id=" . $row['target_id'] . "' class='btn btn-sm btn-outline-danger me-1'><i class='bi bi-trash'></i> Delete Thread</a>";
+                            } else {
+                                echo "<a href='deletereply.php?id=" . $row['target_id'] . "' class='btn btn-sm btn-outline-danger me-1'><i class='bi bi-trash'></i> Delete Reply</a>";
+                            }
+                            echo "<a href='resolve_report.php?id=" . $row['report_id'] . "' class='btn btn-sm btn-outline-success'><i class='bi bi-check2-circle'></i> Resolve</a>";
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </section>
         <section id="reward-management" class="content-section card p-4">
             <div class="section-title">
@@ -426,7 +490,13 @@ include('../connection.php');
             </div>
         </section>
         <section id="suggestions" class="content-section card p-4">
-            <div class="section-title"><i class="bi bi-lightbulb"></i>Suggestions</div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="section-title mb-0"><i class="bi bi-lightbulb"></i>Suggestions</div>
+                <a href="deletesuggestion.php?clear_all=1" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Delete ALL suggestions? This cannot be undone.')">
+                    <i class="bi bi-trash"></i> Delete All
+                </a>
+            </div>
             <div class="mb-3">
                 <input type="text" id="suggestion-search" class="form-control" placeholder="Search suggestions...">
             </div>
@@ -437,6 +507,7 @@ include('../connection.php');
                         <th>Message</th>
                         <th>Date</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="suggestionTable">
@@ -452,6 +523,12 @@ include('../connection.php');
                                     <option value='approved'" . ($row['status'] == 'approved' ? ' selected' : '') . ">Approved</option>
                                     <option value='rejected'" . ($row['status'] == 'rejected' ? ' selected' : '') . ">Rejected</option>
                                 </select>
+                            </td>";
+                        echo "<td>
+                                <a href='deletesuggestion.php?id=" . $row['suggestion_id'] . "' class='btn btn-sm btn-danger'
+                                   onclick=\"return confirm('Delete this suggestion?')\">
+                                    <i class='bi bi-trash'></i> Delete
+                                </a>
                             </td>";
                         echo "</tr>";
                     }
@@ -572,6 +649,21 @@ include('../connection.php');
                 rows[i].style.display = match ? '' : 'none';
             }
         });
+        document.getElementById('report-search').addEventListener('keyup', function() {
+            var searchValue = this.value.toLowerCase();
+            var rows = document.getElementById('reportTable').getElementsByTagName('tr');
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var match = false;
+                for (var j = 0; j < cells.length; j++) {
+                    if (cells[j].innerText.toLowerCase().includes(searchValue)) {
+                        match = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = match ? '' : 'none';
+            }
+        });
         document.getElementById('suggestion-search').addEventListener('keyup', function() {
             var searchValue = this.value.toLowerCase();
             var rows = document.getElementById('suggestionTable').getElementsByTagName('tr');
@@ -662,6 +754,16 @@ include('../connection.php');
                 }
             })
             .catch(error => showToast('Error: ' + error, 'danger'));
+        }
+        // Mark all suggestions as seen when admin opens the section
+        function markSuggestionsSeen() {
+            fetch('mark_suggestions_seen.php')
+                .then(res => res.json())
+                .then(() => {
+                    var badge = document.getElementById('suggestion-badge');
+                    if (badge) badge.remove();
+                })
+                .catch(() => {});
         }
         // Confirmation dialog for user deletion
         function confirmDelete(username, userId) {

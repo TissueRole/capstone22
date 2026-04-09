@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once __DIR__ . '/notifications/notifications_bootstrap.php';
 
 // Determine base path for links and images
 $base = '';
@@ -18,6 +19,7 @@ if (strpos($_SERVER['PHP_SELF'], 'Admin/') !== false) {
 // Get current page for active navigation
 $current_page = basename($_SERVER['PHP_SELF']);
 $current_path = $_SERVER['PHP_SELF'];
+$session_role = $_SESSION['role'] ?? '';
 
 // Function to check if a link should be active
 function isActiveLink($link_path, $current_path, $current_page) {
@@ -244,6 +246,69 @@ function isActiveLink($link_path, $current_path, $current_page) {
     transform: scale(1.05);
     border-color: #256029;
   }
+  .notification-dropdown {
+    min-width: 360px;
+    max-width: 420px;
+    max-height: 440px;
+    overflow-y: auto;
+    border-radius: 1rem;
+    border: 2px solid #d9eadb;
+    padding: 0;
+  }
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #e7f1e8;
+    font-weight: 700;
+    color: #1b5e20;
+  }
+  .notification-item {
+    display: block;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #edf5ee;
+    text-decoration: none;
+    color: #234127;
+  }
+  .notification-item:hover {
+    background: #f4fbf5;
+  }
+  .notification-item.unread {
+    background: #f7fcf8;
+  }
+  .notification-message {
+    display: block;
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+  .notification-time {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.78rem;
+    color: #6b816f;
+  }
+  .notification-empty {
+    padding: 1rem;
+    color: #6b816f;
+    text-align: center;
+  }
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -3px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #d32f2f;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
 <nav class="navbar navbar-expand-lg fixed-top navbar-modern w-100">
   <div class="container-fluid">
@@ -275,17 +340,21 @@ function isActiveLink($link_path, $current_path, $current_page) {
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav justify-content-center w-100 align-items-lg-center">
-          <li class="nav-item">
-            <a class="nav-link <?php echo isActiveLink('modulepage.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/modulepage.php">Module</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link <?php echo isActiveLink('community.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/Forum/community.php">Farming Community</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link <?php echo isActiveLink('simulation.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/simulation.php">Simulation</a>
-          </li>
-        </ul>
+        <?php if (!in_array($session_role, ['admin', 'agriculturist'], true)): ?>
+          <ul class="navbar-nav justify-content-center w-100 align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link <?php echo isActiveLink('modulepage.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/modulepage.php">Module</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link <?php echo isActiveLink('community.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/Forum/community.php">Farming Community</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link <?php echo isActiveLink('simulation.php', $current_path, $current_page) ? 'active' : ''; ?>" href="<?php echo $base; ?>php/simulation.php">Simulation</a>
+            </li>
+          </ul>
+        <?php else: ?>
+          <div class="w-100"></div>
+        <?php endif; ?>
       </div>
     <?php endif; ?>
   </div>
@@ -293,11 +362,14 @@ function isActiveLink($link_path, $current_path, $current_page) {
 <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
   <?php
     include_once dirname(__FILE__) . '/connection.php';
+    require_once __DIR__ . '/notifications/notifications_bootstrap.php';
     $user_id = $_SESSION['user_id'];
     $profile_pic = '';
     $user_name = '';
     $user_role = '';
     $sql = "SELECT name, profile_picture, role FROM users WHERE user_id = ?";
+    $notifications = [];
+    $unread_notifications = 0;
     if ($stmt = $conn->prepare($sql)) {
       $stmt->bind_param("i", $user_id);
       $stmt->execute();
@@ -313,8 +385,68 @@ function isActiveLink($link_path, $current_path, $current_page) {
     } else {
       $profile_pic = $base . "images/clearteenalogo.png";
     }
+
+    $notifCountStmt = $conn->prepare("
+      SELECT COUNT(*)
+      FROM notifications
+      WHERE user_id = ? AND is_read = 0
+    ");
+    if ($notifCountStmt) {
+      $notifCountStmt->bind_param("i", $user_id);
+      $notifCountStmt->execute();
+      $notifCountStmt->bind_result($unreadCount);
+      if ($notifCountStmt->fetch()) {
+        $unread_notifications = (int) $unreadCount;
+      }
+      $notifCountStmt->close();
+    }
+
+    $notifStmt = $conn->prepare("
+      SELECT notification_id, message, link, is_read, created_at
+      FROM notifications
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+      LIMIT 8
+    ");
+    if ($notifStmt) {
+      $notifStmt->bind_param("i", $user_id);
+      $notifStmt->execute();
+      $notifResult = $notifStmt->get_result();
+      while ($row = $notifResult->fetch_assoc()) {
+        $notifications[] = $row;
+      }
+      $notifStmt->close();
+    }
   ?>
-  <div class="profile-dropdown-topright position-fixed" style="top: 20px; right: 40px; z-index: 2000;">
+  <div class="profile-dropdown-topright position-fixed d-flex align-items-start gap-2" style="top: 20px; right: 40px; z-index: 2000;">
+    <div class="dropdown">
+      <a class="btn btn-profile d-flex align-items-center justify-content-center position-relative p-0" href="#" id="notificationDropdownTop" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: none; border: none; width: 44px; height: 44px;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display:block;">
+          <path d="M12 3.75a4.25 4.25 0 0 0-4.25 4.25v1.14c0 .82-.24 1.62-.69 2.3l-1.1 1.67a2.25 2.25 0 0 0 1.88 3.49h8.32a2.25 2.25 0 0 0 1.88-3.49l-1.1-1.67a4.14 4.14 0 0 1-.69-2.3V8A4.25 4.25 0 0 0 12 3.75Z" stroke="#388e3c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.75 18.5a2.25 2.25 0 0 0 4.5 0" stroke="#388e3c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <?php if ($unread_notifications > 0): ?>
+          <span class="notification-badge"><?= $unread_notifications ?></span>
+        <?php endif; ?>
+      </a>
+      <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdownTop">
+        <div class="notification-header">
+          <span>Notifications</span>
+          <a href="<?php echo $base; ?>php/notifications/mark_all_read.php?redirect=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="text-decoration-none small">Mark all read</a>
+        </div>
+        <?php if (!empty($notifications)): ?>
+          <?php foreach ($notifications as $notification): ?>
+            <a class="notification-item <?php echo (int) $notification['is_read'] === 0 ? 'unread' : ''; ?>"
+               href="<?php echo $base; ?>php/notifications/mark_read.php?id=<?php echo (int) $notification['notification_id']; ?>&redirect=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>">
+              <span class="notification-message"><?php echo htmlspecialchars($notification['message']); ?></span>
+              <span class="notification-time"><?php echo date('M d, Y g:i A', strtotime($notification['created_at'])); ?></span>
+            </a>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="notification-empty">No notifications yet.</div>
+        <?php endif; ?>
+      </div>
+    </div>
     <div class="dropdown">
       <a class="btn btn-profile d-flex align-items-center p-0" href="#" id="profileDropdownTop" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: none; border: none;">
         <img src="<?php echo $profile_pic; ?>" alt="Profile" class="profile-pic-navbar" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #4caf50; background: #fff;">
@@ -331,7 +463,9 @@ function isActiveLink($link_path, $current_path, $current_page) {
         <li>
             <a class="dropdown-item" 
               href="<?php 
-                    if ($_SESSION['role'] === 'agriculturist') {
+                    if ($_SESSION['role'] === 'admin') {
+                        echo $base . 'php/Admin/adminpage.php';
+                    } elseif ($_SESSION['role'] === 'agriculturist') {
                         echo $base . 'php/Admin/agriculturistpage.php';
                     } else {
                         echo $base . 'php/userpage.php';

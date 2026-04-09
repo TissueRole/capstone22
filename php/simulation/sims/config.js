@@ -55,8 +55,8 @@ const CONFIG = {
       FRUITING_OPTIMAL_MAX: 30,
       MIN_HOURS_FOR_FRUIT: 6,
       OPTIMAL_HOURS: 14,
-      // Conversion: percentage slider to DLI (0-100% maps to 0-40 DLI)
-      PERCENT_TO_DLI_FACTOR: 0.4,
+      // Conversion: inputs.light is 0-1 (slider 0-100 divided by 100), maps to 0-40 DLI
+      PERCENT_TO_DLI_FACTOR: 40,
     },
 
     SOIL_PH: {
@@ -128,6 +128,8 @@ const CONFIG = {
   // Visual parameters
   VISUAL: {
     LOTTIE_BASELINE_SKIP: 0.08, // Skip first 8% of animation (soil pop-in)
+    LOTTIE_END_TRIM: 0.04, // Skip trailing frames where the mature plant disappears
+    LOTTIE_MAX_VISUAL_PROGRESS: 0.985, // Cap visual progress so 100% stays on the mature plant
     HEALTH_STRESS_FILTERS: {
       MIN_SATURATE: 0.18,
       MIN_BRIGHTNESS: 0.6,

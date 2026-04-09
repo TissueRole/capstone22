@@ -8,7 +8,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         header("Location: Admin/agriculturistpage.php");
         exit();
     } else {
-        header("Location: Admin/agriculturistpage.php");
+        header("Location: ../index.php");
         exit();
     }
 }

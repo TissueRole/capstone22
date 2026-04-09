@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 
 include "../connection.php";
 
-if ($_SESSION['role'] !== 'agriculturist') {
+if (!in_array($_SESSION['role'], ['agriculturist', 'admin'], true)) {
     echo "You do not have permission to perform this action.";
     exit();
 }

@@ -230,6 +230,7 @@ body {
   flex-direction: column;
   gap: var(--spacing-sm);
   z-index: 10;
+  width: 228px;
 }
 
 .status-card {
@@ -241,7 +242,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  min-width: 140px;
+  min-width: 228px;
   box-shadow: var(--shadow-md);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
@@ -253,19 +254,32 @@ body {
 }
 
 .status-emoji {
-  font-size: 1.5rem;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(67, 160, 71, 0.12);
+  color: var(--accent-green-dark);
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .status-content {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
 .status-value {
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: var(--accent-green-dark);
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .status-label {
@@ -279,7 +293,18 @@ body {
 /* Health Bar in Status Column */
 .status-card-healthbar {
   padding: var(--spacing-xs);
-  min-width: 140px;
+  min-width: 228px;
+}
+
+.scenario-onboarding {
+  margin-bottom: var(--spacing-md);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(67, 160, 71, 0.08);
+  border: 1px solid rgba(67, 160, 71, 0.18);
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .health-bar-inline {
@@ -342,9 +367,12 @@ body {
   transform-origin: center bottom;
   transition: filter 0.3s ease, transform 0.3s ease;
   z-index: 250;
-  /* Issue #1: Render plant above header (z-index: 200) */
   pointer-events: none;
-  /* Allow clicks to pass through to elements below */
+}
+
+/* Fix: Force SVG overflow visible so fully-grown plant isn't clipped by SVG viewport */
+.lottie-container svg {
+  overflow: visible !important;
 }
 
 /* Phase 2: Plant hides behind expanded drawer */
@@ -1075,13 +1103,14 @@ body {
 }
 
 .btn-icon {
-  padding: var(--spacing-sm);
-  font-size: 1.2rem;
-  min-width: 40px;
-  height: 40px;
+  padding: 8px 10px;
+  font-size: 1rem;
+  min-width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 10px;
 }
 
 .btn-primary {

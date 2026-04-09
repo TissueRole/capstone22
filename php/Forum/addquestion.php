@@ -3,6 +3,7 @@ session_start();
 header('Content-Type: application/json'); // ensure JSON output
 
 include "../connection.php";
+include "moderation_helpers.php";
 
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Not logged in']);
@@ -16,6 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($title === '' || $body === '') {
         echo json_encode(['success' => false, 'message' => 'Title and body are required']);
+        exit;
+    }
+
+    $moderationError = forum_validate_clean_text([
+        'title' => $title,
+        'message' => $body,
+    ]);
+    if ($moderationError !== null) {
+        echo json_encode(['success' => false, 'message' => $moderationError]);
         exit;
     }
 

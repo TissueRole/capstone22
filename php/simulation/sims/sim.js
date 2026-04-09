@@ -98,6 +98,7 @@ const state = {
   scenarioStartTime: null,
   scenarioProgress: 0,
   scenarios: [],
+  suppressScenarioChange: false,
 
   // pH Treatment system
   activeAmendments: [],
@@ -109,6 +110,7 @@ const state = {
   lastTs: 0,
   lastGrowthPerSec: 0,
   lastHealthPerSec: 0,
+  harvestShown: false,
 
   // Lottie
   animation: null,
@@ -290,8 +292,12 @@ function computeDynamics(inputs) {
 
     console.log(`📊 Scenario health check - Unlocked controls min score: ${(minScore * 100).toFixed(0)}%`);
   } else {
-    // No scenario: Check ALL environmental factors
-    minScore = Math.min(
+    // No scenario: Hybrid health logic.
+    // - Normally use envScore (weighted average) so one slightly-off parameter
+    //   doesn't unfairly crash health when everything else is ideal.
+    // - BUT if any parameter is genuinely deadly (score < 0.2),
+    //   use the strict minimum so 0% water / 0% light causes decline.
+    const criticalMin = Math.min(
       scores.waterScore,
       scores.lightScore,
       scores.tempScore,
@@ -300,6 +306,7 @@ function computeDynamics(inputs) {
       scores.phosphorusScore,
       scores.potassiumScore
     );
+    minScore = criticalMin < 0.2 ? criticalMin : scores.envScore;
   }
 
   const neutralPoint = 0.5;
@@ -382,7 +389,9 @@ function getStageColor(stageName) {
 
 // Map progress to Lottie frame
 function progressToFrame(p01) {
-  const f = lerp(state.frameMin, state.frameMax, clamp01(p01));
+  const visualProgressCap = CONFIG.VISUAL.LOTTIE_MAX_VISUAL_PROGRESS || 0.985;
+  const visualProgress = Math.min(clamp01(p01), visualProgressCap);
+  const f = lerp(state.frameMin, state.frameMax, clamp01(visualProgress));
   return Math.round(f);
 }
 
@@ -545,6 +554,13 @@ function tick(ts) {
     if (state.progress >= 1) {
       state.running = false;
       UI.btnPlayPause.textContent = 'Play';
+      if (!state.harvestShown) {
+        state.harvestShown = true;
+        showHarvestCelebration();
+      }
+      if (state.activeScenario) {
+        setScenarioControlAccess(false);
+      }
     }
   }
 
@@ -552,6 +568,11 @@ function tick(ts) {
   if (state.health <= 0.20 && state.running) {
     state.running = false;
     UI.btnPlayPause.textContent = '▶️';
+
+    UI.btnPlayPause.textContent = 'Play';
+    if (state.activeScenario) {
+      setScenarioControlAccess(false);
+    }
 
     // Show loss message if in scenario
     if (state.activeScenario) {
@@ -662,6 +683,10 @@ function calculateYield() {
 // 6. Smart Reset Logic
 // Issue #6: Scenario-aware reset function
 function reset() {
+  state.running = false;
+  UI.btnPlayPause.textContent = 'Play';
+  state.harvestShown = false;
+
   // Scenario-aware reset: Restore initial day/progress if in a scenario
   if (state.activeScenario && state.activeScenario.initialConditions) {
     const init = state.activeScenario.initialConditions;
@@ -710,17 +735,22 @@ function reset() {
   state.amendmentsLog = [];
   const logContainer = document.getElementById('amendmentLog');
   if (logContainer) logContainer.innerHTML = '';
+
+  if (state.activeScenario) {
+    setScenarioControlAccess(false);
+  }
 }
 
 function setControlsToOptimal() {
-  UI.water.value = 60;
-  UI.light.value = 75;
-  UI.temp.value = 25;
+  UI.water.value = 62;       // Midpoint of optimal 50-75%
+  UI.light.value = 31;       // 31% * 0.4 DLI factor = 12.4 DLI (midpoint of seedling optimal 10-15 DLI)
+  UI.temp.value = 25;        // Midpoint of optimal 21-29°C
   UI.soilPh.value = 6.5;
-  UI.nitrogen.value = 50;
-  UI.phosphorus.value = 50;
-  UI.potassium.value = 50;
-  UI.containerSize.value = 'MEDIUM'; // Balanced choice
+  state.phActual = 6.5;
+  UI.nitrogen.value = 70;    // Midpoint of optimal 60-80%
+  UI.phosphorus.value = 60;  // Midpoint of optimal 50-70%
+  UI.potassium.value = 75;   // Midpoint of optimal 65-85%
+  UI.containerSize.value = 'MEDIUM_POT';
 }
 
 function setControlsToScenarioDefaults(scenario) {
@@ -756,13 +786,11 @@ function setControlsToScenarioDefaults(scenario) {
 }
 
 function getContainerSizeValue(sizeCode) {
-  // Map JSON codes to Select values if needed, or assume they match
-  // JSON: LARGE_POT, MEDIUM_POT, RAISED_BED
-  // UI: SMALL, MEDIUM, LARGE
-  if (sizeCode.includes('SMALL')) return 'SMALL';
-  if (sizeCode.includes('LARGE')) return 'LARGE';
-  if (sizeCode.includes('RAISED')) return 'LARGE';
-  return 'MEDIUM';
+  if (!sizeCode) return 'MEDIUM_POT';
+  if (sizeCode.includes('SMALL')) return 'SMALL_POT';
+  if (sizeCode.includes('RAISED')) return 'RAISED_BED';
+  if (sizeCode.includes('LARGE')) return 'LARGE_POT';
+  return 'MEDIUM_POT';
 }
 
 
@@ -813,9 +841,16 @@ async function loadLottie() {
     });
 
     state.totalFrames = Math.max(1, Math.floor(state.animation.getDuration(true)));
-    state.frameMin = Math.floor(state.totalFrames * 0.08);
-    state.frameMax = state.totalFrames - 1;
+    state.frameMin = Math.floor(state.totalFrames * CONFIG.VISUAL.LOTTIE_BASELINE_SKIP);
+    const trimmedTailFrames = Math.floor(state.totalFrames * (CONFIG.VISUAL.LOTTIE_END_TRIM || 0));
+    state.frameMax = Math.max(state.frameMin + 1, state.totalFrames - 1 - trimmedTailFrames);
     state.svgEl = UI.lottieHost.querySelector('svg');
+
+    // Ensure SVG overflow is visible so plant isn't clipped by SVG viewport
+    if (state.svgEl) {
+      state.svgEl.setAttribute('overflow', 'visible');
+      state.svgEl.style.overflow = 'visible';
+    }
 
     state.animation.goToAndStop(state.frameMin, true);
 
@@ -831,6 +866,9 @@ function bindUI() {
   UI.btnPlayPause.addEventListener('click', () => {
     state.running = !state.running;
     UI.btnPlayPause.textContent = state.running ? 'Pause' : 'Play';
+    if (state.activeScenario) {
+      setScenarioControlAccess(state.running);
+    }
   });
 
   UI.btnReset.addEventListener('click', reset);
@@ -839,6 +877,9 @@ function bindUI() {
     const pct = Number(e.target.value);
     state.running = false;
     UI.btnPlayPause.textContent = 'Play';
+    if (state.activeScenario) {
+      setScenarioControlAccess(false);
+    }
     setProgress(pct / 100);
   });
 
@@ -848,48 +889,25 @@ function bindUI() {
     });
   }
 
-  // Issue #7: Scenario Header Dropdown (Immediate Visual Update + Open Sheet)
   if (UI.scenarioSelectHeader) {
     UI.scenarioSelectHeader.addEventListener('change', () => {
+      if (state.suppressScenarioChange) {
+        return;
+      }
       const scenarioId = UI.scenarioSelectHeader.value;
-      if (scenarioId) {
-        // Sync bottom dropdown
-        if (UI.scenarioSelect) UI.scenarioSelect.value = scenarioId;
-
-        // Visual Update - Issue #7: Update plant appearance immediately
-        const scenario = state.scenarios.find(s => s.id === scenarioId);
-        if (scenario) {
-          setControlsToScenarioDefaults(scenario);
-          updateInputLabels();
-
-          // Apply initial health and progress from scenario
-          if (scenario.initialConditions) {
-            if (scenario.initialConditions.health !== undefined) {
-              state.health = scenario.initialConditions.health / 100;
-              setHealth(state.health);
-            }
-            if (scenario.initialConditions.day !== undefined) {
-              state.currentDay = scenario.initialConditions.day;
-              state.progress = scenario.initialConditions.day / 110;
-              setProgress(state.progress);
-            }
-          }
-
-          // Force visual update immediately
-          updatePlantAppearance();
-          applyHealthVisuals();
-        }
-
-        // Open Sheet (no scenarioSelector anymore)
-        showBottomSheet();
-      } else {
-        // Cleared
+      if (!scenarioId) {
+        cancelScenario(false);
         reset();
+        return;
+      }
+
+      const scenario = state.scenarios.find((item) => item.id === scenarioId);
+      if (scenario) {
+        startScenario(scenario);
       }
     });
   }
 
-  // Scenario event listeners removed - now handled by header dropdown auto-start
   UI.btnCompleteScenario.addEventListener('click', completeScenario);
   UI.btnCancelScenario.addEventListener('click', cancelScenario);
 
@@ -995,6 +1013,11 @@ function lockScenarioControls(scenario) {
   UI.temp.style.cursor = locked.temp ? 'not-allowed' : 'pointer';
   UI.temp.style.pointerEvents = locked.temp ? 'none' : 'auto';
 
+  UI.soilPh.disabled = locked.soilPh || false;
+  UI.soilPh.style.opacity = locked.soilPh ? '0.5' : '1';
+  UI.soilPh.style.cursor = locked.soilPh ? 'not-allowed' : 'pointer';
+  UI.soilPh.style.pointerEvents = locked.soilPh ? 'none' : 'auto';
+
   UI.nitrogen.disabled = locked.nitrogen || false;
   UI.nitrogen.style.opacity = locked.nitrogen ? '0.5' : '1';
   UI.nitrogen.style.cursor = locked.nitrogen ? 'not-allowed' : 'pointer';
@@ -1073,6 +1096,49 @@ function unlockAllControls() {
   console.log('🔓 All controls unlocked');
 }
 
+function setScenarioControlAccess(isEnabled) {
+  if (!state.activeScenario) return;
+
+  const locked = state.activeScenario.lockedControls || {};
+  const lockedAmendments = state.activeScenario.lockedAmendments || {};
+
+  const controlMap = [
+    ['water', UI.water],
+    ['light', UI.light],
+    ['temp', UI.temp],
+    ['soilPh', UI.soilPh],
+    ['nitrogen', UI.nitrogen],
+    ['phosphorus', UI.phosphorus],
+    ['potassium', UI.potassium],
+    ['containerSize', UI.containerSize],
+  ];
+
+  controlMap.forEach(([key, control]) => {
+    if (!control) return;
+    const shouldEnable = isEnabled && !locked[key];
+    control.disabled = !shouldEnable;
+    control.style.opacity = shouldEnable ? '1' : '0.45';
+    control.style.cursor = shouldEnable ? 'pointer' : 'not-allowed';
+    control.style.pointerEvents = shouldEnable ? 'auto' : 'none';
+  });
+
+  const buttonMap = [
+    ['LIME', document.getElementById('btnApplyLime')],
+    ['DOLOMITE', document.getElementById('btnApplyDolomite')],
+    ['SULFUR', document.getElementById('btnApplySulfur')],
+    ['IRON_CHELATE', document.getElementById('btnApplyIron')],
+  ];
+
+  buttonMap.forEach(([key, button]) => {
+    if (!button) return;
+    const shouldEnable = isEnabled && !lockedAmendments[key];
+    button.disabled = !shouldEnable;
+    button.style.opacity = shouldEnable ? '1' : '0.4';
+    button.style.cursor = shouldEnable ? 'pointer' : 'not-allowed';
+    button.style.pointerEvents = shouldEnable ? 'auto' : 'none';
+  });
+}
+
 // Populate scenario dropdown
 function populateScenarioSelector() {
   state.scenarios.forEach(scenario => {
@@ -1093,18 +1159,6 @@ function populateScenarioSelector() {
     }
   });
 
-  // Wire up header dropdown to start scenario immediately
-  if (UI.scenarioSelectHeader) {
-    UI.scenarioSelectHeader.addEventListener('change', (e) => {
-      if (e.target.value) {
-        // Sync with bottom sheet dropdown
-        if (UI.scenarioSelect) {
-          UI.scenarioSelect.value = e.target.value;
-        }
-        startScenario();
-      }
-    });
-  }
 }
 
 // Start a scenario
@@ -1114,6 +1168,9 @@ function startScenario(scenario) {
   state.activeScenario = scenario;
   state.scenarioStartTime = Date.now();
   state.scenarioProgress = 0;
+  state.running = false;
+  state.harvestShown = false;
+  UI.btnPlayPause.textContent = 'Play';
 
   // Apply initial conditions
   const init = scenario.initialConditions;
@@ -1149,6 +1206,7 @@ function startScenario(scenario) {
 
   // Lock/unlock controls based on scenario specifications
   lockScenarioControls(scenario);
+  setScenarioControlAccess(false);
 
   // Phase 2: Apply scenario-specific visual filter
   const plantContainer = document.querySelector('.lottie-container');
@@ -1207,7 +1265,7 @@ function startScenario(scenario) {
 
   // Populate bottom sheet content
   UI.scenarioTitleCompact.textContent = scenario.title;
-  UI.scenarioCurrentObjective.textContent = scenario.objectives[0] || 'Loading...';
+  UI.scenarioCurrentObjective.textContent = 'Press Play, then work through the objectives.';
   UI.scenarioTitle.textContent = scenario.title;
   UI.scenarioDescription.textContent = scenario.description;
 
@@ -1244,13 +1302,21 @@ function startScenario(scenario) {
     for (const [key, criteria] of Object.entries(scenario.successCriteria)) {
       const li = document.createElement('li');
       let criteriaText = `${key.charAt(0).toUpperCase() + key.slice(1)}: `;
-      if (criteria.min !== undefined && criteria.max !== undefined) {
+      if (Array.isArray(criteria.allowed) && criteria.allowed.length > 0) {
+        criteriaText += criteria.allowed
+          .map((value) => value.replace(/_/g, ' ').toLowerCase())
+          .map((value) => value.replace(/\b\w/g, (char) => char.toUpperCase()))
+          .join(' or ');
+      } else if (criteria.min !== undefined && criteria.max !== undefined) {
         criteriaText += `${criteria.min}-${criteria.max}`;
       } else if (criteria.min !== undefined) {
         criteriaText += `≥ ${criteria.min}`;
       } else if (criteria.max !== undefined) {
         criteriaText += `≤ ${criteria.max}`;
       }
+      criteriaText = criteriaText
+        .replace('â‰¥ ', 'At least ')
+        .replace('â‰¤ ', 'At most ');
       li.textContent = criteriaText;
       successContainer.appendChild(li);
     }
@@ -1258,7 +1324,7 @@ function startScenario(scenario) {
 
   UI.scenarioProgressFill.style.width = '0%';
   UI.scenarioProgressFillMini.style.width = '0%';
-  UI.scenarioStatus.textContent = 'Adjust the controls to meet the objectives!';
+  UI.scenarioStatus.textContent = 'Press Play to unlock the scenario controls.';
   UI.btnCompleteScenario.disabled = true;
 
   console.log(`🎯 Started scenario: ${scenario.title}`);
@@ -1301,8 +1367,18 @@ function checkScenarioProgress() {
       case 'health':
         currentValue = state.health * 100;
         break;
+      case 'containerSize':
+        currentValue = UI.containerSize.value;
+        break;
       default:
         continue;
+    }
+
+    if (Array.isArray(range.allowed)) {
+      if (range.allowed.includes(currentValue)) {
+        metCount++;
+      }
+      continue;
     }
 
     // Check if value meets criteria
@@ -1346,6 +1422,9 @@ function completeScenario() {
   const scenario = state.activeScenario;
   console.log(`✅ Completed scenario: ${scenario.title}`);
 
+  state.running = false;
+  UI.btnPlayPause.textContent = 'Play';
+
   // Show success message
   alert(`🎉 Scenario Complete!\n\n${scenario.title}\n\nYou've successfully met all objectives!`);
 
@@ -1381,29 +1460,34 @@ function completeScenario() {
 
   // Reset dropdown to default
   if (UI.scenarioSelectHeader) {
+    state.suppressScenarioChange = true;
     UI.scenarioSelectHeader.value = "";
+    state.suppressScenarioChange = false;
   }
 
   // Unlock all controls
   unlockAllControls();
 
-  // Reset plant to normal defaults (optimal conditions and full health)
-  setControlsToOptimal();
-  setHealth(1.0);
-  setProgress(0);
+  // Preserve the completed plant so users can inspect the final stage.
   updateInputLabels();
   updatePlantAppearance();
   applyHealthVisuals();
 
-  console.log('✅ Scenario completed - plant reset to normal defaults');
+  UI.scenarioStatus.textContent = 'Scenario completed. The plant will stay at its final stage until you press Reset.';
+  console.log('✅ Scenario completed - final plant state preserved');
 }
 
 // Issue #5: Cancel scenario with complete state reset
-function cancelScenario() {
+function cancelScenario(requireConfirm = true) {
   if (!state.activeScenario) return;
 
-  const confirmed = confirm('Are you sure you want to cancel this scenario?');
-  if (!confirmed) return;
+  if (requireConfirm) {
+    const confirmed = confirm('Are you sure you want to cancel this scenario?');
+    if (!confirmed) return;
+  }
+
+  state.running = false;
+  UI.btnPlayPause.textContent = 'Play';
 
   console.log(`❌ Cancelled scenario: ${state.activeScenario.title}`);
 
@@ -1445,7 +1529,9 @@ function cancelScenario() {
 
   // Issue #5: Reset dropdowns to default (empty value shows placeholder)
   if (UI.scenarioSelectHeader) {
+    state.suppressScenarioChange = true;
     UI.scenarioSelectHeader.value = "";
+    state.suppressScenarioChange = false;
   }
 
   // Unlock all controls
@@ -1906,6 +1992,81 @@ function updateZoom(change) {
 
   state.zoom = newZoom;
   applyHealthVisuals(); // Re-apply transform with new zoom
+}
+
+// Normalize container codes to the values used by the select control and config.
+function getContainerSizeValue(sizeCode) {
+  if (!sizeCode) return 'MEDIUM_POT';
+  if (String(sizeCode).includes('SMALL')) return 'SMALL_POT';
+  if (String(sizeCode).includes('RAISED')) return 'RAISED_BED';
+  if (String(sizeCode).includes('LARGE')) return 'LARGE_POT';
+  return 'MEDIUM_POT';
+}
+
+// Override the original amendment logic so pH shifts gradually instead of snapping to the answer.
+function applyAmendment(amendmentType) {
+  const amendment = AMENDMENTS[amendmentType];
+  if (!amendment) return;
+
+  const count = state.activeAmendments.filter((item) => item.type === amendmentType).length;
+  if (count >= amendment.maxApplications) {
+    logAmendment(`Cannot apply more ${amendment.name} (max ${amendment.maxApplications})`, 'warning');
+    return;
+  }
+
+  const previousTarget = state.phTarget;
+
+  if (amendment.effect === 'raises_ph') {
+    state.phTarget = Math.min(CONFIG.ENVIRONMENT.SOIL_PH.MAX, state.phTarget + Math.abs(amendment.phChangePerDay) * 3);
+    logAmendment(`Applied ${amendment.name}. pH target increased from ${previousTarget.toFixed(1)} to ${state.phTarget.toFixed(1)}.`, 'success');
+  } else if (amendment.effect === 'lowers_ph') {
+    state.phTarget = Math.max(CONFIG.ENVIRONMENT.SOIL_PH.MIN, state.phTarget - Math.abs(amendment.phChangePerDay) * 3);
+    logAmendment(`Applied ${amendment.name}. pH target decreased from ${previousTarget.toFixed(1)} to ${state.phTarget.toFixed(1)}.`, 'success');
+  } else if (amendment.effect === 'treats_lockout') {
+    state.health = clamp01(state.health + 0.08);
+    logAmendment(`Applied ${amendment.name}. Iron availability improved while pH shifts gradually.`, 'success');
+  }
+
+  state.activeAmendments.push({
+    type: amendmentType,
+    appliedDay: state.currentDay,
+    phChangePerDay: amendment.phChangePerDay,
+    name: amendment.name
+  });
+}
+
+function updatePH(dtDays) {
+  if (!state.phLocked) {
+    state.phActual = Number(UI.soilPh.value);
+    state.phTarget = state.phActual;
+  } else {
+    const delta = state.phTarget - state.phActual;
+    if (Math.abs(delta) > 0.001) {
+      const direction = delta > 0 ? 1 : -1;
+      const changePerDay = 0.18;
+      const step = Math.min(Math.abs(delta), changePerDay * Math.max(dtDays, 0.25));
+      state.phActual += direction * step;
+    }
+  }
+
+  UI.soilPh.value = Number(state.phActual).toFixed(1);
+  UI.phLabel.textContent = Number(state.phActual).toFixed(1);
+
+  const phDisplay = document.getElementById('phDisplay');
+  if (phDisplay) {
+    phDisplay.textContent = Number(state.phActual).toFixed(1);
+  }
+}
+
+function updateInputLabels() {
+  UI.waterLabel.textContent = `${Math.round(Number(UI.water.value))}%`;
+  UI.lightLabel.textContent = `${Math.round(Number(UI.light.value))}%`;
+  UI.tempLabel.textContent = `${Math.round(Number(UI.temp.value))}C`;
+  UI.phLabel.textContent = `${Number(UI.soilPh.value).toFixed(1)}`;
+  UI.nitrogenLabel.textContent = `${Math.round(Number(UI.nitrogen.value))}%`;
+  UI.phosphorusLabel.textContent = `${Math.round(Number(UI.phosphorus.value))}%`;
+  UI.potassiumLabel.textContent = `${Math.round(Number(UI.potassium.value))}%`;
+  UI.speedLabel.textContent = `${Number(UI.speed.value).toFixed(2)}x`;
 }
 
 // Start when DOM is ready

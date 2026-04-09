@@ -7,6 +7,11 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$isAgriculturist = ($_SESSION['role'] ?? '') === 'agriculturist';
+$successRedirect = $isAgriculturist
+    ? '../Admin/agriculturistpage.php?section=settings&upload=success'
+    : '../userpage.php?section=profile&upload=success';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) {
     $user_id = $_SESSION['user_id'];
     $file = $_FILES['profile_picture'];
@@ -35,13 +40,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
             $stmt->bind_param("si", $filename, $user_id);
             $stmt->execute();
             $stmt->close();
-            header('Location: ../userpage.php?section=profile&upload=success');
+            header('Location: ' . $successRedirect);
             exit();
         } else {
             $error = 'Failed to move uploaded file.';
         }
     }
-    header('Location: ../userpage.php?section=profile&upload=error&message=' . urlencode($error));
+    $errorRedirect = $isAgriculturist
+        ? '../Admin/agriculturistpage.php?section=settings&upload=error&message=' . urlencode($error)
+        : '../userpage.php?section=profile&upload=error&message=' . urlencode($error);
+    header('Location: ' . $errorRedirect);
     exit();
 }
 ?> 

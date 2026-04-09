@@ -17,8 +17,17 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
+$lessonId = (int) $_GET['id'];
+
+if (!isset($_SESSION['lesson_ready_to_complete'])) {
+    $_SESSION['lesson_ready_to_complete'] = [];
+}
+
+// Reset the read-to-end gate each time a lesson is loaded.
+unset($_SESSION['lesson_ready_to_complete'][$lessonId]);
+
 $learning = new TeenAnimLearning($conn);
-$lesson = $learning->getLesson($_GET['id'], $_SESSION['user_id']);
+$lesson = $learning->getLesson($lessonId, $_SESSION['user_id']);
 
 if (!$lesson) {
     http_response_code(404);

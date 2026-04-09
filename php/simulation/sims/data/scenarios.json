@@ -85,6 +85,9 @@
         "min": 50,
         "max": 75
       },
+      "containerSize": {
+        "allowed": ["MEDIUM_POT", "LARGE_POT", "RAISED_BED"]
+      },
       "health": {
         "min": 75
       }

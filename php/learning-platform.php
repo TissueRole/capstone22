@@ -127,6 +127,9 @@ if ($module_id) {
 
             <!-- Lesson Content -->
             <div class="lesson-content">
+                <div id="lesson-read-hint" class="lesson-read-hint">
+                    Scroll to the end of this lesson to unlock completion.
+                </div>
                 <div class="lesson-body" id="lesson-body"></div>
             </div>
 
@@ -167,6 +170,12 @@ class TeenAnimLearning {
         this.currentLesson = null;
         this.currentModule = <?php echo json_encode($current_module); ?>;
         this.userId = <?php echo $_SESSION['user_id']; ?>;
+        this.lessonReachedEnd = false;
+        this.lessonUnlockSent = false;
+        this.hasScrolledThroughLesson = false;
+        this.currentLessonCheckpointsPassed = true;
+        this.lessonContentEl = document.querySelector('.lesson-content');
+        this.onLessonScroll = this.handleLessonScroll.bind(this);
         
         this.init();
     }
@@ -236,6 +245,10 @@ class TeenAnimLearning {
         document.getElementById('next-btn').addEventListener('click', () => {
             this.navigateLesson('next');
         });
+
+        if (this.lessonContentEl) {
+            this.lessonContentEl.addEventListener('scroll', this.onLessonScroll);
+        }
     }
 
     // Hide everything before showing one screen
@@ -271,6 +284,12 @@ class TeenAnimLearning {
             const result = await response.json();
             if (result.success) {
                 this.currentLesson.completed = 1;
+                const moduleLesson = this.currentModule.lessons.find(
+                    lesson => parseInt(lesson.lesson_id) === parseInt(lessonId)
+                );
+                if (moduleLesson) {
+                    moduleLesson.completed = 1;
+                }
                 this.updateCompleteButton();
                 this.updateLessonStatus(lessonId);
                 this.updateProgress();
@@ -290,9 +309,19 @@ class TeenAnimLearning {
         
         document.getElementById('lesson-title').textContent = this.currentLesson.title;
         document.getElementById('lesson-body').innerHTML = this.currentLesson.content;
-        
+
+        this.lessonReachedEnd = this.currentLesson.completed == 1;
+        this.lessonUnlockSent = this.currentLesson.completed == 1;
+        this.hasScrolledThroughLesson = false;
+        this.currentLessonCheckpointsPassed = this.currentLesson.completed == 1;
+        if (this.lessonContentEl) {
+            this.lessonContentEl.scrollTop = 0;
+        }
+        this.initLessonCheckpoints();
         this.updateCompleteButton();
         this.updateNavigationButtons();
+        this.updateReadHint();
+        requestAnimationFrame(() => this.evaluateLessonReadiness());
     }
     
     updateCompleteButton() {
@@ -307,8 +336,180 @@ class TeenAnimLearning {
         } else {
             completeBtn.classList.remove('completed');
             completeBtn.querySelector('.complete-icon').innerHTML = '<i class="bi bi-circle"></i>';
-            completeBtn.querySelector('.complete-text').textContent = 'Mark Complete';
-            completeBtn.disabled = false;
+            completeBtn.querySelector('.complete-text').textContent = this.canUnlockCompletion()
+                ? 'Mark Complete'
+                : 'Finish Lesson Requirements';
+            completeBtn.disabled = !this.canUnlockCompletion();
+        }
+    }
+
+    updateReadHint() {
+        const hint = document.getElementById('lesson-read-hint');
+        if (!hint || !this.currentLesson) return;
+
+        if (this.currentLesson.completed == 1) {
+            hint.classList.add('ready');
+            hint.textContent = 'This lesson is already completed.';
+            return;
+        }
+
+        if (!this.currentLessonCheckpointsPassed) {
+            hint.classList.remove('ready');
+            hint.textContent = 'Answer all checkpoint questions correctly to unlock completion.';
+            return;
+        }
+
+        if (this.lessonReachedEnd) {
+            hint.classList.add('ready');
+            hint.textContent = 'Completion unlocked. You reached the end of the lesson.';
+            return;
+        }
+
+        hint.classList.remove('ready');
+        hint.textContent = 'Scroll to the end of this lesson to unlock completion.';
+    }
+
+    handleLessonScroll() {
+        if (this.lessonContentEl && this.lessonContentEl.scrollTop > 16) {
+            this.hasScrolledThroughLesson = true;
+        }
+        this.evaluateLessonReadiness();
+    }
+
+    canUnlockCompletion() {
+        return this.lessonReachedEnd && this.currentLessonCheckpointsPassed;
+    }
+
+    evaluateLessonReadiness() {
+        if (!this.lessonContentEl || !this.currentLesson || this.currentLesson.completed == 1) {
+            return;
+        }
+
+        const { scrollTop, clientHeight, scrollHeight } = this.lessonContentEl;
+        const fitsWithoutScrolling = scrollHeight <= clientHeight + 24;
+        const reachedEnd = scrollTop + clientHeight >= scrollHeight - 24;
+
+        if (!fitsWithoutScrolling && !this.hasScrolledThroughLesson) {
+            return;
+        }
+
+        if ((!fitsWithoutScrolling && !reachedEnd) || this.lessonReachedEnd) {
+            return;
+        }
+
+        this.lessonReachedEnd = true;
+        this.updateReadHint();
+        this.updateCompleteButton();
+        if (this.canUnlockCompletion()) {
+            this.unlockLessonCompletion(this.currentLesson.lesson_id);
+        }
+    }
+
+    initLessonCheckpoints() {
+        const blocks = document.querySelectorAll('.lesson-checkpoint');
+        this.currentLessonCheckpointsPassed = blocks.length === 0 || this.currentLesson.completed == 1;
+
+        blocks.forEach((block, index) => {
+            const payloadRaw = block.dataset.checkpoint;
+
+            try {
+                const payload = JSON.parse(payloadRaw);
+                block.innerHTML = this.renderCheckpointMarkup(payload, index);
+                const submitButton = block.querySelector('.checkpoint-submit');
+                submitButton?.addEventListener('click', () => this.handleCheckpointSubmit(block, payload));
+            } catch (error) {
+                console.error('Invalid checkpoint payload:', error);
+            }
+        });
+    }
+
+    renderCheckpointMarkup(payload, index) {
+        const type = payload.type;
+        const optionEntries = Object.entries(payload.options || {}).filter(([key, value]) => {
+            if (type === 'true_false') {
+                return key === 'A' || key === 'B';
+            }
+            return value && value.trim() !== '';
+        });
+        const inputType = type === 'multi_select' ? 'checkbox' : 'radio';
+
+        const optionsHtml = optionEntries.map(([key, value]) => `
+            <label class="checkpoint-option">
+                <input type="${inputType}" name="checkpoint-${index}" value="${key}">
+                <span>${value}</span>
+            </label>
+        `).join('');
+
+        return `
+            <div class="checkpoint-card" data-type="${type}">
+                <div class="checkpoint-badge">Checkpoint</div>
+                <h4 class="checkpoint-question">${payload.question}</h4>
+                <div class="checkpoint-options">${optionsHtml}</div>
+                <div class="checkpoint-actions">
+                    <button type="button" class="btn btn-success checkpoint-submit">Check Answer</button>
+                    <div class="checkpoint-feedback"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    handleCheckpointSubmit(block, payload) {
+        const type = payload.type;
+        const selected = Array.from(block.querySelectorAll('input:checked')).map((input) => input.value).sort();
+        const correct = Array.isArray(payload.correct) ? [...payload.correct].sort() : [];
+        const feedback = block.querySelector('.checkpoint-feedback');
+
+        let passed = false;
+        if (type === 'multi_select') {
+            passed = selected.length === correct.length && selected.every((value, index) => value === correct[index]);
+        } else {
+            passed = selected.length === 1 && correct.length > 0 && selected[0] === correct[0];
+        }
+
+        if (passed) {
+            block.classList.add('passed');
+            block.querySelectorAll('input').forEach((input) => input.disabled = true);
+            block.querySelector('.checkpoint-submit').disabled = true;
+            feedback.textContent = 'Correct. Section checkpoint passed.';
+            feedback.className = 'checkpoint-feedback success';
+        } else {
+            feedback.textContent = 'Incorrect. Review this section and try again.';
+            feedback.className = 'checkpoint-feedback error';
+        }
+
+        const allPassed = Array.from(document.querySelectorAll('.lesson-checkpoint')).every((item) => item.classList.contains('passed'));
+        this.currentLessonCheckpointsPassed = allPassed;
+        this.updateReadHint();
+        this.updateCompleteButton();
+
+        if (this.canUnlockCompletion()) {
+            this.unlockLessonCompletion(this.currentLesson.lesson_id);
+        }
+    }
+
+    async unlockLessonCompletion(lessonId) {
+        if (this.lessonUnlockSent) {
+            return;
+        }
+
+        this.lessonUnlockSent = true;
+
+        try {
+            const response = await fetch('learning/api/unlock_lesson_completion.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lesson_id: lessonId })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to unlock lesson completion');
+            }
+        } catch (error) {
+            console.error('Failed to unlock lesson completion:', error);
+            this.lessonUnlockSent = false;
+            this.lessonReachedEnd = false;
+            this.updateReadHint();
+            this.updateCompleteButton();
         }
     }
     

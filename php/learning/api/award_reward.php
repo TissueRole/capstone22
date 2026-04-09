@@ -1,6 +1,7 @@
 <?php
 require '../../connection.php';
 session_start();
+include '../../notifications/notifications_helper.php';
 
 if (!isset($_SESSION['user_id'], $_POST['module_id'])) {
     http_response_code(400);
@@ -27,5 +28,15 @@ $stmt = $conn->prepare("
 ");
 $stmt->bind_param("iis", $user_id, $module_id, $module['rewards']);
 $stmt->execute();
+
+if ($stmt->affected_rows > 0) {
+    create_notification(
+        $conn,
+        $user_id,
+        'reward_unlocked',
+        'A new module reward has been unlocked.',
+        '../../userpage.php?section=rewards'
+    );
+}
 
 echo 'Reward unlocked';
