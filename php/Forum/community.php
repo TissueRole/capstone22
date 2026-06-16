@@ -213,26 +213,6 @@ function role_label(string $role): string
             <p class="mb-0">Ask questions, follow expert replies, and learn from real discussions.</p>
             <div class="community-onboarding-note">New threads are submitted for approval first. Replies should stay respectful and can be reported for moderator review.</div>
           </div>
-          <?php if (!$isForumRestricted): ?>
-            <div class="community-summary">
-              <div class="summary-chip">
-                <span class="summary-value"><?= $summary['approved_threads'] ?></span>
-                <span class="summary-label">Approved Threads</span>
-              </div>
-              <div class="summary-chip">
-                <span class="summary-value"><?= $summary['my_threads'] ?></span>
-                <span class="summary-label">My Posts</span>
-              </div>
-              <div class="summary-chip">
-                <span class="summary-value"><?= $summary['pending_threads'] ?></span>
-                <span class="summary-label">Pending</span>
-              </div>
-              <div class="summary-chip">
-                <span class="summary-value"><?= $summary['unanswered_threads'] ?></span>
-                <span class="summary-label">Need Replies</span>
-              </div>
-            </div>
-          <?php endif; ?>
         </div>
 
         <?php if ($isForumRestricted): ?>
@@ -313,7 +293,7 @@ function role_label(string $role): string
               <i class="bi bi-hourglass-split me-2"></i>My Pending Threads
             </div>
             <div class="card-body">
-              <p class="pending-note mb-3">Pending threads are waiting for admin approval. You can still edit or delete them before they are published.</p>
+              
               <div id="pendingThreadMessage" class="alert d-none mb-3"></div>
 
               <?php if (!empty($pendingThreads)): ?>
@@ -383,7 +363,7 @@ function role_label(string $role): string
               <div>
                 <i class="bi bi-clock-history me-2"></i>Community Discussions
               </div>
-              <span class="list-header-note">Browse latest, unanswered, or expert-active threads</span>
+              <span class="list-header-note">Browse latestor unanswered, or expert-active threads</span>
             </div>
 
             <div class="discussion-toolbar">

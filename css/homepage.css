@@ -257,6 +257,7 @@ h1{
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
+  justify-items:center;
 }
 .agri-stat-card {
   background: #fff;

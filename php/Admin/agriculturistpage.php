@@ -276,29 +276,13 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                         <input type="text" name="title" class="form-control" maxlength="255" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Update Text</label>
+                        <label class="form-label">Update Content</label>
                         <textarea name="body" class="form-control" rows="6" maxlength="5000" required placeholder="Share event details, announcements, advisory notes, or guidance."></textarea>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Image URL</label>
-                            <input type="text" name="image_url" class="form-control" placeholder="https://...">
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label">External Link</label>
                             <input type="url" name="external_url" class="form-control" placeholder="https://...">
-                        </div>
-                    </div>
-                    <div class="row g-3 mt-1">
-                        <div class="col-md-6">
-                            <label class="form-label">Upload Image</label>
-                            <input type="file" name="image_file" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp">
-                        </div>
-                        <div class="col-md-6 d-flex align-items-end">
-                            <div class="form-check form-switch agri-featured-toggle">
-                                <input class="form-check-input" type="checkbox" name="is_pinned" id="isPinnedUpdate">
-                                <label class="form-check-label" for="isPinnedUpdate">Feature this update at the top of the community</label>
-                            </div>
                         </div>
                     </div>
                     <div class="form-text mt-2">Use this for community events, official advisories, featured resources, or helpful announcements. Upload a poster directly if you have one.</div>
