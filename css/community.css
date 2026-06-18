@@ -539,3 +539,42 @@ footer {
     flex-direction: column;
   }
 }
+
+.community-sidebar {
+  position: sticky;
+  top: 90px;
+}
+
+.community-sidebar .community-updates-card,
+.community-sidebar .pending-threads-card {
+  margin-bottom: 1.5rem;
+}
+
+.community-main {
+  min-width: 0;
+}
+
+/* Better scrolling for discussion list */
+.discussion-list-card .list-group {
+  max-height: 900px;
+  overflow-y: auto;
+}
+
+/* Desktop layout */
+@media (min-width: 992px) {
+  .community-sidebar {
+    max-width: 360px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 991.98px) {
+  .community-sidebar {
+    position: static;
+    max-width: 100%;
+  }
+
+  .discussion-list-card .list-group {
+    max-height: none;
+  }
+}

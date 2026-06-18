@@ -48,7 +48,6 @@ $communityStats = $conn->query("
     SELECT
         (SELECT COUNT(*) FROM reply WHERE user_id = {$userId}) AS replies_count,
         (SELECT COUNT(*) FROM community_updates WHERE user_id = {$userId}) AS updates_count,
-        (SELECT COUNT(*) FROM questions WHERE status = 'pending') AS pending_questions_count,
         (SELECT COUNT(*) FROM questions WHERE status = 'approved') AS approved_questions_count
 ")->fetch_assoc();
 
@@ -71,13 +70,12 @@ $activeSection = $_GET['section'] ?? 'dashboard';
 <div class="agri-sidebar">
     <img src="<?php echo $profilePic; ?>" class="avatar" alt="User Avatar" onerror="this.onerror=null;this.src='../../images/clearteenalogo.png';">
     <div class="welcome">Agriculturist Hub</div>
-    <div class="agri-role-note"><?php echo htmlspecialchars($user['name']); ?></div>
     <nav class="nav flex-column w-100 mt-3">
         <a class="nav-link<?php echo ($activeSection === 'dashboard') ? ' active' : ''; ?>" href="?section=dashboard"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-        <a class="nav-link<?php echo ($activeSection === 'profile') ? ' active' : ''; ?>" href="?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
-        <a class="nav-link<?php echo ($activeSection === 'updates') ? ' active' : ''; ?>" href="?section=updates"><i class="bi bi-megaphone-fill"></i> Community Updates</a>
-        <a class="nav-link<?php echo ($activeSection === 'settings') ? ' active' : ''; ?>" href="?section=settings"><i class="bi bi-gear"></i> Settings</a>
         <a class="nav-link" href="../Forum/community.php"><i class="bi bi-people-fill"></i> Farming Community</a>
+        <a class="nav-link<?php echo ($activeSection === 'updates') ? ' active' : ''; ?>" href="?section=updates"><i class="bi bi-megaphone-fill"></i> Community Announcements</a>
+        <a class="nav-link<?php echo ($activeSection === 'settings') ? ' active' : ''; ?>" href="?section=settings"><i class="bi bi-gear"></i> Settings</a>
+        <a class="nav-link<?php echo ($activeSection === 'profile') ? ' active' : ''; ?>" href="?section=profile"><i class="bi bi-person-circle"></i> Profile</a>       
     </nav>
 </div>
 
@@ -99,43 +97,12 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                 <p>Monitor community activity, publish official updates, and keep learner discussions moving with timely expert support.</p>
             </div>
             <div class="agri-header-actions">
-                <a href="?section=updates" class="btn btn-success"><i class="bi bi-plus-circle me-2"></i>New Update</a>
-                <a href="../Forum/community.php" class="btn btn-outline-success"><i class="bi bi-box-arrow-up-right me-2"></i>Open Community</a>
+                <a href="?section=updates" class="btn btn-success"><i class="bi bi-plus-circle me-2"></i>Announcement</a>
+                <a href="../Forum/community.php" class="btn btn-outline-success"><i class="bi bi-box-arrow-up-right me-2"></i>Community</a>
             </div>
         </section>
 
         <?php if ($activeSection === 'dashboard'): ?>
-            <section class="agri-overview-grid">
-                <article class="agri-stat-card">
-                    <div class="agri-stat-icon"><i class="bi bi-reply-fill"></i></div>
-                    <div>
-                        <div class="agri-stat-value"><?php echo (int) ($communityStats['replies_count'] ?? 0); ?></div>
-                        <div class="agri-stat-label">Your Replies</div>
-                    </div>
-                </article>
-                <article class="agri-stat-card">
-                    <div class="agri-stat-icon"><i class="bi bi-megaphone-fill"></i></div>
-                    <div>
-                        <div class="agri-stat-value"><?php echo (int) ($communityStats['updates_count'] ?? 0); ?></div>
-                        <div class="agri-stat-label">Published Updates</div>
-                    </div>
-                </article>
-                <article class="agri-stat-card">
-                    <div class="agri-stat-icon"><i class="bi bi-hourglass-split"></i></div>
-                    <div>
-                        <div class="agri-stat-value"><?php echo (int) ($communityStats['pending_questions_count'] ?? 0); ?></div>
-                        <div class="agri-stat-label">Pending Threads</div>
-                    </div>
-                </article>
-                <article class="agri-stat-card">
-                    <div class="agri-stat-icon"><i class="bi bi-chat-square-text-fill"></i></div>
-                    <div>
-                        <div class="agri-stat-value"><?php echo (int) ($communityStats['approved_questions_count'] ?? 0); ?></div>
-                        <div class="agri-stat-label">Approved Threads</div>
-                    </div>
-                </article>
-            </section>
-
             <section class="agri-dashboard-grid">
                 <div class="agri-card">
                     <div class="agri-card-header">Quick Actions</div>
@@ -245,7 +212,7 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                         <h5>Community Snapshot</h5>
                         <p><strong>Your replies:</strong> <?php echo (int) ($communityStats['replies_count'] ?? 0); ?></p>
                         <p><strong>Your updates:</strong> <?php echo (int) ($communityStats['updates_count'] ?? 0); ?></p>
-                        <p><strong>Pending threads in community:</strong> <?php echo (int) ($communityStats['pending_questions_count'] ?? 0); ?></p>
+
                     </div>
                 </div>
             </section>
@@ -268,7 +235,7 @@ $activeSection = $_GET['section'] ?? 'dashboard';
             </section>
         <?php elseif ($activeSection === 'updates'): ?>
             <section class="agri-card">
-                <div class="agri-card-header">Publish Community Update</div>
+                <div class="agri-card-header">Publish Community Announcement</div>
                 <div id="communityUpdateMessage" class="alert d-none mb-3"></div>
                 <form id="communityUpdateForm" class="agri-update-form">
                     <div class="mb-3">
@@ -286,12 +253,12 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                         </div>
                     </div>
                     <div class="form-text mt-2">Use this for community events, official advisories, featured resources, or helpful announcements. Upload a poster directly if you have one.</div>
-                    <button type="submit" class="btn btn-success mt-3">Publish Update</button>
+                    <button type="submit" class="btn btn-success mt-3">Publish Announcement</button>
                 </form>
             </section>
 
             <section class="agri-card">
-                <div class="agri-card-header">Your Published Updates</div>
+                <div class="agri-card-header">Your Published Announcements</div>
                 <?php if ($updatesResult && $updatesResult->num_rows > 0): ?>
                     <?php while ($update = $updatesResult->fetch_assoc()): ?>
                         <div class="agri-update-card">
@@ -338,24 +305,8 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Image URL</label>
-                                        <input type="text" name="image_url" class="form-control" value="<?php echo htmlspecialchars($update['image_url'] ?? ''); ?>">
-                                    </div>
-                                    <div class="col-md-6">
                                         <label class="form-label">External Link</label>
                                         <input type="url" name="external_url" class="form-control" value="<?php echo htmlspecialchars($update['external_url'] ?? ''); ?>">
-                                    </div>
-                                </div>
-                                <div class="row g-3 mt-1">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Replace Image</label>
-                                        <input type="file" name="image_file" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp">
-                                    </div>
-                                    <div class="col-md-6 d-flex align-items-end">
-                                        <div class="form-check form-switch agri-featured-toggle">
-                                            <input class="form-check-input" type="checkbox" name="is_pinned" id="isPinnedEdit<?php echo (int) $update['update_id']; ?>" <?php echo !empty($update['is_pinned']) ? 'checked' : ''; ?>>
-                                            <label class="form-check-label" for="isPinnedEdit<?php echo (int) $update['update_id']; ?>">Feature this update</label>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="pending-editor-actions mt-3">
@@ -370,7 +321,7 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <p class="mb-0">No published updates yet.</p>
+                    <p class="mb-0">No published announcements yet.</p>
                 <?php endif; ?>
             </section>
         <?php elseif ($activeSection === 'settings'): ?>
@@ -394,7 +345,7 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                     <button class="agri-tab-btn" id="tab-password" type="button" onclick="showAgriTab('password')">Change Password</button>
                 </div>
                 <div id="agri-tab-profile">
-                    <form action="User/editprofile.php" method="POST">
+                    <form action="../User/editprofile.php" method="POST">
                         <div class="mb-3">
                             <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required placeholder=" ">
                             <label for="name" class="form-label">Name</label>
@@ -407,7 +358,7 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                     </form>
                 </div>
                 <div id="agri-tab-password" style="display:none;">
-                    <form action="User/changepassword.php" method="POST">
+                    <form action="../User/changepassword.php" method="POST">
                         <div class="mb-3">
                             <label for="current_password" class="form-label">Current Password</label>
                             <div class="agri-password-row">

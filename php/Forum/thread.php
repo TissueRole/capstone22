@@ -166,17 +166,16 @@ $reportStatus = $_GET['report'] ?? '';
 <div class="agri-sidebar">
     <img src="../../images/clearteenalogo.png" class="avatar" alt="User Avatar">
     <div class="welcome"><?= $currentRole === 'admin' ? 'Admin Hub' : 'Agriculturist Hub' ?></div>
-    <div class="agri-role-note"><?= htmlspecialchars($_SESSION['username'] ?? '') ?></div>
     <nav class="nav flex-column w-100 mt-3">
         <?php if ($currentRole === 'admin'): ?>
             <a class="nav-link" href="../Admin/adminpage.php"><i class="bi bi-speedometer2"></i> Admin Dashboard</a>
         <?php else: ?>
             <a class="nav-link" href="../Admin/agriculturistpage.php?section=dashboard"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-            <a class="nav-link" href="../Admin/agriculturistpage.php?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
-            <a class="nav-link" href="../Admin/agriculturistpage.php?section=updates"><i class="bi bi-megaphone-fill"></i> Community Updates</a>
+            <a class="nav-link active" href="community.php"><i class="bi bi-people-fill"></i> Farming Community</a>
+            <a class="nav-link" href="../Admin/agriculturistpage.php?section=updates"><i class="bi bi-megaphone-fill"></i> Community Announcements</a>
             <a class="nav-link" href="../Admin/agriculturistpage.php?section=settings"><i class="bi bi-gear"></i> Settings</a>
+            <a class="nav-link" href="../Admin/agriculturistpage.php?section=profile"><i class="bi bi-person-circle"></i> Profile</a>
         <?php endif; ?>
-        <a class="nav-link active" href="community.php"><i class="bi bi-people-fill"></i> Farming Community</a>
     </nav>
 </div>
 <?php endif; ?>
@@ -186,13 +185,6 @@ $reportStatus = $_GET['report'] ?? '';
             <a href="community.php" class="back-link"><i class="bi bi-arrow-left"></i> Back to Community</a>
             <a href="#replyForm" class="quick-reply-link"><i class="bi bi-reply"></i> Jump to Reply</a>
         </div>
-
-        <?php if ($reportStatus === 'submitted'): ?>
-            <div class="alert alert-success">Report submitted. Moderators can now review this content.</div>
-        <?php elseif ($reportStatus === 'duplicate'): ?>
-            <div class="alert alert-info">You already reported this content.</div>
-        <?php endif; ?>
-
         <div class="thread-card mb-4">
             <div class="thread-header">
                 <div class="thread-avatar">
@@ -213,38 +205,12 @@ $reportStatus = $_GET['report'] ?? '';
             <div class="thread-body">
                 <?= nl2br(htmlspecialchars($thread['body'])) ?>
             </div>
-            <div class="thread-footer-actions">
-                <button type="button"
-                        class="btn btn-outline-secondary btn-sm report-trigger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#reportContentModal"
-                        data-target-type="question"
-                        data-target-id="<?= $question_id ?>"
-                        data-target-label="thread">
-                    <i class="bi bi-flag"></i> Report Thread
-                </button>
-            </div>
-        </div>
-
-        <div class="thread-insights">
-            <div class="thread-insight">
-                <span class="insight-value"><?= $replyTotal ?></span>
-                <span class="insight-label"><?= $replyTotal === 1 ? 'Reply' : 'Replies' ?></span>
-            </div>
-            <div class="thread-insight">
-                <span class="insight-value"><?= $expertReplyCount ?></span>
-                <span class="insight-label">Expert Replies</span>
-            </div>
-            <div class="thread-insight <?= $hasExpertReply ? 'is-positive' : 'is-neutral' ?>">
-                <span class="insight-value"><?= $hasExpertReply ? 'Yes' : 'No' ?></span>
-                <span class="insight-label">Expert Response</span>
-            </div>
         </div>
 
         <div class="reply-count">
             <?= $replyTotal ?> <?= $replyTotal === 1 ? 'Reply' : 'Replies' ?>
             <?php if ($hasExpertReply): ?>
-                <span class="reply-count-note">Agriculturist/admin guidance is included in this thread.</span>
+                <span class="reply-count-note">Agriculturist is included in this thread.</span>
             <?php elseif ($replyTotal > 0): ?>
                 <span class="reply-count-note">Community responses are available.</span>
             <?php else: ?>
@@ -284,15 +250,6 @@ $reportStatus = $_GET['report'] ?? '';
                                     </div>
                                 <?php endif; ?>
                             </div>
-                            <button type="button"
-                                    class="reply-report"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#reportContentModal"
-                                    data-target-type="reply"
-                                    data-target-id="<?= (int) $reply['reply_id'] ?>"
-                                    data-target-label="reply">
-                                <i class="bi bi-flag"></i>
-                            </button>
                             <?php if ($currentRole === 'agriculturist' || $currentRole === 'admin'): ?>
                                 <a href="delete.php?type=reply&id=<?= $reply['reply_id'] ?>"
                                    class="reply-delete"

@@ -23,56 +23,72 @@ if ($user_id == $_SESSION['user_id']) {
     exit();
 }
 
-// First, check if the user exists and get their information
+// Check if the user exists
 $stmt = $conn->prepare("SELECT username, role FROM users WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
+
     $user = $result->fetch_assoc();
-    
-    // Start transaction to ensure data consistency
+
+    // Start transaction
     $conn->begin_transaction();
-    
+
     try {
-        // Delete related data first (foreign key constraints)
-        
+
         // Delete user's replies
-        $delete_replies = $conn->prepare("DELETE FROM reply WHERE user_id = ?");
-        $delete_replies->bind_param("i", $user_id);
-        $delete_replies->execute();
-        
+        $deleteReplies = $conn->prepare("DELETE FROM reply WHERE user_id = ?");
+        $deleteReplies->bind_param("i", $user_id);
+        $deleteReplies->execute();
+        $deleteReplies->close();
+
         // Delete user's questions
-        $delete_questions = $conn->prepare("DELETE FROM questions WHERE user_id = ?");
-        $delete_questions->bind_param("i", $user_id);
-        $delete_questions->execute();
-        
-        // Finally, delete the user
-        $delete_user = $conn->prepare("DELETE FROM users WHERE user_id = ?");
-        $delete_user->bind_param("i", $user_id);
-        $delete_user->execute();
-        
+        $deleteQuestions = $conn->prepare("DELETE FROM questions WHERE user_id = ?");
+        $deleteQuestions->bind_param("i", $user_id);
+        $deleteQuestions->execute();
+        $deleteQuestions->close();
+
+        // Delete user's lesson progress
+        $deleteProgress = $conn->prepare("DELETE FROM lesson_progress WHERE user_id = ?");
+        $deleteProgress->bind_param("i", $user_id);
+        $deleteProgress->execute();
+        $deleteProgress->close();
+
+        // Delete user's certificates
+        $deleteCertificates = $conn->prepare("DELETE FROM certificates WHERE user_id = ?");
+        $deleteCertificates->bind_param("i", $user_id);
+        $deleteCertificates->execute();
+        $deleteCertificates->close();
+
+        // Delete the user
+        $deleteUser = $conn->prepare("DELETE FROM users WHERE user_id = ?");
+        $deleteUser->bind_param("i", $user_id);
+        $deleteUser->execute();
+        $deleteUser->close();
+
         // Commit transaction
         $conn->commit();
-        
-        // Redirect back to admin page with success message
-        header("Location: adminpage.php?success=User '" . htmlspecialchars($user['username']) . "' deleted successfully");
+
+        header("Location: adminpage.php?success=User '" . urlencode($user['username']) . "' deleted successfully");
         exit();
-        
+
     } catch (Exception $e) {
-        // Rollback transaction on error
+
+        // Rollback if anything fails
         $conn->rollback();
-        header("Location: adminpage.php?error=Failed to delete user: " . $e->getMessage());
+
+        header("Location: adminpage.php?error=" . urlencode("Failed to delete user: " . $e->getMessage()));
         exit();
     }
-    
+
 } else {
-    // User not found
+
     header("Location: adminpage.php?error=User not found");
     exit();
 }
 
 $stmt->close();
 $conn->close();
-?> 
+?>

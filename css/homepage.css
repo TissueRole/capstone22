@@ -136,7 +136,7 @@ h1{
   min-height: 100vh;
 }
 .agri-sidebar {
-  background: linear-gradient(135deg, #43a047 80%, #f7c35f 100%);
+  background: #43a047;
   box-shadow: 2px 0 12px rgba(67,160,71,0.08);
   min-height: 100vh;
   width: 240px;
