@@ -89,7 +89,7 @@ create_notification(
     $user_id,
     'certificate_earned',
     'A new certificate is now available for one of your completed modules.',
-    '../../userpage.php?section=certificates'
+    '../userpage.php?section=certificates'
 );
 
 /* ✅ Success */

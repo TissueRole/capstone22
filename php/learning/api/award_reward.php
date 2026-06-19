@@ -35,7 +35,7 @@ if ($stmt->affected_rows > 0) {
         $user_id,
         'reward_unlocked',
         'A new module reward has been unlocked.',
-        '../../userpage.php?section=rewards'
+        '../userpage.php?section=rewards'
     );
 }
 
