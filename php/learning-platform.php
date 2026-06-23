@@ -518,7 +518,7 @@ class TeenAnimLearning {
         if (lessonItem) {
             const status = lessonItem.querySelector('.lesson-status');
             status.classList.add('completed');
-            status.textContent = '✓';
+          
             lessonItem.querySelector('.lesson-meta').innerHTML = '<span class="text-success">Completed</span>';
         }
     }
