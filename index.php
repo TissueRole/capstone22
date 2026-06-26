@@ -53,7 +53,7 @@
             <div class="mb-3"><i class="bi bi-rocket-takeoff fs-1 text-success"></i></div>
             <h3>Seamless Start</h3>
             <p>Farming Made Easy. Get started with our simple online resources, tools, and community support to kickstart your journey in agriculture.</p>
-            <button class="btn btn-outline-success mt-2" onclick="scrollToSection('module-carousel')">Learn More</button>
+
           </div>
         </div>
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
@@ -61,7 +61,7 @@
             <div class="mb-3"><i class="bi bi-award fs-1 text-success"></i></div>
             <h3>Our Promise</h3>
             <p>Empowering Your Success. Whether you're planting your first seed or scaling your garden, we're here to support every step of the way.</p>
-            <button class="btn btn-outline-success mt-2" onclick="scrollToSection('about-page')">Learn More</button>
+
           </div>
         </div>
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
@@ -69,7 +69,7 @@
             <div class="mb-3"><i class="bi bi-lightbulb fs-1 text-success"></i></div>
             <h3>Guided Growth</h3>
             <p>Learn from the Best. Access expert tips, articles, and videos on sustainable practices, modern farming techniques, and how to grow your own food.</p>
-            <button class="btn btn-outline-success mt-2" onclick="scrollToSection('community-page')">Learn More</button>
+
           </div>
         </div>
       </div>
@@ -167,7 +167,7 @@
         <div class="col-md-6" data-aos="fade-right">
           <h2 class="mb-3">Contact Us</h2>
           <p class="fs-5">At Teen-Anim, we're always looking to improve and grow, just like you. Have ideas on how we can make farming more exciting for young people? Want to see new features, resources, or topics covered? We'd love to hear your thoughts!</p>
-          <p class="fs-5 mb-1"><strong>Email:</strong> teenanim2024@gmail.com</p>
+          <p class="fs-5 mb-1"><strong>Email:</strong> teenanim@gmail.com</p>
           <p class="fs-5"><strong>Phone Number:</strong> 09956957814</p>
         </div>
         <div class="col-md-6" data-aos="fade-left">
