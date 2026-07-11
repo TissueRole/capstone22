@@ -1,6 +1,8 @@
 <?php
 session_start();
 include('../connection.php');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Only admins can access
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
@@ -72,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($text !== "" && $a !== "" && $b !== "" && $c !== "" && $d !== "") {
                 $stmt = $conn->prepare("INSERT INTO quiz_questions 
-                    (quiz_id, question_text, option_a, option_b, option_c, option_d, correct_answer) 
+                    (quiz_id, question_text, option_a, option_b, option_c, option_d, correct_option) 
                     VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("issssss", $quiz_id, $text, $a, $b, $c, $d, $correct);
                 $stmt->execute();
