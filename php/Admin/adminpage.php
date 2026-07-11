@@ -169,7 +169,7 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                         echo "<td>" . htmlspecialchars($row['updated_at']) . "</td>";
                         echo "<td class='d-flex gap-1'>
                                 <a href='editmodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i> Edit</a>
-                                <a href='deletemodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Are you sure you want to delete the module: &quot;" . htmlspecialchars(addslashes($row['title'])) . "&quot;?\\n\\nThis will also delete all its lessons and cannot be undone.')\"><i class='bi bi-trash'></i> Delete</a>
+                                <a href='deletemodule.php?id=" . $row['module_id'] . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Are you sure you want to delete the module: &quot;" . htmlspecialchars(addslashes($row['title'])) . "&quot;?\\n\\nThis will also delete all its lessons and cannot be undone.')\"><i class='bi bi-trash'></i>Remove</a>
                               </td>";
                         echo "</tr>";
                     }
@@ -194,23 +194,40 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                             <th>Module</th>
                             <th>Order</th>
                             <th>Created_at</th>
-                            <th>Edit</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="lessonTable">
                         <?php
-                        $lessons = $conn->query("SELECT l.*, m.title AS module_title FROM lessons l JOIN modules m ON l.module_id = m.module_id");
+                        $lessons = $conn->query("
+                            SELECT l.*, m.title AS module_title
+                            FROM lessons l
+                            JOIN modules m ON l.module_id = m.module_id
+                        ");
+
                         while ($row = $lessons->fetch_assoc()) {
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($row['title']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['module_title']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['lesson_order']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
-                            echo "<td><a href='editlesson.php?id=" . $row['lesson_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i>Edit</a></td>";
+
+                            echo "<td class='d-flex gap-1'>
+                                    <a href='editlesson.php?id=" . $row['lesson_id'] . "' class='btn btn-sm btn-warning'>
+                                        <i class='bi bi-pencil-square'></i> Edit
+                                    </a>
+
+                                    <a href='deletelesson.php?id=" . $row['lesson_id'] . "'
+                                    class='btn btn-sm btn-danger'
+                                    onclick=\"return confirm('Are you sure you want to delete the lesson: &quot;" . htmlspecialchars(addslashes($row['title'])) . "&quot;?\\n\\nThis action cannot be undone.')\">
+                                        <i class='bi bi-trash'></i> Remove
+                                    </a>
+                                </td>";
+
                             echo "</tr>";
                         }
                         ?>
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </section>

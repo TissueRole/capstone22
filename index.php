@@ -183,10 +183,10 @@
     </section>
     <footer>
       <div class="container-fluid footer-bg py-3 mt-5">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center px-5">
-          <p class="mb-2 mb-md-0">Copyright 2024</p>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center px-5"> 
+          <p class="mb-0 text-center text-md-start"></p>
           <img src="images/clearteenalogo.png" class="teenanimlogo mb-2" alt="TEENANIM LOGO">
-          <p class="mb-0">Terms & Conditions / Privacy Policy</p>
+          <p class="mb-0 text-center text-md-start"></p>
         </div>
       </div>
     </footer>
