@@ -295,6 +295,31 @@
     margin-bottom: 1rem;
 }
 
+.lesson-body h1 {
+    color: #2e7d32;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+.lesson-body h4 {
+    color: #2e7d32;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+.lesson-body h5 {
+    color: #2e7d32;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+.lesson-body h6 {
+    color: #2e7d32;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
 .lesson-body h2:first-child {
     margin-top: 0;
 }
