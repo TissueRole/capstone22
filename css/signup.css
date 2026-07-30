@@ -1,38 +1,423 @@
-body{
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                url("../images/HeroPage.png");
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    font-family: 'Irish Grover', 'Poppins', sans-serif;
+/* ================================
+TEEN-ANIM SIGN UP PAGE
+================================ */
+
+* {
+  box-sizing: border-box;
+  }
+
+body {
+min-height: 100vh;
+margin: 0;
+background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+font-family: 'Segoe UI', Arial, sans-serif;
+color: #333;
 }
-.font-style{
-    font-family: 'Poppins', sans-serif;
-    font-family: 'Irish Grover';
+
+/* ================================
+HEADER
+================================ */
+
+.custom-header {
+width: 100%;
+background: #ffffff;
+border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
-.nav-background{
-    background-color: rgba(40, 167, 69, .9);
+
+.header-content {
+display: flex;
+align-items: center;
+height: 65px;
+padding: 0 28px;
 }
-.white
-{
-    background-color: white;
+
+.header-logo {
+width: 48px;
+height: 48px;
+object-fit: cover;
+border-radius: 50%;
+margin-right: 12px;
 }
-.blurred{
-    background-color: rgba(255, 255, 255,0.5);
-    border-radius: 20px;
-    border:1px solid black;
-backdrop-filter: blur(10px);
+
+.header-title {
+font-size: 1.8rem;
+font-weight: 700;
+color: #4caf50;
+letter-spacing: 1px;
 }
-.button{
-    background-color: #213A58;
-    
+
+/* ================================
+SIGN UP CONTAINER
+================================ */
+
+.container-fluid.d-flex {
+min-height: calc(100vh - 65px);
+padding-top: 45px !important;
+padding-bottom: 80px !important;
 }
-.teenanimlogo{
-    height: 50px;
-    width: 50px;
-    object-fit: cover;
-    margin-left: 10px ;
+
+/* ================================
+SIGN UP CARD
+================================ */
+
+.signup-card {
+width: 100%;
+max-width: 500px;
+margin: 0 auto;
+padding: 32px 35px 30px;
+background: #ffffff;
+border-radius: 20px;
+
+
+box-shadow:
+    0 12px 35px rgba(31, 38, 135, 0.12),
+    0 3px 10px rgba(0, 0, 0, 0.04);
+
+border: 1px solid rgba(76, 175, 80, 0.08);
+
+transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+
+
 }
-.footer-bg{
-    background-color: rgba(40, 167, 69, .9);
+
+.signup-card:hover {
+transform: translateY(-2px);
+
+box-shadow:
+    0 16px 40px rgba(31, 38, 135, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.05);
+
+}
+
+
+.signup-card h3 {
+color: #333;
+font-size: 1.65rem;
+font-weight: 700;
+margin-bottom: 25px !important;
+}
+
+
+.form-label {
+display: block;
+margin-bottom: 7px;
+color: #444;
+font-size: 0.92rem;
+font-weight: 600;
+}
+
+
+
+.input-group {
+margin-bottom: 18px !important;
+}
+
+.input-group-text {
+min-width: 45px;
+justify-content: center;
+
+
+background: #f4f6fa;
+color: #4caf50;
+
+border: 1px solid #e3e7ed;
+border-right: none;
+
+border-radius: 9px 0 0 9px;
+
+
+}
+
+.form-control {
+min-height: 45px;
+
+color: #333;
+background: #ffffff;
+
+border: 1px solid #e3e7ed;
+border-left: none;
+
+border-radius: 0 9px 9px 0;
+
+font-size: 0.94rem;
+
+transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.form-control::placeholder {
+color: #9aa0a6;
+}
+
+.form-control:hover {
+background-color: #fcfdfd;
+}
+
+.form-control:focus {
+background-color: #ffffff;
+
+border-color: #a3c9f7;
+
+box-shadow:
+    0 0 0 3px rgba(163, 201, 247, 0.25);
+
+outline: none;
+
+
+}
+
+/* Keep icon area connected when input is focused */
+
+.input-group:focus-within .input-group-text {
+border-color: #a3c9f7;
+background: #f1f7ff;
+color: #4caf50;
+}
+
+/* ================================
+PASSWORD TOGGLE
+================================ */
+
+.toggle-password {
+cursor: pointer;
+
+border-left: none;
+border-right: 1px solid #e3e7ed;
+
+border-radius: 0 9px 9px 0;
+
+transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+
+}
+
+.toggle-password:hover {
+background: #e9f6ea;
+color: #388e3c;
+}
+
+/* ================================
+PASSWORD STRENGTH
+================================ */
+
+.password-strength {
+width: 20%;
+height: 5px;
+
+margin-top: -8px;
+margin-bottom: 7px;
+
+border-radius: 10px;
+
+background: #adb5bd;
+
+transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+
+
+}
+
+/* ================================
+HELPER TEXT
+================================ */
+
+.form-text {
+color: #777;
+font-size: 0.78rem;
+line-height: 1.45;
+}
+
+#passwordtext {
+margin-bottom: 18px !important;
+}
+
+#usernameFeedback,
+#matchFeedback {
+margin-top: -10px;
+margin-bottom: 14px !important;
+}
+
+
+.alert {
+border: none;
+border-radius: 10px;
+
+font-size: 0.88rem;
+
+padding: 11px 14px;
+
+box-shadow:
+    0 4px 12px rgba(220, 53, 69, 0.08);
+
+transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+
+}
+
+.alert-hide {
+opacity: 0;
+transform: translateY(-10px);
+}
+
+
+.btn-success {
+min-height: 45px;
+
+background: #4caf50;
+border: 1px solid #4caf50;
+
+border-radius: 9px;
+
+font-size: 0.94rem;
+font-weight: 600;
+
+box-shadow:
+    0 4px 10px rgba(76, 175, 80, 0.18);
+
+transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.btn-success:hover {
+background: #43a047;
+border-color: #43a047;
+
+
+transform: translateY(-1px);
+
+box-shadow:
+    0 6px 14px rgba(76, 175, 80, 0.25);
+
+
+}
+
+.btn-success:active {
+transform: translateY(0);
+}
+
+
+.signup-card a {
+color: #4caf50;
+font-size: 0.78rem;
+font-weight: 500;
+transition: color 0.2s ease;
+
+}
+
+.signup-card a:hover {
+color: #388e3c;
+}
+.signup-card .row {
+margin-top: 8px;
+align-items: center;
+}
+
+.signup-card .row > .col {
+padding-left: 5px;
+padding-right: 5px;
+}
+.footer-bg {
+background: rgba(255, 255, 255, 0.96);
+
+border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+box-shadow:
+    0 -2px 10px rgba(0, 0, 0, 0.03);
+
+}
+
+.footer-bg > div {
+min-height: 42px;
+}
+
+.footer-bg p {
+margin: 0;
+
+color: #777;
+
+font-size: 0.7rem;
+
+}
+
+.teenanimlogo {
+width: 25px;
+height: 25px;
+
+object-fit: cover;
+border-radius: 50%;
+
+
+}
+
+/* ================================
+RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 576px) {
+
+.header-content {
+    height: 58px;
+    padding: 0 18px;
+}
+
+.header-logo {
+    width: 42px;
+    height: 42px;
+}
+
+.header-title {
+    font-size: 1.5rem;
+}
+
+.container-fluid.d-flex {
+    padding: 25px 15px 75px !important;
+}
+
+.signup-card {
+    padding: 26px 20px 24px;
+    border-radius: 16px;
+}
+
+.signup-card h3 {
+    font-size: 1.45rem;
+}
+
+.signup-card .row {
+    flex-direction: column;
+    gap: 14px;
+}
+
+.signup-card .row > .col {
+    width: 100%;
+}
+
+.signup-card .row > .col:last-child {
+    justify-content: stretch !important;
+}
+
+.btn-success {
+    width: 100%;
+}
+
+.footer-bg p {
+    font-size: 0.6rem;
+}
+
+.footer-bg > div {
+    margin-left: 15px !important;
+    margin-right: 15px !important;
+}
+
 }

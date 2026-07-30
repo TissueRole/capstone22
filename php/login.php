@@ -1,39 +1,77 @@
 <?php
+
 session_start();
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+
+if (
+    isset($_SESSION['logged_in']) &&
+    $_SESSION['logged_in'] === true
+) {
     if ($_SESSION['role'] == 'admin') {
         header("Location: Admin/adminpage.php");
         exit();
+
     } elseif ($_SESSION['role'] == 'agriculturist') {
         header("Location: Admin/agriculturistpage.php");
         exit();
+
     } else {
         header("Location: ../index.php");
         exit();
     }
 }
+
 $error_message = '';
+$success_message = '';
+if (isset($_SESSION['verification_success'])) {
+    $success_message = $_SESSION['verification_success'];
+    unset($_SESSION['verification_success']);
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     include('connection.php');
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    $stmt = $conn->prepare("SELECT user_id, password, role, status FROM users WHERE username = ?");
+    $stmt = $conn->prepare(
+        "SELECT user_id, password, role, status,
+                email, email_verified
+         FROM users
+         WHERE username = ?
+         LIMIT 1"
+    );
+
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
-    
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($user_id, $hashed_password, $role, $status);
-        $stmt->fetch();
 
+    if ($stmt->num_rows > 0) {
+
+        $stmt->bind_result(
+            $user_id,
+            $hashed_password,
+            $role,
+            $status,
+            $email,
+            $email_verified
+        );
+
+        $stmt->fetch();
         if (password_verify($password, $hashed_password)) {
+
+            if ((int)$email_verified !== 1) {
+
+                $_SESSION['verification_user_id'] = $user_id;
+                $_SESSION['verification_email'] = $email;
+
+                header("Location: verify.php");
+                exit();
+            }
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $role;
-            $_SESSION['status'] = $status; // REQUIRED
+            $_SESSION['status'] = $status;
             $_SESSION['logged_in'] = true;
 
             if ($role === 'admin') {
@@ -50,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $error_message = "Username not found.";
     }
-
     $stmt->close();
     $conn->close();
 }
@@ -260,6 +297,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <i class="bi bi-exclamation-triangle-fill me-2"></i>
               <div><?= htmlspecialchars($error_message) ?></div>
             </div>
+        <?php endif; ?>
+        <?php if (!empty($success_message)): ?>
+          <div
+              class="alert alert-success d-flex align-items-center"
+              role="alert"
+          >
+              <i class="bi bi-check-circle-fill me-2"></i>
+              <div>
+                  <?= htmlspecialchars($success_message) ?>
+              </div>
+          </div>
         <?php endif; ?>
         <form action="login.php" method="post" id="loginForm" autocomplete="off">
           <div class="form-floating mb-3">

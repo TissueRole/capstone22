@@ -1,6 +1,7 @@
 {
     "require": {
         "erusev/parsedown": "^1.7",
-        "mpdf/mpdf": "^8.2"
+        "mpdf/mpdf": "^8.2",
+        "phpmailer/phpmailer": "^7.1"
     }
 }
