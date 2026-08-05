@@ -174,6 +174,7 @@ class TeenAnimLearning {
         this.lessonUnlockSent = false;
         this.hasScrolledThroughLesson = false;
         this.currentLessonCheckpointsPassed = true;
+        this.passedCheckpoints = [];
         this.lessonContentEl = document.querySelector('.lesson-content');
         this.onLessonScroll = this.handleLessonScroll.bind(this);
         
@@ -317,6 +318,17 @@ class TeenAnimLearning {
         if (this.lessonContentEl) {
             this.lessonContentEl.scrollTop = 0;
         }
+        let savedCheckpointProgress = this.currentLesson.checkpoint_progress;
+        if (typeof savedCheckpointProgress === 'string') {
+            try {
+                savedCheckpointProgress = JSON.parse(savedCheckpointProgress);
+            } catch (error) {
+                savedCheckpointProgress = [];
+            }
+        }
+        this.passedCheckpoints = Array.isArray(savedCheckpointProgress)
+            ? savedCheckpointProgress.map(String)
+            : [];
         this.initLessonCheckpoints();
         this.updateCompleteButton();
         this.updateNavigationButtons();
@@ -407,20 +419,60 @@ class TeenAnimLearning {
 
     initLessonCheckpoints() {
         const blocks = document.querySelectorAll('.lesson-checkpoint');
-        this.currentLessonCheckpointsPassed = blocks.length === 0 || this.currentLesson.completed == 1;
-
         blocks.forEach((block, index) => {
             const payloadRaw = block.dataset.checkpoint;
-
             try {
                 const payload = JSON.parse(payloadRaw);
                 block.innerHTML = this.renderCheckpointMarkup(payload, index);
                 const submitButton = block.querySelector('.checkpoint-submit');
-                submitButton?.addEventListener('click', () => this.handleCheckpointSubmit(block, payload));
+                submitButton?.addEventListener('click', () => {
+                    this.handleCheckpointSubmit(block, payload, index);
+                });
+                if (this.passedCheckpoints.includes(String(index))) {
+                    this.setCheckpointPassed(block, payload);
+                }
+
             } catch (error) {
                 console.error('Invalid checkpoint payload:', error);
             }
         });
+        const allBlocks = document.querySelectorAll('.lesson-checkpoint');
+        this.currentLessonCheckpointsPassed =
+            allBlocks.length === 0 ||
+            Array.from(allBlocks).every(block =>
+                block.classList.contains('passed')
+            );
+
+        this.updateReadHint();
+        this.updateCompleteButton();
+    }
+    setCheckpointPassed(block, payload = {}) {
+        block.classList.add('passed');
+
+        const correctAnswers = Array.isArray(payload.correct)
+            ? payload.correct.map(String)
+            : [];
+
+        block.querySelectorAll('input').forEach(input => {
+            if (correctAnswers.includes(String(input.value))) {
+                input.checked = true;
+            }
+
+            input.disabled = true;
+        });
+
+        const submitButton = block.querySelector('.checkpoint-submit');
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = '✓ Correct Answer';
+        }
+
+        const feedback = block.querySelector('.checkpoint-feedback');
+
+        if (feedback) {
+            feedback.className = 'checkpoint-feedback success';
+        }
     }
 
     renderCheckpointMarkup(payload, index) {
@@ -453,7 +505,7 @@ class TeenAnimLearning {
         `;
     }
 
-    handleCheckpointSubmit(block, payload) {
+    async handleCheckpointSubmit(block, payload, index) {
         const type = payload.type;
         const selected = Array.from(block.querySelectorAll('input:checked')).map((input) => input.value).sort();
         const correct = Array.isArray(payload.correct) ? [...payload.correct].sort() : [];
@@ -467,13 +519,16 @@ class TeenAnimLearning {
         }
 
         if (passed) {
-            block.classList.add('passed');
-            block.querySelectorAll('input').forEach((input) => input.disabled = true);
-            block.querySelector('.checkpoint-submit').disabled = true;
-            feedback.textContent = 'Correct. Section checkpoint passed.';
-            feedback.className = 'checkpoint-feedback success';
+            this.setCheckpointPassed(block, payload);
+
+            if (!this.passedCheckpoints.includes(String(index))) {
+                this.passedCheckpoints.push(String(index));
+            }
+
+            await this.saveCheckpointProgress();
+
         } else {
-            feedback.textContent = 'Incorrect. Review this section and try again.';
+            feedback.textContent = 'Incorrect.';
             feedback.className = 'checkpoint-feedback error';
         }
 
@@ -484,6 +539,29 @@ class TeenAnimLearning {
 
         if (this.canUnlockCompletion()) {
             this.unlockLessonCompletion(this.currentLesson.lesson_id);
+        }
+    }
+    async saveCheckpointProgress() {
+        try {
+            const response = await fetch('learning/api/save-checkpoint-progress.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    lesson_id: this.currentLesson.lesson_id,
+                    checkpoints: this.passedCheckpoints
+                })
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                console.error('Failed to save checkpoint progress:', result.message);
+            }
+
+        } catch (error) {
+            console.error('Checkpoint save error:', error);
         }
     }
 
