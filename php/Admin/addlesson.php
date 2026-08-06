@@ -7,7 +7,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
 
 include('../connection.php');
 
-function buildLessonContentFromTemplate($builderPayloadJson) {
+function buildLessonContentFromTemplate($builderPayloadJson, $imagePaths = []) {
     $payload = json_decode($builderPayloadJson, true);
     if (!is_array($payload)) {
         return '';
@@ -30,10 +30,10 @@ function buildLessonContentFromTemplate($builderPayloadJson) {
         $parts[] = "[youtube:$introVideoUrl]";
     }
 
-    foreach ($sections as $section) {
+    foreach ($sections as $index => $section) {
         $heading = trim($section['heading'] ?? '');
         $body = trim($section['body'] ?? '');
-        $imageUrl = trim($section['image'] ?? '');
+        $imageUrl = $imagePaths[$index] ?? '';
         $videoUrl = trim($section['video_url'] ?? '');
         $linkUrl = trim($section['link_url'] ?? '');
         $linkLabel = trim($section['link_label'] ?? '');
@@ -111,12 +111,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $module_id = intval($_POST['module_id'] ?? 0);
     $title = trim($_POST['lesson_title'] ?? '');
     $lesson_order = intval($_POST['lesson_order'] ?? 1);
+    $imagePaths = [];
+
+    if (!empty($_FILES['section_image']['name'][0])) {
+
+        $uploadDir = "../../images/lessons/";
+
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        foreach ($_FILES['section_image']['tmp_name'] as $i => $tmpName) {
+
+            if ($_FILES['section_image']['error'][$i] != UPLOAD_ERR_OK)
+                continue;
+
+            $ext = strtolower(pathinfo($_FILES['section_image']['name'][$i], PATHINFO_EXTENSION));
+
+            $allowed = ['jpg','jpeg','png','gif','webp'];
+
+            if (!in_array($ext,$allowed))
+                continue;
+
+            $newName = uniqid("lesson_") . "." . $ext;
+
+            move_uploaded_file(
+                $tmpName,
+                $uploadDir . $newName
+            );
+
+            $imagePaths[$i] = "../images/lessons/" . $newName;
+        }
+    }
+    
     $contentMode = $_POST['content_mode'] ?? 'builder';
 
     if ($contentMode === 'raw') {
         $content = trim($_POST['lesson_content'] ?? '');
     } else {
-        $content = buildLessonContentFromTemplate($_POST['builder_payload'] ?? '');
+        $content = buildLessonContentFromTemplate(
+            $_POST['builder_payload'] ?? '',
+            $imagePaths
+        );
     }
 
     if ($module_id > 0 && $title !== '' && $content !== '') {
@@ -179,7 +215,7 @@ $modules = $conn->query("SELECT module_id, title FROM modules ORDER BY created_a
 
     <div class="card">
         <div class="card-body p-4">
-            <form method="POST" id="lessonForm">
+            <form method="POST" id="lessonForm" enctype="multipart/form-data">
                 <input type="hidden" name="content_mode" id="content_mode" value="builder">
                 <input type="hidden" name="builder_payload" id="builder_payload">
 
@@ -284,8 +320,18 @@ $modules = $conn->query("SELECT module_id, title FROM modules ORDER BY created_a
             <input type="text" data-role="section-heading" class="form-control" placeholder="Section title">
         </div>
         <div class="mb-3">
-            <label class="form-label">Image URL</label>
-            <input type="text" data-role="section-image" class="form-control" placeholder="https://example.com/image.jpg">
+            <label class="form-label">Upload Image</label>
+            <input
+                type="file"
+                name="section_image[]"
+                class="form-control section-image-file"
+                accept="image/*">
+            <input
+                type="hidden"
+                data-role="section-image">
+            <img
+                class="img-fluid rounded mt-2 image-preview"
+                style="display:none;max-height:250px;">
         </div>
         <div class="mb-3">
             <label class="form-label">YouTube URL or Video ID</label>
@@ -412,10 +458,12 @@ const endCheckpointsContainer = document.getElementById('end-checkpoints-contain
 const addEndCheckpointBtn = document.getElementById('add-end-checkpoint-btn');
 const noEndCheckpoints = document.getElementById('no-end-checkpoints');
 
-function updateSectionLabels() {
-    sectionsContainer.querySelectorAll('.section-block').forEach((section, index) => {
-        section.querySelector('.section-handle').textContent = `Section ${index + 1}`;
-        updateCheckpointLabels(section);
+function updateCheckpointLabels(section) {
+    const checkpoints = section.querySelectorAll(".checkpoint-block");
+
+    checkpoints.forEach((checkpoint, index) => {
+        checkpoint.querySelector(".checkpoint-handle").textContent =
+            `Checkpoint ${index + 1}`;
     });
 }
 
@@ -437,6 +485,11 @@ function attachSectionEvents(section) {
             sectionsContainer.insertBefore(next, section);
             updateSectionLabels();
         }
+    });
+}
+function updateSectionLabels() {
+    sectionsContainer.querySelectorAll('.section-block').forEach((section, index) => {
+        section.querySelector('.section-handle').textContent = `Section ${index + 1}`;
     });
 }
 
@@ -557,7 +610,6 @@ function buildBuilderPayload() {
         sectionsContainer.querySelectorAll('.section-block')
     ).map((section) => ({
         heading: section.querySelector('[data-role="section-heading"]').value.trim(),
-        image: section.querySelector('[data-role="section-image"]').value.trim(),
         video_url: section.querySelector('[data-role="section-video"]').value.trim(),
         link_url: section.querySelector('[data-role="section-link-url"]').value.trim(),
         link_label: section.querySelector('[data-role="section-link-label"]').value.trim(),
@@ -602,7 +654,34 @@ lessonForm.addEventListener('submit', () => {
 });
 
 addSectionBtn.addEventListener('click', addSection);
+
 addSection();
+document.addEventListener("change", function (e) {
+
+    if (!e.target.classList.contains("section-image-file"))
+        return;
+
+    const file = e.target.files[0];
+
+    if (!file)
+        return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+
+        const section = e.target.closest(".section-block");
+
+        const preview = section.querySelector(".image-preview");
+
+        preview.src = event.target.result;
+        preview.style.display = "block";
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
 </script>
 </body>
 </html>
