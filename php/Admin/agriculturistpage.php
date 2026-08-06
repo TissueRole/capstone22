@@ -37,11 +37,12 @@ $updatesResult = $conn->query("
 ");
 
 $recentThreadsResult = $conn->query("
-    SELECT q.question_id, q.title, q.status, q.created_at, u.name, u.username
+    SELECT q.*, u.name, u.username
     FROM questions q
     JOIN users u ON q.user_id = u.user_id
+    WHERE q.status = 'approved'
     ORDER BY q.created_at DESC
-    LIMIT 5
+    LIMIT 10
 ");
 
 $communityStats = $conn->query("

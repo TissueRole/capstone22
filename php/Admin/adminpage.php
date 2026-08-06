@@ -105,15 +105,15 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                         echo "<td>" . htmlspecialchars($row['date_created']) . "</td>";
                         echo "<td>";
                             if ($row['offense_count'] == 0) {
-                                echo "<span class='badge bg-success'>0</span>";
+                                echo "<span class='badge bg-success'>No Offense</span>";
                             } elseif ($row['offense_count'] == 1) {
-                                echo "<span class='badge bg-warning text-dark'>1</span>";
+                                echo "<span class='badge bg-warning text-dark'>1st Offense</span>";
                             } elseif ($row['offense_count'] == 2) {
-                                echo "<span class='badge bg-danger'>2</span>";
+                                echo "<span class='badge bg-danger'>2nd Offense</span>";
                             } else {
-                                echo "<span class='badge bg-dark'>" . $row['offense_count'] . " (Permanent)</span>";
+                                echo "<span class='badge bg-dark'>3rd Offense (Permanent)</span>";
                             }
-                            echo "</td>";
+                        echo "</td>";
                         echo "<td>
                             <select class='form-select' onchange='updateUser(this, " . $row['user_id'] . ", \"status\")'>
                                 <option value='active'" . ($row['status'] == 'active' ? ' selected' : '') . ">None</option>
