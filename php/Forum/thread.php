@@ -328,26 +328,64 @@ $reportStatus = $_GET['report'] ?? '';
             <div class="card-header">
                 <h6>Post a Reply</h6>
             </div>
+
             <div class="card-body">
-                <?php if ($replyError !== ''): ?>
-                    <div class="alert alert-danger mb-3"><?= htmlspecialchars($replyError) ?></div>
-                <?php endif; ?>
+
                 <?php if ($isRestricted): ?>
-                    <div class="alert alert-danger">
-                        <strong>Community Access Restricted</strong><br>
-                        <?= htmlspecialchars($restrictionMessage) ?>
+
+                    <div class="alert alert-danger text-center mb-0">
+                        <h5><i class="bi bi-shield-lock-fill"></i> Community Access Restricted</h5>
+
+                        <p class="mb-2">
+                            <?= htmlspecialchars($restrictionMessage) ?>
+                        </p>
+
+                        <?php if ($restriction['restriction_type'] === 'temporary'): ?>
+                            <small class="text-muted">
+                                Restriction ends on
+                                <strong>
+                                    <?= date('F d, Y h:i A', strtotime($restriction['restriction_until'])) ?>
+                                </strong>
+                            </small>
+                        <?php endif; ?>
+
                     </div>
+
                 <?php else: ?>
-                <form method="POST" id="replyForm">
+
+                    <?php if ($replyError !== ''): ?>
+                        <div class="alert alert-danger">
+                            <?= htmlspecialchars($replyError) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="POST" id="replyForm">
+
+                        <div class="mb-3">
+                            <textarea
+                                name="reply"
+                                class="form-control"
+                                rows="4"
+                                maxlength="3000"
+                                placeholder="Write your reply..."
+                                required></textarea>
+                        </div>
+
+                        <div class="reply-form-actions">
+                            <div class="reply-form-note">
+                                Be specific. Mention what the user should check, change, or try next.
+                                Inappropriate language is blocked and reported content can be reviewed by moderators.
+                            </div>
+
+                            <button type="submit" class="btn btn-success">
+                                Submit Reply
+                            </button>
+                        </div>
+
+                    </form>
+
                 <?php endif; ?>
-                    <div class="mb-3">
-                        <textarea name="reply" class="form-control" rows="4" maxlength="3000" placeholder="Write your reply..." required></textarea>
-                    </div>
-                    <div class="reply-form-actions">
-                        <div class="reply-form-note">Be specific. Mention what the user should check, change, or try next. Inappropriate language is blocked and reported content can be reviewed by moderators.</div>
-                        <button type="submit" class="btn btn-success">Submit Reply</button>
-                    </div>
-                </form>
+
             </div>
         </div>
     </main>
