@@ -12,6 +12,56 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $currentRole = $_SESSION['role'] ?? 'student';
+$userRestriction = $conn->prepare("
+    SELECT status, restriction_type, restriction_until
+    FROM users
+    WHERE user_id = ?
+");
+$userRestriction->bind_param("i", $_SESSION['user_id']);
+$userRestriction->execute();
+$restriction = $userRestriction->get_result()->fetch_assoc();
+$userRestriction->close();
+
+$isRestricted = false;
+$restrictionMessage = "";
+
+
+if (
+    $restriction['status'] === 'inactive' &&
+    $restriction['restriction_type'] === 'permanent'
+) {
+    $isRestricted = true;
+    $restrictionMessage = "Your Farming Community access has been permanently restricted due to repeated violations.";
+}
+
+elseif (
+    $restriction['status'] === 'inactive' &&
+    $restriction['restriction_type'] === 'temporary'
+) {
+
+    if (strtotime($restriction['restriction_until']) > time()) {
+
+        $isRestricted = true;
+
+        $restrictionMessage =
+            "Your Farming Community access is temporarily restricted until "
+            . date("F d, Y h:i A", strtotime($restriction['restriction_until'])) . ".";
+
+    } else {
+
+        $restore = $conn->prepare("
+            UPDATE users
+            SET
+                status='active',
+                restriction_type='none',
+                restriction_until=NULL
+            WHERE user_id=?
+        ");
+        $restore->bind_param("i", $_SESSION['user_id']);
+        $restore->execute();
+        $restore->close();
+    }
+}
 
 function role_label(string $role): string
 {
@@ -35,7 +85,12 @@ if (!isset($_GET['id'])) {
 $question_id = (int) $_GET['id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
-    $reply_body = trim($_POST['reply'] ?? '');
+
+    if ($isRestricted) {
+        header("Location: thread.php?id=".$question_id."&reply_error=".urlencode($restrictionMessage));
+        exit;
+    }    $reply_body = trim($_POST['reply'] ?? '');
+    
     $user_id = (int) $_SESSION['user_id'];
 
     if ($reply_body !== '') {
@@ -277,7 +332,14 @@ $reportStatus = $_GET['report'] ?? '';
                 <?php if ($replyError !== ''): ?>
                     <div class="alert alert-danger mb-3"><?= htmlspecialchars($replyError) ?></div>
                 <?php endif; ?>
+                <?php if ($isRestricted): ?>
+                    <div class="alert alert-danger">
+                        <strong>Community Access Restricted</strong><br>
+                        <?= htmlspecialchars($restrictionMessage) ?>
+                    </div>
+                <?php else: ?>
                 <form method="POST" id="replyForm">
+                <?php endif; ?>
                     <div class="mb-3">
                         <textarea name="reply" class="form-control" rows="4" maxlength="3000" placeholder="Write your reply..." required></textarea>
                     </div>
