@@ -6,12 +6,50 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
+
+
 include "../connection.php";
 include "community_updates_bootstrap.php";
 
 $currentUserId = (int) $_SESSION['user_id'];
-$currentRole = $_SESSION['role'] ?? 'student';
-$isForumRestricted = (isset($_SESSION['status']) && $_SESSION['status'] === 'inactive');
+
+$userStmt = $conn->prepare("
+      SELECT status, offense_count, restriction_type, restriction_until
+      FROM users
+      WHERE user_id = ?
+  ");
+  $userStmt->bind_param("i", $currentUserId);
+  $userStmt->execute();
+  $user = $userStmt->get_result()->fetch_assoc();
+  $userStmt->close();
+
+  $currentRole = $_SESSION['role'] ?? 'student';
+
+  if (
+      $user['restriction_type'] === 'temporary' &&
+      !empty($user['restriction_until']) &&
+      strtotime($user['restriction_until']) <= time()
+  ) {
+      $restore = $conn->prepare("
+          UPDATE users
+          SET status='active',
+              restriction_type='none',
+              restriction_until=NULL
+          WHERE user_id=?
+      ");
+      $restore->bind_param("i", $currentUserId);
+      $restore->execute();
+      $restore->close();
+
+      $user['status'] = 'active';
+      $user['restriction_type'] = 'none';
+      $user['restriction_until'] = null;
+
+      $_SESSION['status'] = 'active';
+  }
+
+$isForumRestricted = ($user['status'] === 'inactive');
 
 $search = trim($_GET['q'] ?? '');
 $filter = $_GET['filter'] ?? 'all';
@@ -211,17 +249,40 @@ function role_label(string $role): string
               <i class="bi bi-people-fill me-2"></i>Farming Community
             </h2>
             <p class="mb-0">Ask questions, follow expert replies, and learn from real discussions.</p>
+            <p class="mb-0">Be respectful and constructive in your interactions.</p>
             <div class="community-onboarding-note">New threads are submitted for approval first. </div>
           </div>
         </div>
 
         <?php if ($isForumRestricted): ?>
           <div class="restricted-card text-center" data-aos="fade-up">
-            <div class="restricted-icon"><i class="bi bi-shield-lock"></i></div>
-            <h3>Community Access Restricted</h3>
-            <p>Your account cannot post or view forum discussions right now. Contact an admin or agriculturist if you think this is a mistake.</p>
+              <div class="restricted-icon">
+                  <i class="bi bi-shield-lock"></i>
+              </div>
+              <h3>Community Access Restricted</h3>
+              <?php if ($user['restriction_type'] === 'temporary'): ?>
+                  <p>
+                      Your Farming Community access has been temporarily restricted due to a violation of the community guidelines.
+                  </p>
+                  <p>
+                      <strong>Restriction Ends:</strong><br>
+                      <?= date('F d, Y \a\t h:i A', strtotime($user['restriction_until'])) ?>
+                  </p>
+                  <p class="text-muted">
+                      Your access will be restored automatically after the restriction period ends.
+                  </p>
+              <?php else: ?>
+                  <p>
+                      Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.
+                  </p>
+                  <p class="text-muted">
+                      You may continue using the learning modules, quizzes, and simulations, but you cannot participate in the Farming Community.
+                  </p>
+
+              <?php endif; ?>
+
           </div>
-        <?php else: ?>
+          <?php else: ?>
 
           <button class="btn btn-success w-100 mb-3 py-3 fs-5 fw-bold"
                   type="button"
