@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 30, 2026 at 03:28 PM
+-- Generation Time: Aug 06, 2026 at 11:32 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -133,7 +133,11 @@ INSERT INTO `lessons` (`lesson_id`, `module_id`, `title`, `content`, `lesson_ord
 (20, 5, 'Factors Influencing Crop Selection ( Part 2 )', '## Space Constraints\r\n\r\nUrban areas like Baguio City often have limited space for farming, especially in densely\r\npopulated regions. Therefore, choosing crops that can yield high results in small spaces or\r\nvertical spaces is essential.\r\n\r\n- **Vertical Farming:** Growing climbing crops like beans, peas, and tomatoes on trellises or\r\nusing vertical hydroponics can help maximize limited space.\r\n- **High-Yield, Low-Space Crops:** **Leafy vegetables** (e.g., lettuce, kale), **herbs** (e.g., basil,\r\ncilantro), and **small fruits** (e.g., strawberries, dwarf varieties of tomatoes) can be grown\r\nefficiently in compact spaces, such as containers, window boxes, and small garden beds.\r\n\r\n## Market Demand and Nutritional Value\r\n\r\nWhen selecting crops for urban farming, it\'s essential to consider local market demand and\r\nnutritional value. This ensures the crops are not only suited to local conditions but also meet\r\nconsumer needs.\r\n\r\n- **Local Restaurants and Markets:** Baguio City has a thriving food culture, with restaurants\r\nseeking fresh, local produce. Crops like basil, lettuce, tomatoes, and culinary herbs are\r\nalways in demand.\r\n- **Nutritional Value:** Prioritize crops that provide nutritional benefits, such as **leafy greens**\r\n(rich in vitamins A, C, and K) and **root vegetables** (good sources of carbohydrates and\r\nfiber).', 2, '2025-09-17 03:54:00'),
 (21, 5, 'Seasonal Crop Calendars for Baguio City ( Part 1)', 'A seasonal crop calendar helps farmers plan their crops to ensure year-round production,\r\nmaximize yields, and manage pest cycles effectively. The following steps outline the process for\r\ncreating a seasonal crop calendar tailored to the specific conditions of Baguio City.\r\n\r\n## Key Steps in Planning\r\n\r\n- **1. Identify Growing Seasons Based on Local Climatic Data**\r\n    - Baguio City experiences distinct dry and wet seasons. Knowing the timing and\r\n    duration of these seasons helps determine which crops are best suited for specific\r\n    months.\r\n    - Cool season crops are typically planted during the dry months (**November to\r\n    February**), while warm season crops are planted during the warmer, wetter\r\n    months (**March to June**).\r\n- **2. Plan for Crop Rotations**\r\n    - To maintain soil health and prevent pest build-up, practice crop rotation. For\r\n    instance, after growing nitrogen-demanding crops like beans, rotate with crops\r\n    like carrots or tomatoes that don’t deplete soil nutrients as quickly.\r\n- **3. Account for Crop Maturity Periods**\r\n    - To ensure staggered harvests and minimize waste, plan for crops with varying\r\n    maturity periods. For example, plant radishes (quick-growing) alongside broccoli\r\n    (longer growing period) to harvest different crops at different times.', 3, '2025-09-17 03:58:28'),
 (22, 5, 'Seasonal Crop Calendars for Baguio City (Part 2)', '## Example Crop Calendar for Baguio City\r\n![](../images/lessons/BaguioCrops.png)', 4, '2025-09-17 04:01:53'),
-(23, 5, 'Techniques for Maximizing Yields Across Different Seasons', '## 1. Greenhouses and Shade Netting\r\n\r\n- In Baguio, temperature fluctuations can sometimes affect crops. Using\r\n**greenhouses** or shade nets can help manage temperature, protect plants from\r\npests, and extend the growing season.\r\n\r\n##  2. Raised Beds and Containers\r\n\r\n- Utilize **raised beds** for better soil drainage, which is especially helpful during the\r\nrainy season. **Container gardening** is another space-saving technique that allows\r\nfarmers to grow crops like tomatoes, peppers, and herbs in compact urban spaces.\r\n\r\n## 3. Water Management\r\n\r\n-  Install **drip irrigation systems** to ensure efficient water delivery during dry periods\r\nand prevent waterlogging during the rainy season.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/l_5Y7FdTzYg\" title=\"The Best Raised Garden Bed Option for you!\"\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n\r\n<br><br><br><br><br>\r\n\r\n**References:**\r\n- _Lal, R. (2004). Soil carbon sequestration to mitigate climate change. Geoderma, 123(1),1–22_\r\n- _Pande, C., Joshi, A., & Tewari, A. (2020). Rainwater harvesting: An approach towardswater conservation. Water Management, 34(2), 78–85._', 5, '2025-09-17 04:03:42');
+(23, 5, 'Techniques for Maximizing Yields Across Different Seasons', '## 1. Greenhouses and Shade Netting\r\n\r\n- In Baguio, temperature fluctuations can sometimes affect crops. Using\r\n**greenhouses** or shade nets can help manage temperature, protect plants from\r\npests, and extend the growing season.\r\n\r\n##  2. Raised Beds and Containers\r\n\r\n- Utilize **raised beds** for better soil drainage, which is especially helpful during the\r\nrainy season. **Container gardening** is another space-saving technique that allows\r\nfarmers to grow crops like tomatoes, peppers, and herbs in compact urban spaces.\r\n\r\n## 3. Water Management\r\n\r\n-  Install **drip irrigation systems** to ensure efficient water delivery during dry periods\r\nand prevent waterlogging during the rainy season.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/l_5Y7FdTzYg\" title=\"The Best Raised Garden Bed Option for you!\"\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n\r\n<br><br><br><br><br>\r\n\r\n**References:**\r\n- _Lal, R. (2004). Soil carbon sequestration to mitigate climate change. Geoderma, 123(1),1–22_\r\n- _Pande, C., Joshi, A., & Tewari, A. (2020). Rainwater harvesting: An approach towardswater conservation. Water Management, 34(2), 78–85._', 5, '2025-09-17 04:03:42'),
+(36, 11, 'dasdasdasd', 'asdasdasd\n\n[youtube:dasdasd]\n\n## asdasd\n\n![](asdasd)\n\n[youtube:asdasd]\n\nasdasdasd\n\n[asdas](asdasd)\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJhc2Rhc2QiLCJvcHRpb25zIjp7IkEiOiJhc2Rhc2RhcyIsIkIiOiJhc2Rhc2QiLCJDIjoiYXNkYXNkIiwiRCI6ImFzZGFzZCJ9LCJjb3JyZWN0IjpbIkQiXX0=]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJhc2Rhc2QiLCJvcHRpb25zIjp7IkEiOiJhc2Rhc2RhcyIsIkIiOiJhc2Rhc2QiLCJDIjoiYXNkYXNkIiwiRCI6ImFzZGFzZGFzIn0sImNvcnJlY3QiOlsiRCJdfQ==]', 1, '2026-08-05 06:39:44'),
+(37, 11, 'asdasd', 'qweqweqw\n\n[youtube:eqweqweqw]\n\n## qweqwe\n\n![](qweqwe)\n\n[youtube:qweqwe]\n\nqweqweqw\n\n[eqweqwe](qweqweqwe)\n\n[checkpoint:eyJ0eXBlIjoidHJ1ZV9mYWxzZSIsInF1ZXN0aW9uIjoicXdlcXdlcXdlcXdlcXdlIiwib3B0aW9ucyI6eyJBIjoiVHJ1ZSIsIkIiOiJGYWxzZSIsIkMiOiIiLCJEIjoiIn0sImNvcnJlY3QiOlsiQiJdfQ==]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJxd2Vxd2Vxd2UiLCJvcHRpb25zIjp7IkEiOiJUcnVlcXdlcXdlIiwiQiI6IkZhbHNlcXdlcXdlIiwiQyI6InF3ZXF3ZXF3ZSIsIkQiOiJxd2Vxd2UifSwiY29ycmVjdCI6WyJEIl19]', 1, '2026-08-05 07:23:53'),
+(39, 11, '1', '2\n\n[youtube:1]\n\n## 1\n\n![](1)\n\n[youtube:1]\n\n1\n\n[Open Resource](1)\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiIxIiwib3B0aW9ucyI6eyJBIjoiVHJ1ZSIsIkIiOiJGYWxzZSIsIkMiOiIxIiwiRCI6IjEifSwiY29ycmVjdCI6WyJEIl19]', 1, '2026-08-05 07:34:23'),
+(40, 11, 'asdasd', 'asdasd\n\n[youtube:asdasd]\n\n## asdas\n\n![](asdas)\n\n[youtube:asd]\n\nasdasd\n\n[asdasd](asdasd)\n\n[checkpoint:eyJ0eXBlIjoidHJ1ZV9mYWxzZSIsInF1ZXN0aW9uIjoiYXNkYXNkIiwib3B0aW9ucyI6eyJBIjoiVHJ1ZSIsIkIiOiJGYWxzZSIsIkMiOiIiLCJEIjoiIn0sImNvcnJlY3QiOlsiQiJdfQ==]', 1, '2026-08-05 07:37:24');
 
 -- --------------------------------------------------------
 
@@ -146,6 +150,7 @@ CREATE TABLE `lesson_progress` (
   `user_id` int(11) NOT NULL,
   `lesson_id` int(11) NOT NULL,
   `completed` tinyint(1) DEFAULT 0,
+  `checkpoint_progress` text DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -154,24 +159,26 @@ CREATE TABLE `lesson_progress` (
 -- Dumping data for table `lesson_progress`
 --
 
-INSERT INTO `lesson_progress` (`progress_id`, `user_id`, `lesson_id`, `completed`, `completed_at`, `created_at`) VALUES
-(90, 47, 19, 1, '2026-06-19 02:26:04', '2026-06-19 02:26:04'),
-(91, 47, 20, 1, '2026-06-19 02:26:05', '2026-06-19 02:26:05'),
-(92, 47, 21, 1, '2026-06-19 02:26:07', '2026-06-19 02:26:07'),
-(93, 47, 22, 1, '2026-06-19 02:26:09', '2026-06-19 02:26:09'),
-(94, 47, 23, 1, '2026-06-19 02:26:11', '2026-06-19 02:26:11'),
-(95, 47, 13, 1, '2026-06-23 04:52:34', '2026-06-23 04:52:34'),
-(96, 47, 14, 1, '2026-06-23 04:53:25', '2026-06-23 04:53:25'),
-(97, 47, 15, 1, '2026-06-23 04:56:07', '2026-06-23 04:56:07'),
-(98, 47, 16, 1, '2026-06-23 04:57:16', '2026-06-23 04:57:16'),
-(99, 47, 17, 1, '2026-06-23 04:57:48', '2026-06-23 04:57:48'),
-(100, 47, 18, 1, '2026-06-23 05:10:06', '2026-06-23 05:10:06'),
-(101, 47, 8, 1, '2026-06-23 05:31:39', '2026-06-23 05:31:39'),
-(102, 47, 9, 1, '2026-06-23 05:31:41', '2026-06-23 05:31:41'),
-(103, 47, 10, 1, '2026-06-23 05:31:44', '2026-06-23 05:31:44'),
-(104, 47, 1, 1, '2026-06-30 08:04:35', '2026-06-30 08:04:35'),
-(105, 47, 2, 1, '2026-06-30 08:04:36', '2026-06-30 08:04:36'),
-(106, 47, 3, 1, '2026-06-30 08:04:38', '2026-06-30 08:04:38');
+INSERT INTO `lesson_progress` (`progress_id`, `user_id`, `lesson_id`, `completed`, `checkpoint_progress`, `completed_at`, `created_at`) VALUES
+(100, 47, 18, 1, NULL, '2026-06-23 05:10:06', '2026-06-23 05:10:06'),
+(101, 47, 8, 1, NULL, '2026-06-23 05:31:39', '2026-06-23 05:31:39'),
+(102, 47, 9, 1, NULL, '2026-06-23 05:31:41', '2026-06-23 05:31:41'),
+(103, 47, 10, 1, NULL, '2026-06-23 05:31:44', '2026-06-23 05:31:44'),
+(104, 47, 1, 1, NULL, '2026-06-30 08:04:35', '2026-06-30 08:04:35'),
+(105, 47, 2, 1, NULL, '2026-06-30 08:04:36', '2026-06-30 08:04:36'),
+(106, 47, 3, 1, NULL, '2026-06-30 08:04:38', '2026-06-30 08:04:38'),
+(109, 47, 5, 1, NULL, '2026-08-05 02:57:10', '2026-08-05 02:57:10'),
+(110, 47, 6, 1, NULL, '2026-08-05 02:59:53', '2026-08-05 02:59:53'),
+(111, 47, 7, 1, NULL, '2026-08-05 03:00:34', '2026-08-05 03:00:34'),
+(112, 47, 11, 1, NULL, '2026-08-05 05:30:18', '2026-08-05 05:30:18'),
+(113, 47, 12, 1, NULL, '2026-08-05 05:30:20', '2026-08-05 05:30:20'),
+(114, 47, 19, 1, NULL, '2026-08-05 05:51:43', '2026-08-05 05:51:43'),
+(115, 47, 20, 1, NULL, '2026-08-05 06:07:34', '2026-08-05 06:07:34'),
+(116, 47, 36, 1, '[\"0\",\"1\"]', '2026-08-05 06:40:17', '2026-08-05 06:40:17'),
+(123, 47, 37, 1, '[\"0\",\"1\"]', '2026-08-05 07:32:04', '2026-08-05 07:31:02'),
+(126, 47, 21, 1, NULL, '2026-08-05 07:32:15', '2026-08-05 07:32:15'),
+(128, 47, 39, 1, '[\"0\"]', '2026-08-05 07:34:35', '2026-08-05 07:34:31'),
+(130, 47, 40, 1, '[\"0\"]', '2026-08-05 07:37:44', '2026-08-05 07:37:39');
 
 -- --------------------------------------------------------
 
@@ -198,7 +205,8 @@ INSERT INTO `modules` (`module_id`, `title`, `description`, `image_path`, `creat
 (2, 'Planning and Designing Urban Agriculture Systems', 'Urban agriculture systems must be carefully planned and designed to maximize the use of\r\navailable resources, ensure sustainability, and adapt to urban constraints. This module provides a\r\ndetailed guide to site assessment, system designs, and resource management.', '../html/moduleimages/module_1767852055_7385.jpg', '2025-09-16 10:31:50', '2026-01-29 02:35:09', 'Free seeds: Okra and Alugbati'),
 (3, 'Techniques and Practices in Urban Agriculture', 'This module focuses on various techniques and practices essential for successful urban\r\nagriculture. It covers soil-based farming, soilless farming techniques (hydroponics and\r\naeroponics), and the importance of composting and resource recycling in urban settings.', '../html/moduleimages/module_1767852063_4288.jpg', '2025-09-17 02:51:30', '2026-01-29 02:35:47', 'Free seeds: Sitao and Upo'),
 (4, 'Pest and Disease Management in Urban Farming', 'Effective pest and disease management is crucial for urban agriculture, where limited space and proximity to homes and communities require sustainable and environmentally friendly approaches. Integrated Pest Management (IPM) integrates biological, cultural, mechanical, and chemical controls to manage pests and diseases without harming the environment or human health.', '../html/moduleimages/module_1767852071_4463.jpg', '2025-09-17 03:29:05', '2026-01-29 02:36:06', 'Free seeds: Eggplant and Saluyot'),
-(5, 'Crop Selection and Calendar Planning (Baguio City Focus)', 'In urban agriculture, selecting the right crops and creating an efficient seasonal crop calendar are essential for maximizing yields, meeting market demands, and ensuring the sustainability of farming systems. Baguio City, with its distinct climate and terrain, presents unique challenges and opportunities for crop selection. This module provides a comprehensive approach to understanding these factors and creating an effective crop calendar tailored to Baguio City\'s conditions.', '../html/moduleimages/module_1767852088_2399.jpg', '2025-09-17 03:48:32', '2026-01-29 02:37:12', 'Free seeds: Tomato\r\nFree Nursery Pots');
+(5, 'Crop Selection and Calendar Planning (Baguio City Focus)', 'In urban agriculture, selecting the right crops and creating an efficient seasonal crop calendar are essential for maximizing yields, meeting market demands, and ensuring the sustainability of farming systems. Baguio City, with its distinct climate and terrain, presents unique challenges and opportunities for crop selection. This module provides a comprehensive approach to understanding these factors and creating an effective crop calendar tailored to Baguio City\'s conditions.', '../html/moduleimages/module_1767852088_2399.jpg', '2025-09-17 03:48:32', '2026-01-29 02:37:12', 'Free seeds: Tomato\r\nFree Nursery Pots'),
+(11, 'asdasd', 'asdasd', 'asdasd', '2026-08-05 01:08:16', '2026-08-05 01:08:16', 'asdasd');
 
 -- --------------------------------------------------------
 
@@ -259,7 +267,34 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `type`, `message`, `l
 (13, 47, 'thread_approved', 'Your thread \"Test\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-06-18 17:32:17'),
 (14, 47, 'expert_reply', 'An expert replied to your thread \"Test\".', '../Forum/thread.php?id=60', 1, '2026-06-18 17:36:40'),
 (17, 47, 'certificate_earned', 'A new certificate is now available for one of your completed modules.', '../userpage.php?section=certificates', 1, '2026-06-19 10:27:00'),
-(18, 47, 'reward_unlocked', 'A new module reward has been unlocked.', '../userpage.php?section=rewards', 1, '2026-06-30 16:09:44');
+(18, 47, 'reward_unlocked', 'A new module reward has been unlocked.', '../userpage.php?section=rewards', 1, '2026-06-30 16:09:44'),
+(19, 47, 'thread_approved', 'Your thread \"test\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-08-06 15:11:34'),
+(20, 47, 'expert_reply', 'An expert replied to your thread \"test\".', '../Forum/thread.php?id=62', 1, '2026-08-06 15:12:15'),
+(21, 47, 'thread_reply', 'Someone replied to your thread \"test\".', '../Forum/thread.php?id=62', 1, '2026-08-06 15:13:27'),
+(22, 47, '', 'Your access to the Farming Community has been restricted by an administrator.', 'php/Forum/community.php', 1, '2026-08-06 15:44:08'),
+(23, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 15:51:52'),
+(24, 47, '', 'Your access to the Farming Community has been restricted by an administrator.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 15:52:18'),
+(25, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 16:27:57'),
+(26, 48, '', 'Your access to the Farming Community has been restricted contact the admin for access.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:28:02'),
+(27, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:29:28'),
+(28, 48, '', 'Your access to the Farming Community has been restricted contact the admin for access.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:29:50'),
+(29, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:55:38'),
+(30, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:18:48'),
+(31, 48, '', 'Your Farming Community access has been temporarily restricted for 7 days due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:21:53'),
+(32, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:21:58'),
+(33, 48, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:22:08'),
+(34, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:22:26'),
+(35, 47, '', 'Your Farming Community access has been temporarily restricted for 1 day due to a violation of the community guidelines.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:25:47'),
+(36, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:07'),
+(37, 47, '', 'Your Farming Community access has been temporarily restricted for 7 days due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:11'),
+(38, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:14'),
+(39, 47, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:15'),
+(40, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:16'),
+(41, 47, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:18'),
+(42, 60, '', 'Your Farming Community access has been temporarily restricted for 1 day due to a violation of the community guidelines.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:36'),
+(43, 48, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:29:15'),
+(44, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:29:29'),
+(45, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:29:33');
 
 -- --------------------------------------------------------
 
@@ -310,7 +345,8 @@ CREATE TABLE `questions` (
 --
 
 INSERT INTO `questions` (`question_id`, `user_id`, `title`, `body`, `image_path`, `created_at`, `updated_at`, `status`, `best_reply_id`) VALUES
-(59, 46, 'Test', 'Test', NULL, '2026-06-18 17:28:02', NULL, 'approved', NULL);
+(59, 46, 'Test', 'Test', NULL, '2026-06-18 17:28:02', NULL, 'approved', NULL),
+(62, 47, 'test', 'test', NULL, '2026-08-06 15:11:10', NULL, 'approved', 59);
 
 -- --------------------------------------------------------
 
@@ -437,7 +473,9 @@ CREATE TABLE `reply` (
 --
 
 INSERT INTO `reply` (`reply_id`, `question_id`, `user_id`, `body`, `created_at`, `updated_at`) VALUES
-(55, 59, 47, 'test', '2026-06-18 17:30:31', NULL);
+(55, 59, 47, 'test', '2026-06-18 17:30:31', NULL),
+(59, 62, 46, 'asdasd', '2026-08-06 15:12:15', NULL),
+(60, 62, 48, 'asd', '2026-08-06 15:13:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -478,20 +516,23 @@ CREATE TABLE `users` (
   `email` varchar(255) DEFAULT NULL,
   `verification_code` varchar(10) DEFAULT NULL,
   `verification_expires` datetime DEFAULT NULL,
-  `email_verified` tinyint(1) DEFAULT 0
+  `email_verified` tinyint(1) DEFAULT 0,
+  `offense_count` int(11) NOT NULL DEFAULT 0,
+  `restriction_until` datetime DEFAULT NULL,
+  `restriction_type` enum('none','temporary','permanent') NOT NULL DEFAULT 'none'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `name`, `username`, `password`, `role`, `date_created`, `status`, `profile_picture`, `email`, `verification_code`, `verification_expires`, `email_verified`) VALUES
-(1, 'admin', 'admin', '$2y$10$B.jf5ql45Tg/wj5YijIaZuANWPNmTtc0GGh.ZfTSckvnl.SCITgmq', 'admin', '2024-12-01 06:06:20', 'forum rest', NULL, NULL, NULL, NULL, 0),
-(46, 'Jhon Doe', 'test', '$2y$10$.2J45gpH.CFF2sh6xsxKv.XJZ626HGyPUt.3vccX2ggh35GLpbxP.', 'agriculturist', '2026-06-18 07:58:06', 'active', 'user_46_1783856078.png', NULL, NULL, NULL, 0),
-(47, 'John Does', 'test2', '$2y$10$63k.y8/QoYmYzN37Zzgc6et57cxkxT9GaWusIZ6DV6JRcfc62IeJu', 'new user', '2026-06-18 07:58:32', 'active', 'user_47_1782183973.png', NULL, NULL, NULL, 0),
-(48, 'Jane Doe', 'test3', '$2y$10$vaYUXJqeEic4jUVPH/cC.e0WLZOGue3cmdLCJDzKHnv.SXUFGh23G', 'new user', '2026-06-18 07:58:52', 'active', NULL, NULL, NULL, NULL, 0),
-(51, 'System Administrator', 'nimdA', '$2y$10$jVwXG1owiA/Jv.ntrIhQ0eG2CORBJ33RziahSI9cAJqMKHdqjdam6', 'admin', '2026-06-23 03:02:43', 'active', NULL, NULL, NULL, NULL, 0),
-(60, 'tets', 'tets', '$2y$10$F8wswZYFcyX/7AXODsdMluJnKSnNGhr.m4xbX9HcMFnaysSd6n1te', 'new user', '2026-07-30 13:27:11', 'active', NULL, 'mangjose246@gmail.com', NULL, NULL, 1);
+INSERT INTO `users` (`user_id`, `name`, `username`, `password`, `role`, `date_created`, `status`, `profile_picture`, `email`, `verification_code`, `verification_expires`, `email_verified`, `offense_count`, `restriction_until`, `restriction_type`) VALUES
+(1, 'admin', 'admin', '$2y$10$B.jf5ql45Tg/wj5YijIaZuANWPNmTtc0GGh.ZfTSckvnl.SCITgmq', 'admin', '2024-12-01 06:06:20', 'forum rest', NULL, NULL, NULL, NULL, 1, 0, NULL, 'none'),
+(46, 'Jhon Doe', 'test', '$2y$10$.2J45gpH.CFF2sh6xsxKv.XJZ626HGyPUt.3vccX2ggh35GLpbxP.', 'agriculturist', '2026-06-18 07:58:06', 'active', 'user_46_1783856078.png', NULL, NULL, NULL, 1, 0, NULL, 'none'),
+(47, 'John Does', 'test2', '$2y$10$63k.y8/QoYmYzN37Zzgc6et57cxkxT9GaWusIZ6DV6JRcfc62IeJu', 'new user', '2026-06-18 07:58:32', 'active', 'user_47_1782183973.png', NULL, NULL, NULL, 1, 4, NULL, 'none'),
+(48, 'Jane Doe', 'test3', '$2y$10$vaYUXJqeEic4jUVPH/cC.e0WLZOGue3cmdLCJDzKHnv.SXUFGh23G', 'new user', '2026-06-18 07:58:52', 'active', NULL, NULL, NULL, NULL, 1, 4, NULL, 'none'),
+(51, 'System Administrator', 'nimdA', '$2y$10$jVwXG1owiA/Jv.ntrIhQ0eG2CORBJ33RziahSI9cAJqMKHdqjdam6', 'admin', '2026-06-23 03:02:43', 'active', NULL, NULL, NULL, NULL, 1, 0, NULL, 'none'),
+(60, 'tets', 'tets', '$2y$10$F8wswZYFcyX/7AXODsdMluJnKSnNGhr.m4xbX9HcMFnaysSd6n1te', 'new user', '2026-07-30 13:27:11', 'inactive', NULL, 'mangjose246@gmail.com', NULL, NULL, 1, 1, '2026-08-07 11:26:36', 'temporary');
 
 -- --------------------------------------------------------
 
@@ -665,19 +706,19 @@ ALTER TABLE `forum_reports`
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `lesson_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `lesson_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `lesson_progress`
 --
 ALTER TABLE `lesson_progress`
-  MODIFY `progress_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
+  MODIFY `progress_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- AUTO_INCREMENT for table `modules`
 --
 ALTER TABLE `modules`
-  MODIFY `module_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `module_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `module_quizzes`
@@ -689,7 +730,7 @@ ALTER TABLE `module_quizzes`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `plant`
@@ -701,7 +742,7 @@ ALTER TABLE `plant`
 -- AUTO_INCREMENT for table `questions`
 --
 ALTER TABLE `questions`
-  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `quiz_questions`
@@ -719,7 +760,7 @@ ALTER TABLE `quiz_results`
 -- AUTO_INCREMENT for table `reply`
 --
 ALTER TABLE `reply`
-  MODIFY `reply_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `reply_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `suggestions`
@@ -737,7 +778,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_rewards`
 --
 ALTER TABLE `user_rewards`
-  MODIFY `reward_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `reward_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
