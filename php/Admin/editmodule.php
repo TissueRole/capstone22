@@ -1,453 +1,199 @@
 <?php
-    include '../connection.php';
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
-    $message = "";
-    $current_image_path = "";
+session_start();
 
-    if (isset($_GET['id'])){
-        $id = $_GET['id'];
+if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
 
-        $sql = "SELECT * FROM modules WHERE module_id = $id";
-        $result = $conn->query($sql);
+include('../connection.php');
 
-        if ($result->num_rows > 0){
-            $row = $result->fetch_assoc();
-            $title = $row['title'];
-            $description = $row['description'];
-            $image_path = $row['image_path'];
-            $current_image_path = $row['image_path'];
-            $rewards = $row['rewards']; 
-        }
-        else{
-            echo "No module found";
-            exit();
-        }
-    }
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    exit("❌ Error: Missing Module ID parameter in URL.");
+}
 
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        $title = mysqli_real_escape_string($conn, $_POST['title']);
-        $description = mysqli_real_escape_string($conn, $_POST['description']);
-        $rewards = mysqli_real_escape_string($conn, $_POST['rewards'] ?? '');
-        $id = $_POST['id'];
+$id_param = (int)$_GET['id'];
 
-        // Handle image input (file upload or URL)
-        $image_path = $current_image_path; // Keep current image by default
-        
-        // Check if user provided an image URL
-        if(!empty($_POST['image_url']) && filter_var($_POST['image_url'], FILTER_VALIDATE_URL)) {
-            $image_path = $_POST['image_url'];
-            
-            // Delete old uploaded file if it exists and is different
-            if(!empty($current_image_path) && $current_image_path != $image_path && !filter_var($current_image_path, FILTER_VALIDATE_URL)) {
-                $old_file_path = '../../' . $current_image_path;
-                if(file_exists($old_file_path)) {
-                    unlink($old_file_path);
+$stmt = $conn->prepare("SELECT * FROM modules WHERE module_id = ?");
+if (!$stmt) {
+    exit("❌ SQL Error on SELECT: " . $conn->error);
+}
+
+$stmt->bind_param("i", $id_param);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    exit("❌ Error: Module ID $id_param was not found in the database.");
+}
+
+$module = $result->fetch_assoc();
+$success = $error = "";
+
+if (isset($_POST['update_module'])) {
+    $title = trim($_POST['title'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $rewards = trim($_POST['rewards'] ?? '');
+    $image_path = $module['image_path'] ?? '';
+
+    if (!empty($title) && !empty($description)) {
+
+        if (isset($_FILES['module_image']) && $_FILES['module_image']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath   = $_FILES['module_image']['tmp_name'];
+            $fileName      = $_FILES['module_image']['name'];
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            if (in_array($fileExtension, $allowed)) {
+                $uploadDir = '../../images/modules/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
                 }
-            }
-        }
-        // Check if user uploaded a file
-        elseif(isset($_FILES['module_image']) && $_FILES['module_image']['error'] == 0) {
-            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/avif', 'image/webp'];
-            $file_type = $_FILES['module_image']['type'];
-            $file_size = $_FILES['module_image']['size'];
-            $file_name = $_FILES['module_image']['name'];
-            
-            // Validate file type
-            if(!in_array($file_type, $allowed_types)) {
-                $message = "<div class='alert alert-danger'>Invalid file type. Only JPG, PNG, GIF, AVIF, and WebP images are allowed.</div>";
-            }
-            // Validate file size (5MB limit)
-            elseif($file_size > 5 * 1024 * 1024) {
-                $message = "<div class='alert alert-danger'>File size too large. Maximum size is 5MB.</div>";
-            }
-            else {
-                // Generate unique filename
-                $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-                $new_filename = 'module_' . time() . '_' . rand(1000, 9999) . '.' . $file_extension;
-                $upload_path = '../../html/moduleimages/' . $new_filename;
-                
-                // Upload file
-                if(move_uploaded_file($_FILES['module_image']['tmp_name'], $upload_path)) {
-                    $image_path = '../html/moduleimages/' . $new_filename;
-                    
-                    // Delete old image if it exists and is different
-                    if(!empty($current_image_path) && $current_image_path != $image_path && !filter_var($current_image_path, FILTER_VALIDATE_URL)) {
-                        $old_file_path = '../../' . $current_image_path;
-                        if(file_exists($old_file_path)) {
-                            unlink($old_file_path);
+
+                $newFileName = 'module_' . time() . '_' . uniqid() . '.' . $fileExtension;
+                $destPath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $destPath)) {
+                    // Delete previous image file from server if it exists
+                    if (!empty($module['image_path'])) {
+                        // Adds extra '../' to convert '../images/...' into '../../images/...' for admin scope
+                        $oldFilePath = '../' . $module['image_path'];
+                        if (file_exists($oldFilePath) && is_file($oldFilePath)) {
+                            @unlink($oldFilePath);
                         }
                     }
+                    // Stored formatted for php/modulepage.php
+                    $image_path = '../images/modules/' . $newFileName;
                 } else {
-                    $message = "<div class='alert alert-danger'>Failed to upload image. Please try again.</div>";
+                    $error = "❌ Failed to save uploaded image file.";
                 }
+            } else {
+                $error = "❌ Invalid image format. Allowed formats: JPG, PNG, GIF, WEBP.";
             }
         }
 
-        if(!empty($title) && !empty($description) && empty($message)){
-            $sql = "UPDATE modules 
-                SET 
-                    title='$title',
-                    description='$description',
-                    rewards='$rewards',
-                    image_path='$image_path',
-                    updated_at=CURRENT_TIMESTAMP 
-                WHERE module_id='$id'";
+        if (empty($error)) {
+            $updateStmt = $conn->prepare("
+                UPDATE modules 
+                SET title = ?, description = ?, image_path = ?, rewards = ?, updated_at = NOW() 
+                WHERE module_id = ?
+            ");
 
-            if($conn->query($sql) === TRUE){
-                $message = "<div class='alert alert-success'>Module updated successfully!</div>";
-                // No redirect; stay on the edit page and show the success message
+            if (!$updateStmt) {
+                exit("❌ SQL Error on UPDATE: " . $conn->error);
             }
-            else{
-                $message = "<div class='alert alert-danger'>Update Failed: " . mysqli_error($conn) . "</div>";
+
+            $updateStmt->bind_param("ssssi", $title, $description, $image_path, $rewards, $id_param);
+
+            if ($updateStmt->execute()) {
+                $success = "✅ Module updated successfully!";
+                $module['title'] = $title;
+                $module['description'] = $description;
+                $module['image_path'] = $image_path;
+                $module['rewards'] = $rewards;
+            } else {
+                $error = "❌ Update execution failed: " . $updateStmt->error;
             }
         }
-        elseif(empty($message)){
-            $message = "<div class='alert alert-warning'>Please fill all the required fields!</div>";
-        }
+    } else {
+        $error = "❌ Title and Description are required.";
     }
+}
 
+// Convert DB path ('../images/...') into Admin browser path ('../../images/...') by prepending '../'
+$preview_src = "";
+if (!empty($module['image_path'])) {
+    $preview_src = '../' . $module['image_path'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Module</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Admin - Edit Module</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Irish+Grover&display=swap" rel="stylesheet">
     <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            overflow-x: hidden;
-            background: #e8f5e9;
-            font-family: 'Poppins', Arial, sans-serif;
-        }
-        .d-flex {
-            min-height: 100vh;
-            justify-content: center;
-            align-items: center;
-            padding: 80px 0 20px 0;
-        }
-        .form-container {
-            background: #f1fdf6;
-            border-radius: 22px;
-            box-shadow: 0 8px 32px 0 rgba(56,142,60,0.18);
-            border: 2.5px solid #43a047;
-            padding: 2.5rem 2.5rem 2rem 2.5rem;
-            max-width: 900px;
-            margin: 0 auto;
-            animation: fadeInUp 0.7s cubic-bezier(.39,.575,.565,1) both;
-        }
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: none; }
-        }
-        .section-title {
-            font-family: 'Irish Grover', cursive;
-            color: #2e7d32;
-            font-size: 2.1rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-        }
-        .form-label {
-            color: #2e7d32;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .form-control, textarea.form-control {
-            border-radius: 10px;
-            border: 1.5px solid #43a047;
-            background: #e8f5e9;
-            font-size: 1.08rem;
-            margin-bottom: 1.1rem;
-        }
-        .form-control:focus, textarea.form-control:focus {
-            border-color: #388e3c;
-            box-shadow: 0 0 0 2px #43a04733;
-        }
-        .content-input-tabs, .image-input-tabs {
-            display: flex;
-            margin-bottom: 15px;
-            border-radius: 7px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(56,142,60,0.10);
-        }
-        .content-input-tab, .image-input-tab {
-            flex: 1;
-            padding: 16px 0;
-            background: #c8e6c9;
-            color: #2e7d32;
-            text-align: center;
-            cursor: pointer;
-            transition: background 0.3s, color 0.3s;
-            border: none;
-            font-weight: 600;
-            font-size: 1.15rem;
-        }
-        .content-input-tab.active, .image-input-tab.active {
-            background: #43a047;
-            color: #fff;
-            font-weight: bold;
-        }
-        .content-input-tab:not(.active), .image-input-tab:not(.active) {
-            background: #dcedc8;
-            color: #388e3c;
-        }
-        .content-input-tab:hover:not(.active), .image-input-tab:hover:not(.active) {
-            background: #a5d6a7;
-            color: #2e7d32;
-        }
-        .input-content, .image-input-content {
-            display: none;
-        }
-        .input-content.active, .image-input-content.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .image-preview, .content-preview {
-            max-width: 220px;
-            max-height: 150px;
-            border-radius: 10px;
-            border: 2px solid #43a047;
-            margin-bottom: 0.5rem;
-            background: #e8f5e9;
-        }
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-        .file-input-label {
-            display: block;
-            padding: 10px 15px;
-            background: #388e3c;
-            color: #fff;
-            border-radius: 7px;
-            cursor: pointer;
-            text-align: center;
-            transition: background 0.3s;
-            font-weight: 600;
-        }
-        .file-input-label:hover {
-            background: #2e7d32;
-        }
-        .current-image-info {
-            background: #c8e6c9;
-            padding: 10px;
-            border-radius: 7px;
-            margin-bottom: 10px;
-            color: #2e7d32;
-            font-size: 1rem;
-        }
-        .url-example {
-            background: #f1fdf6;
-            padding: 10px;
-            border-radius: 7px;
-            margin-top: 10px;
-            font-size: 0.98em;
-            color: #2e7d32;
-        }
-        .url-example code {
-            color: #2e7d32;
-            background: #c8e6c9;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-        .btn-success {
-            background: #43a047;
-            color: #fff;
-            border-radius: 50px;
-            font-weight: 600;
-            padding: 0.7rem 2.5rem;
-            font-size: 1.1rem;
-            border: none;
-            box-shadow: 0 2px 8px rgba(56,142,60,0.13);
-            transition: background 0.2s, transform 0.2s;
-        }
-        .btn-success:hover {
-            background: #2e7d32;
-            color: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(56,142,60,0.18);
-        }
-        .btn-secondary {
-            border-radius: 50px;
-            font-weight: 600;
-            padding: 0.7rem 2.5rem;
-            font-size: 1.1rem;
-        }
-        @media (max-width: 900px) {
-            .form-container { padding: 1.2rem 0.5rem; }
-        }
-        @media (max-width: 600px) {
-            .form-container { padding: 0.5rem 0.2rem; }
-            .section-title { font-size: 1.3rem; }
-        }
+        body { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); font-family: 'Poppins', sans-serif; }
+        .page-header { background: #388e3c; color: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; box-shadow: 0px 4px 15px rgba(0,0,0,0.15); }
+        .card { border-radius: 1rem; box-shadow: 0px 6px 18px rgba(0,0,0,0.1); }
+        .btn-success { background: #66bb6a; border: none; }
+        .btn-success:hover { background: #388e3c; }
+        .form-label { font-weight: 600; color: #2e7d32; }
+        #imagePreview { max-height: 200px; object-fit: cover; border-radius: 0.5rem; display: <?= !empty($preview_src) ? 'block' : 'none' ?>; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-5 fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="adminpage.php"><i class="bi bi-arrow-left"></i> Admin Dashboard</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<div class="container py-5">
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Edit Module</h2>
+        <a href="adminpage.php" class="btn btn-light"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+    <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+
+    <div class="card border-0 mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-pencil-fill me-2"></i> Update Module Details (ID: <?= $id_param ?>)</h5>
         </div>
-    </nav>
-    
-    <div class="d-flex">
-        <div class="container p-5">
-            <?php if (!empty($message)) echo $message; ?>
-            
-            <form action="editmodule.php?id=<?php echo $id; ?>" method="POST" enctype="multipart/form-data" class="p-5 form-container">
-                <div class="section-title mb-4"><i class="bi bi-pencil-square"></i> Edit Module Details</div>
-
-                <input type="hidden" name="id" value="<?php echo $id; ?>">
-
-                <div class="row">
-                    <div class="col-md-8">
-                        <label for="title" class="form-label fw-semibold fs-5 ">Module Title:</label>
-                        <input type="text" class="form-control mb-3" id="title" name="title" value="<?php echo htmlspecialchars($title); ?>" required>
-
-                        <label for="description" class="form-label fw-semibold fs-5 ">Description:</label>
-                        <textarea class="form-control mb-3" id="description" name="description" rows="4" required><?php echo htmlspecialchars($description); ?></textarea>
-
-                        <label class="form-label">Module Rewards</label>
-                        <textarea name="rewards" class="form-control" rows="4"><?php echo htmlspecialchars($rewards ?? ''); ?></textarea>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="image-input-tabs">
-                            <button type="button" class="image-input-tab active" onclick="switchImageInput('upload')">Upload Image</button>
-                            <button type="button" class="image-input-tab" onclick="switchImageInput('url')">Use URL</button>
-                        </div>
-                        <div id="upload-content" class="image-input-content active">
-                            <div class="file-input-wrapper">
-                                <label for="module_image" class="file-input-label">
-                                    <i class="bi bi-upload"></i> Choose Image File
-                                </label>
-                                <input type="file" id="module_image" name="module_image" accept="image/*">
-                            </div>
-                            <div id="image-preview-container" class="mt-3" style="display: none;">
-                                <p class="mb-2"><strong>New Image Preview:</strong></p>
-                                <img id="image-preview" src="" alt="Image preview" class="image-preview">
-                                <p id="file-info" class="text-muted small"></p>
-                            </div>
-                            <p class="text-muted small mt-2">
-                                <i class="bi bi-info-circle"></i> 
-                                Supported formats: JPG, PNG, GIF, AVIF, WebP<br>
-                                Maximum size: 5MB
-                            </p>
-                        </div>
-                        <div id="url-content" class="image-input-content">
-                            <input type="url" class="form-control mb-3" id="image_url" name="image_url" placeholder="https://example.com/image.jpg" value="<?php echo filter_var($current_image_path, FILTER_VALIDATE_URL) ? htmlspecialchars($current_image_path) : ''; ?>">
-                            <div id="url-preview-container" class="mt-3" style="display: none;">
-                                <p class="mb-2"><strong>URL Image Preview:</strong></p>
-                                <img id="url-preview" src="" alt="URL image preview" class="image-preview">
-                                <p id="url-info" class="text-muted small"></p>
-                            </div>
-                            <div class="url-example">
-                                <i class="bi bi-info-circle"></i> <strong>Examples:</strong><br>
-                                • Google Drive: <code>https://drive.google.com/uc?export=view&id=YOUR_FILE_ID</code><br>
-                                • Imgur: <code>https://i.imgur.com/example.jpg</code><br>
-                                • Any direct image URL
-                            </div>
-                        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">Module Title</label>
+                    <input type="text" name="title" class="form-control" value="<?= htmlspecialchars($module['title'] ?? '') ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Module Description</label>
+                    <textarea name="description" class="form-control" rows="5" required><?= htmlspecialchars($module['description'] ?? '') ?></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Module Rewards</label>
+                    <textarea name="rewards" class="form-control" rows="2" placeholder="Enter rewards"><?= htmlspecialchars($module['rewards'] ?? '') ?></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Module Image</label>
+                    <input type="file" name="module_image" id="moduleImageInput" class="form-control" accept="image/*">
+                    <small class="text-muted">Leave empty to keep current image.</small>
+                    <div class="mt-2">
+                        <img id="imagePreview" src="<?= htmlspecialchars($preview_src) ?>" alt="Image Preview" class="img-thumbnail">
                     </div>
                 </div>
 
-                <div class="mt-1">
-                    <button type="submit" class="btn btn-success me-2">
-                        <i class="bi bi-check-circle"></i> Update Module
+                <div class="d-flex gap-2">
+                    <button type="submit" name="update_module" class="btn btn-success flex-grow-1">
+                        <i class="bi bi-save me-1"></i> Save Changes
                     </button>
-                    <a href="adminpage.php#module-management" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to Admin
-                    </a>
+                    <a href="adminpage.php" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
+</div>
 
-    <script>
-        // Switch between upload and URL input for image
-        function switchImageInput(type) {
-            const tabs = document.querySelectorAll('.image-input-tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            if (type === 'upload') {
-                tabs[0].classList.add('active');
-                document.getElementById('upload-content').classList.add('active');
-                document.getElementById('upload-content').style.display = 'block';
-                document.getElementById('url-content').classList.remove('active');
-                document.getElementById('url-content').style.display = 'none';
-            } else {
-                tabs[1].classList.add('active');
-                document.getElementById('upload-content').classList.remove('active');
-                document.getElementById('upload-content').style.display = 'none';
-                document.getElementById('url-content').classList.add('active');
-                document.getElementById('url-content').style.display = 'block';
-            }
+<script>
+    const imageInput = document.getElementById('moduleImageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const originalSrc = "<?= htmlspecialchars($preview_src) ?>";
+
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            imagePreview.src = URL.createObjectURL(file);
+            imagePreview.style.display = 'block';
+        } else if (originalSrc) {
+            imagePreview.src = originalSrc;
+            imagePreview.style.display = 'block';
+        } else {
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
         }
-        // Image preview functionality for file upload
-        document.getElementById('module_image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const previewContainer = document.getElementById('image-preview-container');
-            const preview = document.getElementById('image-preview');
-            const fileInfo = document.getElementById('file-info');
-            if (file) {
-                const fileSize = (file.size / 1024 / 1024).toFixed(2);
-                fileInfo.textContent = `${file.name} (${fileSize} MB)`;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    previewContainer.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                previewContainer.style.display = 'none';
-            }
-        });
-        // URL preview functionality
-        document.getElementById('image_url').addEventListener('input', function(e) {
-            const url = e.target.value;
-            const previewContainer = document.getElementById('url-preview-container');
-            const preview = document.getElementById('url-preview');
-            const urlInfo = document.getElementById('url-info');
-            if (url && isValidUrl(url)) {
-                urlInfo.textContent = `URL: ${url}`;
-                preview.src = url;
-                previewContainer.style.display = 'block';
-                preview.onerror = function() {
-                    urlInfo.textContent = `URL: ${url} (Image not accessible)`;
-                    preview.style.display = 'none';
-                };
-                preview.onload = function() {
-                    preview.style.display = 'block';
-                };
-            } else {
-                previewContainer.style.display = 'none';
-            }
-        });
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-    </script>
+    });
+</script>
 </body>
 </html>

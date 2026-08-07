@@ -149,7 +149,6 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                     <tr>
                         <th>Title</th>
                         <th>Description</th>
-                        <th>Image</th>
                         <th>Created_at</th>
                         <th>Updated_at</th>
                         <th>Actions</th>
@@ -162,21 +161,6 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['title']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['description']) . "</td>";
-                        // Display image preview in admin table
-                        $image_path = $row['image_path'];
-                        if (filter_var($image_path, FILTER_VALIDATE_URL)) {
-                            // External URL
-                            echo "<td>
-                                    <img src='" . htmlspecialchars($image_path) . "' alt='Module Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 5px;' onerror='this.style.display=\"none\"; this.nextElementSibling.style.display=\"block\";'>
-                                    <span style='display: none; font-size: 0.8em; color: #666;'>External URL</span>
-                                  </td>";
-                        } else {
-                            // Local file
-                            echo "<td>
-                                    <img src='../../" . htmlspecialchars($image_path) . "' alt='Module Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 5px;' onerror='this.style.display=\"none\"; this.nextElementSibling.style.display=\"block\";'>
-                                    <span style='display: none; font-size: 0.8em; color: #666;'>Local File</span>
-                                  </td>";
-                        }
                         echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['updated_at']) . "</td>";
                         echo "<td class='d-flex gap-1'>

@@ -570,10 +570,7 @@ function addSection(data = null) {
         section.querySelector('[data-role="section-body"]').value = data.body || '';
         
         if (data.image_url) {
-            // Keep the database path in the hidden input
             section.querySelector('[data-role="existing-image"]').value = data.image_url;
-            
-            // Use the adjusted preview path for the <img> src
             const preview = section.querySelector('.image-preview');
             preview.src = data.preview_url || data.image_url;
             preview.style.display = 'block';
