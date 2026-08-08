@@ -40,7 +40,7 @@ function buildLessonContentFromTemplate($builderPayloadJson, $imagePaths = [], $
         $heading = trim($section['heading'] ?? '');
         $body = trim($section['body'] ?? '');
         
-        // Prioritize newly uploaded image, fallback to existing image URL if not replaced
+        // Match exact index from $imagePaths or fallback to existing image
         $imageUrl = !empty($imagePaths[$index]) ? $imagePaths[$index] : ($existingImages[$index] ?? '');
         
         $videoUrl = trim($section['video_url'] ?? '');
@@ -125,7 +125,6 @@ function parseRawContentToBuilder($rawContent) {
         $block = trim($block);
         if ($block === '') continue;
 
-        // Check for Checkpoints
         if (preg_match('/^\[checkpoint:(.+)\]$/', $block, $matches)) {
             $decoded = json_decode(base64_decode($matches[1]), true);
             if ($decoded) {
@@ -142,7 +141,6 @@ function parseRawContentToBuilder($rawContent) {
             continue;
         }
 
-        // Check for Heading -> Starts a new section
         if (strpos($block, '## ') === 0) {
             $isIntro = false;
             if ($currentSection !== null) {
@@ -159,7 +157,6 @@ function parseRawContentToBuilder($rawContent) {
             continue;
         }
 
-        // Check for YouTube Embed
         if (preg_match('/^\[youtube:(.+)\]$/', $block, $matches)) {
             if ($isIntro && empty($payload['sections'])) {
                 $payload['intro_video_url'] = $matches[1];
@@ -169,26 +166,21 @@ function parseRawContentToBuilder($rawContent) {
             continue;
         }
 
-        // Check for Image
         if (preg_match('/^!\[(.*?)\]\((.*?)\)$/', $block, $matches)) {
             if ($currentSection !== null) {
                 $rawPath = $matches[2];
-                
-                // If the path starts with "../images/", add another "../" so the browser 
-                // in admin directory can locate "../../images/lessons/..."
                 if (strpos($rawPath, '../images/') === 0) {
                     $previewPath = '../' . $rawPath;
                 } else {
                     $previewPath = $rawPath;
                 }
 
-                $currentSection['image_url'] = $rawPath;     // Retain original path for database saves
-                $currentSection['preview_url'] = $previewPath; // Relative path for admin page preview
+                $currentSection['image_url'] = $rawPath;
+                $currentSection['preview_url'] = $previewPath;
             }
             continue;
         }
 
-        // Check for Link
         if (preg_match('/^\[(.*?)\]\((.*?)\)$/', $block, $matches)) {
             if ($currentSection !== null) {
                 $currentSection['link_label'] = $matches[1];
@@ -197,7 +189,6 @@ function parseRawContentToBuilder($rawContent) {
             continue;
         }
 
-        // Regular Text
         if ($isIntro && empty($payload['sections'])) {
             $payload['intro'] = $payload['intro'] !== '' ? $payload['intro'] . "\n\n" . $block : $block;
         } else if ($currentSection !== null) {
@@ -214,7 +205,6 @@ function parseRawContentToBuilder($rawContent) {
 
 $success = $error = "";
 
-// Fetch existing lesson data
 $stmt = $conn->prepare("SELECT * FROM lessons WHERE lesson_id = ?");
 $stmt->bind_param("i", $lesson_id);
 $stmt->execute();
@@ -231,23 +221,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $imagePaths = [];
     $existingImages = $_POST['existing_section_images'] ?? [];
 
-    if (!empty($_FILES['section_image']['name'][0])) {
+    // --- FIX: Process uploads by preserving exact section indices ---
+    if (isset($_FILES['section_image']['name']) && is_array($_FILES['section_image']['name'])) {
         $uploadDir = "../../images/lessons/";
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        foreach ($_FILES['section_image']['tmp_name'] as $i => $tmpName) {
-            if ($_FILES['section_image']['error'][$i] != UPLOAD_ERR_OK) continue;
+        foreach ($_FILES['section_image']['name'] as $i => $filename) {
+            if ($_FILES['section_image']['error'][$i] === UPLOAD_ERR_OK) {
+                $tmpName = $_FILES['section_image']['tmp_name'][$i];
+                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                $allowed = ['jpg','jpeg','png','gif','webp'];
 
-            $ext = strtolower(pathinfo($_FILES['section_image']['name'][$i], PATHINFO_EXTENSION));
-            $allowed = ['jpg','jpeg','png','gif','webp'];
-
-            if (!in_array($ext, $allowed)) continue;
-
-            $newName = uniqid("lesson_") . "." . $ext;
-            if (move_uploaded_file($tmpName, $uploadDir . $newName)) {
-                $imagePaths[$i] = "../images/lessons/" . $newName;
+                if (in_array($ext, $allowed)) {
+                    $newName = uniqid("lesson_") . "." . $ext;
+                    if (move_uploaded_file($tmpName, $uploadDir . $newName)) {
+                        // Key $i matches the exact section block index
+                        $imagePaths[$i] = "../images/lessons/" . $newName;
+                    }
+                }
             }
         }
     }
@@ -272,7 +265,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($updateStmt->execute()) {
             $success = "Lesson updated successfully.";
-            // Refresh local data
             $lesson['module_id'] = $module_id;
             $lesson['title'] = $title;
             $lesson['content'] = $content;
@@ -366,7 +358,7 @@ $parsedPayloadJson = json_encode(parseRawContentToBuilder($lesson['content']));
                         <h5 class="mb-3">Lesson Intro</h5>
                         <div class="mb-3">
                             <label class="form-label">Intro Paragraph</label>
-                            <textarea id="lesson_intro" class="form-control" placeholder="Short introduction for the lesson"></textarea>
+                            <textarea id="lesson_intro" class="form-control" placeholder="Short introduction for the lesson" rows="8"></textarea>
                         </div>
                         <div class="mb-0">
                             <label class="form-label">Intro YouTube URL or Video ID</label>
@@ -434,6 +426,7 @@ $parsedPayloadJson = json_encode(parseRawContentToBuilder($lesson['content']));
         </div>
         <div class="mb-3">
             <label class="form-label">Upload Image</label>
+            <!-- FIX: Empty array name section_image[] is maintained dynamically -->
             <input type="file" name="section_image[]" class="form-control section-image-file" accept="image/*">
             <input type="hidden" name="existing_section_images[]" data-role="existing-image">
             <img class="img-fluid rounded mt-2 image-preview" style="display:none;max-height:250px;">
@@ -454,7 +447,7 @@ $parsedPayloadJson = json_encode(parseRawContentToBuilder($lesson['content']));
         </div>
         <div class="mb-3">
             <label class="form-label">Section Content</label>
-            <textarea data-role="section-body" class="form-control" placeholder="Write short paragraphs or bullet points"></textarea>
+            <textarea data-role="section-body" class="form-control" placeholder="Write short paragraphs or bullet points" rows="10"></textarea>
         </div>
     </div>
 </template>
@@ -530,9 +523,21 @@ const endCheckpointsContainer = document.getElementById('end-checkpoints-contain
 const addEndCheckpointBtn = document.getElementById('add-end-checkpoint-btn');
 const noEndCheckpoints = document.getElementById('no-end-checkpoints');
 
+// FIX: Dynamically reindex input file names whenever sections are added, removed, or moved
 function updateSectionLabels() {
     sectionsContainer.querySelectorAll('.section-block').forEach((section, index) => {
         section.querySelector('.section-handle').textContent = `Section ${index + 1}`;
+        
+        // Reindex input names so $_FILES['section_image']['name'][$index] aligns with buildLessonContentFromTemplate()
+        const fileInput = section.querySelector('.section-image-file');
+        if (fileInput) {
+            fileInput.name = `section_image[${index}]`;
+        }
+        
+        const existingInput = section.querySelector('[data-role="existing-image"]');
+        if (existingInput) {
+            existingInput.name = `existing_section_images[${index}]`;
+        }
     });
 }
 
@@ -555,6 +560,22 @@ function attachSectionEvents(section) {
             updateSectionLabels();
         }
     });
+
+    const imageInput = section.querySelector('.section-image-file');
+    const imagePreview = section.querySelector('.image-preview');
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagePreview.src = event.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
 }
 
 function addSection(data = null) {
@@ -719,7 +740,6 @@ function buildBuilderPayload() {
     };
 }
 
-// Initialize form inputs with decoded payload
 function populateBuilderData(data) {
     document.getElementById('lesson_intro').value = data.intro || '';
     document.getElementById('lesson_video_url').value = data.intro_video_url || '';
@@ -754,22 +774,6 @@ lessonForm.addEventListener('submit', () => {
 addSectionBtn.addEventListener('click', () => addSection());
 addEndCheckpointBtn.addEventListener('click', () => addEndCheckpoint());
 
-document.addEventListener("change", function (e) {
-    if (!e.target.classList.contains("section-image-file")) return;
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const section = e.target.closest(".section-block");
-        const preview = section.querySelector(".image-preview");
-        preview.src = event.target.result;
-        preview.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-});
-
-// Load stored values into fields
 populateBuilderData(existingData);
 </script>
 </body>

@@ -483,7 +483,8 @@ class TeenAnimLearning {
             }
             return value && value.trim() !== '';
         });
-        const inputType = type === 'multi_select' ? 'checkbox' : 'radio';
+
+        const inputType = 'radio';
 
         const optionsHtml = optionEntries.map(([key, value]) => `
             <label class="checkpoint-option">
@@ -527,9 +528,16 @@ class TeenAnimLearning {
 
             await this.saveCheckpointProgress();
 
+            if (feedback) {
+                feedback.textContent = '';
+                feedback.className = 'checkpoint-feedback error';
+            }
+
         } else {
-            feedback.textContent = 'Incorrect.';
-            feedback.className = 'checkpoint-feedback error';
+            if (feedback) {
+                feedback.textContent = 'Incorrect.';
+                feedback.className = 'checkpoint-feedback error';
+            }
         }
 
         const allPassed = Array.from(document.querySelectorAll('.lesson-checkpoint')).every((item) => item.classList.contains('passed'));
@@ -541,6 +549,7 @@ class TeenAnimLearning {
             this.unlockLessonCompletion(this.currentLesson.lesson_id);
         }
     }
+
     async saveCheckpointProgress() {
         try {
             const response = await fetch('learning/api/save-checkpoint-progress.php', {

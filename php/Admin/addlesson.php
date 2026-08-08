@@ -113,34 +113,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lesson_order = intval($_POST['lesson_order'] ?? 1);
     $imagePaths = [];
 
-    if (!empty($_FILES['section_image']['name'][0])) {
-
+    // Process keyed image uploads matching section indices
+    if (!empty($_FILES['section_images']['name']) && is_array($_FILES['section_images']['name'])) {
         $uploadDir = "../../images/lessons/";
 
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        foreach ($_FILES['section_image']['tmp_name'] as $i => $tmpName) {
-
-            if ($_FILES['section_image']['error'][$i] != UPLOAD_ERR_OK)
+        foreach ($_FILES['section_images']['name'] as $i => $name) {
+            if (empty($name) || $_FILES['section_images']['error'][$i] !== UPLOAD_ERR_OK) {
                 continue;
+            }
 
-            $ext = strtolower(pathinfo($_FILES['section_image']['name'][$i], PATHINFO_EXTENSION));
+            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-            $allowed = ['jpg','jpeg','png','gif','webp'];
-
-            if (!in_array($ext,$allowed))
+            if (!in_array($ext, $allowed, true)) {
                 continue;
+            }
 
             $newName = uniqid("lesson_") . "." . $ext;
+            $tmpName = $_FILES['section_images']['tmp_name'][$i];
 
-            move_uploaded_file(
-                $tmpName,
-                $uploadDir . $newName
-            );
-
-            $imagePaths[$i] = "../images/lessons/" . $newName;
+            if (move_uploaded_file($tmpName, $uploadDir . $newName)) {
+                $imagePaths[$i] = "../images/lessons/" . $newName;
+            }
         }
     }
     
@@ -250,7 +248,7 @@ $modules = $conn->query("SELECT module_id, title FROM modules ORDER BY created_a
                         <h5 class="mb-3">Lesson Intro</h5>
                         <div class="mb-3">
                             <label class="form-label">Intro Paragraph</label>
-                            <textarea id="lesson_intro" class="form-control" placeholder="Short introduction for the lesson"></textarea>
+                            <textarea id="lesson_intro" class="form-control" placeholder="Short introduction for the lesson" rows="8"></textarea>
                         </div>
                         <div class="mb-0">
                             <label class="form-label">Intro YouTube URL or Video ID</label>
@@ -323,7 +321,6 @@ $modules = $conn->query("SELECT module_id, title FROM modules ORDER BY created_a
             <label class="form-label">Upload Image</label>
             <input
                 type="file"
-                name="section_image[]"
                 class="form-control section-image-file"
                 accept="image/*">
             <input
@@ -349,7 +346,7 @@ $modules = $conn->query("SELECT module_id, title FROM modules ORDER BY created_a
         </div>
         <div class="mb-3">
             <label class="form-label">Section Content</label>
-            <textarea data-role="section-body" class="form-control" placeholder="Write short paragraphs or bullet points"></textarea>
+            <textarea data-role="section-body" class="form-control" placeholder="Write short paragraphs or bullet points" rows="8"></textarea>
         </div>
         <div class="checkpoints-container"></div>
     </div>
@@ -458,15 +455,6 @@ const endCheckpointsContainer = document.getElementById('end-checkpoints-contain
 const addEndCheckpointBtn = document.getElementById('add-end-checkpoint-btn');
 const noEndCheckpoints = document.getElementById('no-end-checkpoints');
 
-function updateCheckpointLabels(section) {
-    const checkpoints = section.querySelectorAll(".checkpoint-block");
-
-    checkpoints.forEach((checkpoint, index) => {
-        checkpoint.querySelector(".checkpoint-handle").textContent =
-            `Checkpoint ${index + 1}`;
-    });
-}
-
 function attachSectionEvents(section) {
     section.querySelector('.remove-section-btn').addEventListener('click', () => {
         section.remove();
@@ -487,9 +475,16 @@ function attachSectionEvents(section) {
         }
     });
 }
+
 function updateSectionLabels() {
     sectionsContainer.querySelectorAll('.section-block').forEach((section, index) => {
         section.querySelector('.section-handle').textContent = `Section ${index + 1}`;
+        
+        // Key the file input directly to the section index position
+        const fileInput = section.querySelector('.section-image-file');
+        if (fileInput) {
+            fileInput.name = `section_images[${index}]`;
+        }
     });
 }
 
@@ -499,6 +494,7 @@ function addSection() {
     attachSectionEvents(section);
     updateSectionLabels();
 }
+
 function updateEndCheckpointLabels() {
     const checkpoints = endCheckpointsContainer.querySelectorAll('.checkpoint-block');
 
@@ -509,6 +505,7 @@ function updateEndCheckpointLabels() {
             `Checkpoint ${index + 1}`;
     });
 }
+
 function syncCheckpointUI(checkpoint) {
     const typeSelect = checkpoint.querySelector('[data-role="checkpoint-type"]');
     const type = typeSelect.value;
@@ -551,6 +548,7 @@ function syncCheckpointUI(checkpoint) {
         });
     }
 }
+
 function addEndCheckpoint() {
     const checkpoint = checkpointTemplate.content.firstElementChild.cloneNode(true);
 
@@ -602,8 +600,8 @@ function addEndCheckpoint() {
     syncCheckpointUI(checkpoint);
     updateEndCheckpointLabels();
 }
-addEndCheckpointBtn.addEventListener('click', addEndCheckpoint);
 
+addEndCheckpointBtn.addEventListener('click', addEndCheckpoint);
 
 function buildBuilderPayload() {
     const sections = Array.from(
@@ -656,8 +654,8 @@ lessonForm.addEventListener('submit', () => {
 addSectionBtn.addEventListener('click', addSection);
 
 addSection();
-document.addEventListener("change", function (e) {
 
+document.addEventListener("change", function (e) {
     if (!e.target.classList.contains("section-image-file"))
         return;
 
@@ -669,9 +667,7 @@ document.addEventListener("change", function (e) {
     const reader = new FileReader();
 
     reader.onload = function(event){
-
         const section = e.target.closest(".section-block");
-
         const preview = section.querySelector(".image-preview");
 
         preview.src = event.target.result;
@@ -679,9 +675,7 @@ document.addEventListener("change", function (e) {
     };
 
     reader.readAsDataURL(file);
-
 });
-
 </script>
 </body>
 </html>

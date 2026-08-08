@@ -1,0 +1,881 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Aug 08, 2026 at 01:12 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `capstone`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `certificates`
+--
+
+CREATE TABLE `certificates` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `module_id` int(11) NOT NULL,
+  `completion_date` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `certificates`
+--
+
+INSERT INTO `certificates` (`id`, `user_id`, `module_id`, `completion_date`) VALUES
+(4, 47, 5, '2026-06-19 10:27:00'),
+(7, 47, 21, '2026-08-08 18:50:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `community_updates`
+--
+
+CREATE TABLE `community_updates` (
+  `update_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `body` text NOT NULL,
+  `image_url` varchar(500) DEFAULT NULL,
+  `external_url` varchar(500) DEFAULT NULL,
+  `is_pinned` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `community_updates`
+--
+
+INSERT INTO `community_updates` (`update_id`, `user_id`, `title`, `body`, `image_url`, `external_url`, `is_pinned`, `created_at`, `updated_at`) VALUES
+(5, 37, 'Test', 'Test', '', 'https://www.facebook.com/photo/?fbid=1308706891441006', 0, '2026-06-18 15:22:03', '2026-06-18 15:22:03'),
+(6, 46, 'Test Update', 'Test Updates', '', 'https://www.facebook.com/photo/?fbid=1339601601641109', 0, '2026-06-18 15:59:51', '2026-06-18 16:08:43'),
+(7, 46, 'Test2', 'test', '', '', 0, '2026-06-18 17:20:35', '2026-06-18 17:20:35'),
+(8, 46, 'sadsad', 'asdas', '', '', 0, '2026-07-12 19:33:28', '2026-07-12 19:33:38'),
+(9, 63, 'Magkakaroon ng pagtaas ang uggot ng sayote', 'SAYOTE LANG SAKALAM', '', 'https://www.tiktok.com/@whitewabbitxx/video/7424749333406338311', 0, '2026-08-06 18:06:06', '2026-08-06 18:06:06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `forum_reports`
+--
+
+CREATE TABLE `forum_reports` (
+  `report_id` int(11) NOT NULL,
+  `reporter_user_id` int(11) NOT NULL,
+  `target_type` enum('question','reply') NOT NULL,
+  `target_id` int(11) NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `forum_reports`
+--
+
+INSERT INTO `forum_reports` (`report_id`, `reporter_user_id`, `target_type`, `target_id`, `reason`, `created_at`) VALUES
+(1, 39, 'question', 54, 'Other moderation concern', '2026-06-16 23:19:01'),
+(2, 46, 'question', 59, 'Profanity or abusive language', '2026-06-18 17:31:39');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lessons`
+--
+
+CREATE TABLE `lessons` (
+  `lesson_id` int(11) NOT NULL,
+  `module_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` longtext NOT NULL,
+  `lesson_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `lessons`
+--
+
+INSERT INTO `lessons` (`lesson_id`, `module_id`, `title`, `content`, `lesson_order`, `created_at`) VALUES
+(1, 1, 'Definition and Scope', '##What is Urban Agriculture? \r\nUrban agriculture is the practice of cultivating crops, growing food,\r\nand raising livestock in urban and peri-urban settings. It includes producing, processing, and\r\ndistributing agricultural goods within city spaces to address food security, promote sustainable\r\nlivelihoods, and integrate agriculture into the urban economy.\r\n\r\n##Key Features:\r\n- **Utilizes Urban Spaces:** Urban agriculture makes innovative use of spaces like vacant \r\nlots, rooftops, balconies, walls, and even abandoned buildings to grow food and raise animals.\r\n- **Comprehensive Activities:** Beyond farming, it encompasses food processing (turning raw\r\ncrops into consumable products), distribution (transporting produce to consumers), and\r\nmarketing.\r\n- **Scales of Operation**: Practices range from small-scale home gardens to large commercial\r\nurban farms.\r\n\r\n##Categories:\r\n**1. Food Production:** Includes cultivating vegetables, fruits, herbs, aquaponics (combining fish farming\r\nand hydroponics), and hydroponics (growing plants without soil).\r\n\r\n**2. Livestock Production:** Small-scale raising of poultry, rabbits, or goats, and even urban beekeeping.\r\n\r\n**3. Ornamentals:** Growing flowers and landscaping plants for beautifying spaces, increasing\r\nbiodiversity, and promoting mental well-being.', 1, '2025-09-16 07:00:37'),
+(2, 1, 'Historical Context', 'Urban agriculture has a long-standing history as a solution to food scarcity, particularly during\r\ntimes of crisis. Understanding its evolution helps recognize its importance in contemporary\r\nurban development.\r\n##Wartime Response (Victory Gardens)\r\nDuring World War II, governments promoted \"**Victory Gardens**\" in cities and\r\nsuburbs to supplement food rations. Citizens grew vegetables and fruits in\r\nbackyards, parks, and rooftops to ensure food security during supply chain\r\ndisruptions.\r\n##Traditional Systems in Asia\r\nUrban farming is deeply rooted in cultures such as India, where rooftop and\r\ncourtyard farming have been practiced for centuries. These systems not only\r\nsupplemented family diets but also reflected sustainable resource use, like\r\nrainwater harvesting.\r\n##Modern Evolution\r\nAs cities grew, urban agriculture adapted with innovations like vertical farming,\r\naquaponics, and greenhouses to maximize limited space while addressing urban\r\nchallenges like food deserts.', 2, '2025-09-16 09:58:12'),
+(3, 1, 'Benefits of Urban Agriculture', 'Urban agriculture offers multifaceted benefits that address environmental, social, and economic\r\nchallenges faced by cities today.\r\n\r\n##Environmental Benefits\r\n- **Carbon Sequestration:** Urban farms absorb carbon dioxide, helping mitigate climate\r\nchange. Plants act as natural air purifiers by improving air quality in congested areas.\r\n\r\n- **Reduction of Urban Heat Island Effect:** Rooftop gardens and urban farms reduce heat\r\nbuildup in cities by insulating buildings and lowering surrounding temperatures,\r\ndecreasing energy demands for cooling.\r\n\r\n- **Biodiversity:** Urban gardens create habitats for pollinators like bees and butterflies,\r\nfostering biodiversity in cities.\r\n\r\n##Social Benefits\r\n- **Community Engagement:** Urban farming projects encourage community participation,\r\nempowering residents to work collaboratively. Community gardens foster a sense of\r\nownership and pride.\r\n\r\n- **Improved Well-Being:** Green spaces have proven psychological benefits, reduced stress\r\nand promoting relaxation in densely populated urban areas.\r\n\r\n- **Education and Awareness:** Urban farms serve as educational tools for teaching\r\nsustainable farming practices and healthy eating habits.\r\n\r\n##Economic Benefits\r\n- **Cost Savings:** Growing food locally reduces reliance on expensive imported produce,\r\nsaving households money.\r\n- **Job Creation:** Urban agriculture generates employment opportunities across farming, food\r\nprocessing, marketing, and distribution.\r\n- **Local Entrepreneurship:** Initiatives like farmers\' markets and agri-business startups\r\nencourage entrepreneurship and stimulate local economies. <br><br><br><br><br>\r\n\r\n**References:**\r\n- _Altieri, M. A., et al. (1999). The greening of the “barrios”: Urban agriculture for food security in Cuba. Agriculture and Human Values, 16(2), 131–140._\r\n- _Orsini, F., Kahane, R., Nono-Womdim, R., & Gianquinto, G. (2013). Urban agriculture:Another way to feed cities. Agriculture, Ecosystems & Environment, 198, 1–9._', 3, '2025-09-16 10:22:23'),
+(5, 2, 'System Designs', 'Urban agriculture systems can be adapted to different spaces and needs. Below are various\r\nsystem designs, including landscaping and backyard gardening, that can be implemented in\r\nurban environments.\r\n\r\n## 1. Vertical Gardens\r\nVertical gardens are ideal for maximizing space in urban areas like balconies, walls, and small\r\nbackyards.\r\n\r\n### Examples of Vertical Gardens\r\n- **Wall-mounted planters:** Pots or containers attached to a vertical surface such as a\r\nfence, wall, or building side.\r\n\r\n- **Modular systems:** Pre-designed, stackable units that allow for efficient use of\r\nvertical space, often with slots for multiple plants.\r\n- **Living walls (green walls):** Vertical panels with integrated irrigation systems,\r\nsupporting climbing plants or small crops.\r\n- **Benefits**\r\n     - **Space-efficient:** Makes use of unused vertical space.\r\n     - **Aesthetic appeal:** Adds greenery to urban environments, improving the visual\r\n     environment.\r\n     - **Accessibility:** Easy maintenance and harvesting from elevated structures.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/hV6zGMhKMxM\" title=\"How to Create a Vertical Garden\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n\r\n## 2. Rooftop Gardens\r\nRooftops present an untapped resource for growing food in urban areas. Rooftop gardens can\r\nprovide a space for growing vegetables, fruits, and herbs while also offering environmental\r\nbenefits.\r\n\r\n**Key Design Features**\r\n     - **Lightweight soil media:** To avoid overloading the roof structure, use materials\r\n     like cocopeat, perlite, and vermiculite that are lighter than traditional soil.\r\n     - **Drainage systems:** Proper drainage is crucial to prevent waterlogging and leaks.\r\n     Using drainage mats, sloped beds, or built-in drainage systems ensures water\r\n     flows away from the roof.\r\n     - **Raised beds and containers:** Use raised beds or modular containers to make\r\n     gardening more manageable, provide structure, and optimize space.\r\n\r\n- **Advantages**\r\n     - **Urban heat island mitigation:** Rooftop gardens cool buildings and reduce the\r\n     surrounding heat, decreasing the need for air conditioning.\r\n     - **Insulation:** Green roofs provide insulation, reducing energy consumption in the\r\n     building below.\r\n\r\n## 3. Hydroponics and Aquaponics\r\nThese soilless techniques can be especially beneficial in urban environments where soil space is\r\nlimited or of poor quality.\r\n\r\n### Hydroponics\r\n- **Soilless cultivation:** In hydroponics, plants grow in a nutrient-rich water solution.  \r\n- **Example:** A small-scale system using PVC pipes arranged in tiers, where water\r\n  flows through the pipes, nourishing the plants.  \r\n- **Benefits:** Hydroponics requires less water than traditional farming and can be\r\n  easily scaled for small urban spaces.  \r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/rp7MeQYmm5k\" title=\"Got P500 to Invest? Learn Hydroponics Farming (TUTORIAL) | OG\"  frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n\r\n### Aquaponics\r\n- **Integrated system:** Combines hydroponics and fish farming, where fish waste\r\n  provides nutrients for plants, and plants help filter and purify the water for the\r\n  fish.  \r\n- **Example:** A small backyard system with a fish tank, plant grow beds, and a water\r\n  circulation system.  \r\n- **Benefits:** Sustainable food production that conserves water and reduces waste.', 2, '2025-09-16 12:14:26'),
+(6, 2, 'System Designs (Part 2)', '##4. Landscaping for Urban Agriculture:\r\nLandscaping can be a functional and aesthetic addition to urban agriculture, enhancing both the\r\nbeauty and sustainability of the space.\r\n- **Examples of Landscaping Elements**\r\n     - **Edible landscapes:** Using ornamental plants that are also edible, such as **herbs**\r\n     (e.g., mint, basil), **edible flowers** (e.g., nasturtiums), or **fruit trees** (e.g., dwarf\r\n     apple or citrus).\r\n     - **Pollinator gardens:** Creating spaces to attract beneficial insects like **bees** and\r\n     **butterflies**. These gardens support biodiversity and ensure the pollination of\r\n     nearby food crops.\r\n     - **Companion planting in landscapes:** Strategic planting of crops that benefit each\r\n     other, such as planting basil near tomatoes to repel pests and enhance growth.\r\n- **Benefits:**\r\n     - **Aesthetic enhancement:** Green landscapes can beautify urban spaces, creating\r\n     tranquil environments in otherwise barren areas.\r\n     - **Sustainability:** Landscaping elements, such as **rain gardens**, can help manage\r\n     stormwater runoff and improve soil health.\r\n     - **Biodiversity promotion:** Pollinator and native plant gardens foster a healthy\r\n     ecosystem in urban areas, supporting wildlife and pest control.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/3frkqNjScpk\" title=\"Rain Gardens Explained in 2 minutes\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n\r\n##5. Backyard Gardening:\r\nBackyard gardens are a simple yet highly effective way to incorporate urban agriculture into\r\nresidential settings.\r\n\r\n- **Examples of Backyard Gardening:**\r\n    - **Traditional raised beds:** Use raised beds to grow vegetables like tomatoes, lettuce,\r\n     and carrots, which can be easily tended to and help prevent soil compaction.\r\n    - **Container gardens:** Use pots or containers to grow plants, especially in spaces\r\n     with limited ground area, such as patios or balconies. Containers can support\r\n     vegetables, herbs, and small fruit plants.\r\n    - **Composting systems:** Integrating composting into a backyard garden helps\r\n    recycle organic waste into nutrient-rich soil, enhancing plant health and\r\n    sustainability.\r\n- **Benefits**\r\n     - **Self-sufficiency:** Growing food in your backyard reduces reliance on external\r\n     food sources and promotes food security.\r\n     - **Improved diet:** Backyard gardens provide access to fresh, organic produce.\r\n     - **Engagement and wellness:** Gardening promotes physical activity, mental wellbeing, \r\n     and a deeper connection to nature.', 3, '2025-09-16 14:00:59'),
+(7, 2, 'Resource Management in Design', 'Efficient resource use is vital to the sustainability of urban agriculture systems. \r\nRecycling and optimization are key strategies.\r\n\r\n##1. Recycling Materials\r\n- Urban agriculture can creatively use discarded materials to save costs and reduce waste.\r\n- **Examples:**\r\n     - Plastic bottles cut in half for seedling pots or vertical gardens.\r\n     - Old tires repurposed as planters for small crops.\r\n     - Wooden pallets converted into raised garden beds or vertical frames.\r\n\r\n##2. Water Optimization\r\nEfficient water management is critical in urban settings where water availability may be limited.\r\n     - **Rainwater Harvesting Systems**\r\n          - Install simple rainwater collection setups, such as barrels or tanks, connected to\r\n          rooftop gutters. Use collected rainwater for irrigation to reduce reliance on\r\n          municipal water supplies.\r\n     - **Drip Irrigation Systems**\r\n          - Drip irrigation delivers water directly to the plant roots through a network of\r\n          tubes, minimizing evaporation and runoff.\r\n          - **Example:** A rooftop garden equipped with a timer-controlled drip system for\r\n          consistent watering.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe  src=\"https://www.youtube.com/embed/1QYzMD78UJc\" title=\"Cheap, Quick and Easy Drip Irrigation System for Your Garden\"  frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n\r\n## 3.Nutrient Recycling\r\n- Use organic waste like vegetable peels and garden clippings to create compost, which can\r\nbe integrated into soil or used in vermicomposting systems.\r\n- **Nutrient-rich** water from aquaponics or collected rainwater can also be reused for\r\nirrigation.<br><br><br><br><br>\r\n\r\n**References:**\r\n- _Despommier, D. (2011). The Vertical Farm: Feeding the World in the 21st Century._\r\n- _Hynes, H. P. (1996). A Patch of Eden: America’s Inner-City Gardeners. Chelsea Green Publishing._', 4, '2025-09-16 14:10:22'),
+(8, 3, 'Soil-Based Farming', 'Soil-based farming remains one of the most common practices in urban agriculture. Proper soil\r\nmanagement is key to optimizing plant growth and ensuring sustainable food production.\r\n\r\n## 1. Steps in Soil Preparation\r\n\r\n- **Soil Testing**\r\nBefore planting, soil testing is essential to understand the soil’s nutrient content and pH\r\nlevel.\r\n    - **pH Testing:** Soil should have a neutral pH **(6.0 to 7.0)** for most crops. If the soil is\r\n    too acidic (below 6.0), lime can be added to raise the pH. If it is too alkaline\r\n    (above 7.0), organic matter like compost can help lower the pH.\r\n    - **Nutrient Testing:** Tests for **macronutrients** (nitrogen, phosphorus, potassium) and\r\n    micronutrients (iron, calcium, magnesium) are important to determine if\r\n    additional fertilizers or amendments are needed.\r\n- **Adding Organic Matter**\r\nOrganic matter improves soil structure, increases water retention, and provides essential\r\nnutrients. Common types include:\r\n    - **Compost:** Decomposed organic material rich in nutrients.\r\n    - **Manure:** Animal waste, often from poultry, cows, or horses, that must be\r\n    composted before use to avoid introducing pathogens.\r\n    - **Cover Crops:** Planting legumes like clover or beans as green manure helps fix\r\n    nitrogen in the soil, improving fertility\r\n\r\n## 2. Crop Management\r\n\r\n- **Plant Spacing**\r\n\r\nProper spacing between plants is critical for optimizing resource use (sunlight, water, and\r\nnutrients). Crowded plants compete for these resources, leading to poor growth and\r\nincreased susceptibility to pests and diseases. Use guidelines for recommended spacing\r\nbased on the type of crops being grown.\r\n\r\n- **Mulching**\r\n\r\nMulching helps to conserve soil moisture, reduce weed growth, and improve soil quality.\r\nMulch can be organic (straw, grass clippings) or inorganic (plastic sheets). It also helps\r\nregulate soil temperature by protecting the roots from extreme heat or cold.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/UlGdc1o3510\" title=\"Types of MULCHING in Agriculture | Advantages of Mulching In Farming\"  frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>', 1, '2025-09-17 02:55:34'),
+(9, 3, 'Soilless Farming Techniques', 'Soilless farming is an innovative method for growing plants without traditional soil, using water\r\nand nutrient solutions. These techniques are particularly useful in urban settings where soil may\r\nbe limited, contaminated, or unavailable.\r\n\r\n## 1. Hydroponics\r\nHydroponics is the practice of growing plants in a water-based, nutrient-rich solution without\r\nsoil.\r\n- **Steps to Build a Deep-Water Culture System**\r\n    - **Container:** Use a container to hold water (e.g., a large plastic bin).\r\n    - **Air Pump and Air Stone:** Place an air pump at the bottom to oxygenate the water.\r\n    An air stone connected to the pump helps to distribute oxygen evenly throughout\r\n    the solution.\r\n    - **Net Pots and Grow Media:** Use net pots to hold the plants. Place a growing\r\n    medium (such as expanded clay pellets or perlite) inside the net pots to support\r\n    the plant roots.\r\n   - **Nutrient Solution:** Mix hydroponic nutrients with water. This solution provides\r\n    essential nutrients like nitrogen, phosphorus, potassium, calcium, and magnesium.\r\n    - **Water Circulation:** Ensure water circulates through the system to allow plants to\r\n    absorb nutrients efficiently. In a Deep-Water Culture (DWC) system, plants\' roots\r\n    are submerged in the nutrient solution, which they can directly absorb.\r\n\r\n- **Nutrient Requirements for Hydroponic Vegetables**\r\n\r\nHydroponic plants require a balanced nutrient solution containing:\r\n      ![](../images/lessons/Macronutrients.png)\r\n    - Regular monitoring and adjusting of the pH (usually **between 5.5 and 6.5**) and\r\n    nutrient levels is necessary to ensure optimal plant growth.\r\n\r\n## 2. Aeroponics\r\nAeroponics is a soilless growing technique where plant roots are suspended in air and misted\r\nwith a nutrient solution.\r\n\r\n- **Mist System**\r\n\r\n    A mist or fine spray is used to deliver nutrients and water directly to the plant roots. The\r\n    mist allows roots to absorb moisture and nutrients without being submerged in liquid.\r\n    - **Setup:** Typically involves a chamber or enclosed structure with hanging plants\r\n    and a misting system that delivers nutrient-laden water to the roots.\r\n- **Benefits of Aeroponics**\r\n    - **Faster Growth Rates:** Due to the high oxygen availability around the roots, plants\r\n    in aeroponic systems often grow faster than those in soil or hydroponic systems.\r\n    - **Water Efficiency:** Aeroponics uses less water than traditional farming methods\r\n    and hydroponics, as the mist system uses minimal amounts of water, and excess\r\n    water is often recycled.\r\n    - **Space Efficiency:** Aeroponics systems can be stacked vertically, making them\r\n    ideal for small urban spaces.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/IInjYsqRXmg\" title=\"Which Method Reigns Supreme: Hydroponics or Aeroponics\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>', 2, '2025-09-17 03:02:21'),
+(10, 3, 'Composting and Resource Recycling ( Part 1 )', 'Composting and resource recycling are critical components of urban agriculture, allowing\r\ncommunities to recycle organic waste into nutrient-rich soil amendments. This process reduces\r\nwaste sent to landfills, improves soil health, and supports sustainable food production.\r\n\r\n## Types of Composting\r\n\r\n- **1. Aerobic Composting (Requires Oxygen)** \r\n\r\nAerobic composting occurs when organic material decomposes in the presence \r\nof oxygen. It relies on microorganisms, such as bacteria and fungi, that require \r\noxygen to break down organic matter.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/8VrS12R1_vY\" title=\"Aerobic Compost - How does it work?\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n<br>\r\n\r\n- **Traditional Aerobic Composting**\r\n\r\n    - **Process:** Involves layering organic waste (green materials like food scraps, grass\r\n    clippings, and brown materials like leaves, straw, or cardboard) in a compost pile or bin.\r\n    The pile must be turned regularly (every few weeks) to ensure oxygen reaches all parts\r\n    and to accelerate decomposition.\r\n    - **Benefits:** Produces high-quality compost with a balance of nutrients that enriches soil.\r\n    - **Timeframe:** Typically takes 3-6 months to fully decompose, depending on pile size and\r\n    environmental factors (e.g., temperature and moisture).\r\n- **Rapid Aerobic Composting**\r\n    - **Process:** This method speeds up the composting process by maintaining a high\r\n    temperature (**50-70°C** or **122-158°F**) and regular turning of the compost pile. Adding\r\n    nitrogen-rich materials (e.g., fresh grass, manure) and ensuring proper moisture helps\r\n    create the ideal conditions for heat-loving microorganisms.\r\n    - **Benefits:** Accelerates the breakdown of organic material in a shorter time frame (2-3\r\n    weeks).\r\n    - **Considerations:** Requires frequent monitoring of temperature and moisture levels to\r\n    maintain optimal conditions.\r\n- **Hot Composting (Temperature-Controlled Method)**\r\n    - **Process:** The compost pile is kept at higher temperatures (above **55°C** or **131°F**) for a\r\n    period of time, which kills pathogens, weed seeds, and accelerates decomposition.\r\n    - **Benefits:** Results in quick decomposition and cleaner compost. Ideal for large amounts of\r\n    waste.\r\n    - **Considerations:** Needs careful management of moisture, aeration, and carbon-to-nitrogen\r\n    ratio. It can require more frequent turning.\r\n- **Bin or Tumbler Composting**\r\n    - **Process:** Using a compost bin or tumbler to contain and rotate compost. The enclosed\r\n    space retains heat and moisture, making it easier to manage the process.\r\n    - **Benefits:** More compact and neat compared to open piles. Easier to turn with a tumbler.\r\n    - **Considerations:** Can be smaller, making it less suitable for large quantities of waste.', 3, '2025-09-17 03:14:05'),
+(11, 3, 'Composting and Resource Recycling ( Part 2 )', '## Types of Composting\r\n\r\n- **2. Anaerobic Composting (Without Oxygen)**\r\n\r\nAnaerobic composting takes place in low-oxygen environments. Microorganisms\r\nthat thrive without oxygen (**anaerobes**) break down the organic matter in these systems.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/9m3jNmsB5Lw\" title=\"A Beginner&#39;s Guide to Bokashi Composting\"  frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n<br>\r\n\r\n- **Bokashi Composting**\r\n\r\n    - **Process:** A Japanese method where food scraps (including cooked food and dairy) are\r\n    fermented using a special inoculant made of beneficial microorganisms. The scraps are\r\n    placed in an airtight container, and the Bokashi mix is added to encourage fermentation.\r\n    - **Benefits:** Can compost a wider variety of organic materials (e.g., meat, dairy) compared\r\n    to other composting methods. Produces a fermented product that can be added to soil or\r\n    used as a soil amendment.\r\n    - **Considerations:** Requires a sealed container and patience for fermentation. The final\r\n    product is not fully composted and must be buried or added to a compost pile for further\r\n    decomposition.\r\n\r\n- **Pit Composting**\r\n\r\n    - **Process:** Organic waste is buried in a pit or trench where anaerobic decomposition occurs.\r\n    It is often used for large-scale organic waste management.\r\n    - **Benefits:** Simple and low-maintenance; suitable for disposing of large amounts of organic\r\n    waste.\r\n    - **Considerations:** Longer decomposition times and possible odors if not properly managed.\r\n\r\n- **Tumbler or Closed-Container Anaerobic Composting**\r\n\r\n    - **Process:** A sealed container or tumbler is used to contain organic waste, where anaerobic\r\n    conditions are maintained. Some systems incorporate the use of microorganisms or\r\n    inoculants to enhance fermentation.\r\n    - **Benefits:** More contained and odor-controlled compared to pit composting.\r\n    - **Considerations** Requires a closed system, making it more manageable but slower than\r\n    aerobic methods.', 4, '2025-09-17 03:19:41'),
+(12, 3, 'Composting and Resource Recycling ( Part3 )', '## Types of Composting\r\n\r\n**3. Vermicomposting (Using Earthworms)**\r\n\r\nVermicomposting uses worms (often red wiggler worms) to break down organic waste into high quality compost. \r\nThe worms consume organic material, producing castings (worm manure) that are rich in plant nutrients.\r\n\r\n- **Process:** Create a worm bin using bedding (e.g., shredded newspaper, coconut coir) and\r\nadd food scraps like fruit and vegetable peels. The worms digest the organic waste and\r\nproduce nutrient-rich castings.\r\n- **Benefits:** The resulting vermicompost is high in essential nutrients like nitrogen,\r\nphosphorus, and potassium, which are excellent for soil health.\r\n- **Considerations:** Vermicomposting requires a controlled environment (cool, moist, and\r\ndark) and may not be suitable for large-scale composting.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/6Ejq4pbANww\" title=\"How to Make Vermicompost | How To make Vermicompost at Home From Kitchen Waste\"  frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n<br>\r\n\r\n**4. Black Soldier Fly (BSF) Composting**\r\n\r\nBlack soldier flies are larvae of the black soldier fly (**Hermetia illucens**) and are known for their\r\nability to decompose organic waste rapidly. They are commonly used in waste-to-nutrient\r\nsystems.\r\n\r\n- **Process:** Organic waste (e.g., food scraps, manure) is placed in a container where BSF\r\nlarvae consume the waste and convert it into high-protein biomass. The larvae can later\r\nbe harvested and used as feed for animals, while the remaining composted material can\r\nbe used to enrich soil.\r\n- **Benefits:**\r\n    - Rapid decomposition of organic waste.\r\n    - Larvae are a high-protein animal feed, making the system a dual-purpose solution.\r\n    - Efficient conversion of waste into usable products.\r\n- **Considerations:** Requires a warm environment for optimal larvae growth (**25-35°C** or **77-\r\n95°F**). Careful management of the system is needed to prevent odors and ensure proper\r\nwaste flow.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe  src=\"https://www.youtube.com/embed/qc7xCVuJJCs\" title=\"Black Soldier Fly Farming at Home: How to Set Up a BSF Composting Bin\"  frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n<br>\r\n\r\n**5. Recycling Waste for Fertilizer Production**\r\n\r\nUsing kitchen scraps and other organic waste materials for composting and fertilizer production\r\nhelps reduce the volume of waste in landfills while creating valuable resources for urban\r\nagriculture. Simple methods like composting food scraps, yard waste, and organic materials such\r\nas coffee grounds, eggshells, and fruit peels can result in nutrient-dense compost, which can be\r\ndirectly added to soil or used as part of a vermicomposting or BSF system.<br><br><br><br><br>\r\n\r\n**References:**\r\n- _FAO. (2017). Urban and peri-urban agriculture: Guidelines for policymakers._\r\n- _Hynes, H. P. (1996). A Patch of Eden: America’s Inner-City Gardeners. Chelsea Green Publishing._\r\n- _Orsini, F., Kahane, R., Nono-Womdim, R., & Gianquinto, G. (2013). Urban agriculture:Another way to feed cities. Agriculture, Ecosystems & Environment, 198, 1-9._', 5, '2025-09-17 03:25:48'),
+(13, 4, 'Common Pests and Diseases in Urban Farming ( Part 1 )', '## Pests \r\n\r\n**Pests** are organisms that damage crops by feeding on them, transmitting diseases, or\r\ndisturbing their growth processes. Here are some common pests found in urban farming,\r\nespecially in vegetables:\r\n\r\n- **Aphids:** Small, soft-bodied insects that suck sap from plants, leading to stunted growth,\r\ncurled leaves, and reduced plant vitality. Common on leafy greens like lettuce and\r\nspinach.\r\n- **Spider Mites:** Tiny arachnids that cause speckled, discolored, and damaged leaves,\r\nparticularly on crops like tomatoes, peppers, and beans. They thrive in hot, dry\r\nconditions.\r\n- **Whiteflies:** Small, flying insects that feed on plant sap, often found on the undersides of\r\nleaves. They can transmit viral diseases and lead to yellowing and wilting.\r\n- **Slugs and Snails:** These pests feed on leaves, stems, and fruit, creating irregular holes and\r\nsilvery trails on plants like lettuce, cabbage, and other leafy vegetables.\r\n- **Cabbage Worms (Imported Cabbageworm):** The larvae of a white butterfly, these worms\r\nchew on the leaves of cabbage, cauliflower, and other brassicas, damaging the plant.\r\n- **Thrips:** Tiny, winged insects that cause streaking or silvering on leaves and flowers,\r\nparticularly affecting tomatoes, peppers, and strawberries.\r\n- **Root-Knot Nematodes:** Microscopic worms that infect the roots of plants like tomatoes\r\nand peppers, causing swelling or galls, leading to reduced water and nutrient uptake.\r\n                        <a href=\'https://www.fix.com/blog/common-garden-pests-and-how-to-get-rid-of-them/?srsltid=AfmBOor4dh_yVXdg6HR0eOlM3iG0Uz8-LS4_A8M5DEBnJQnZM9NsEZRY\'><img src=\"https://fixcom-g4bhetdmcgd9b7er.z01.azurefd.net/assets/content/15641/which-insects-benefit-your-garden-001.png\" alt=\"Insects That Benefit The Garden\" border=0 /></a>\r\n                        <br />\r\n                        Source: <a href=\"https://www.fix.com/blog/\">Fix.com Blog</a>', 1, '2025-09-17 03:32:53'),
+(14, 4, 'Common Pests and Diseases in Urban Farming ( Part 2 )', '## Diseases\r\n\r\n**Plant diseases** are caused by various pathogens like fungi, bacteria, viruses, and\r\nnematodes. Common vegetable diseases in urban agriculture include:\r\n\r\n- **Powdery Mildew:** A fungal disease that appears as white, powdery spots on leaves. It\r\naffects many crops like cucumbers, squash, and tomatoes, reducing photosynthesis and\r\nweakening plants.\r\n- **Bacterial Blight:** Caused by bacteria, this disease results in water-soaked lesions on\r\nleaves, stems, and fruits. It is common in tomatoes, peppers, and beans and can spread\r\nrapidly in humid conditions.\r\n- **Downy Mildew:** A fungal-like disease that affects plants like lettuce, spinach, and\r\ncucumbers. It causes yellowing and distortion of leaves, especially under high humidity.\r\n- **Fusarium Wilt:** A soil-borne fungal disease that causes wilting, yellowing of leaves, and\r\ndeath of the plant. Common in tomatoes, eggplants, and peppers.\r\n- **Tomato Blight (Early and Late Blight):** Fungal infections that cause dark, water-soaked\r\nlesions on leaves, stems, and fruits. Early blight affects older foliage, while late blight\r\nspreads rapidly under wet, cool conditions.\r\n- **Root Rot (Phytophthora or Pythium):** Caused by water mold, root rot affects plants in\r\npoorly drained soils and leads to yellowing, wilting, and eventual death of the plant.\r\n\r\n     <a><img src=\"https://fixcom-g4bhetdmcgd9b7er.z01.azurefd.net/assets/content/30476/detecting-garden-diseases-embed-large.png\" alt=\"How to Detect and Prevent Garden Diseases\" border=0 /></a><br /> Source: <a href=\"https://www.fix.com/blog/\">Fix.com Blog</a>', 2, '2025-09-17 03:34:25'),
+(15, 4, 'Management Practices for Pest and Disease Control ( Part 1 )', '## Biological Control\r\n\r\nBiological control involves the use of natural enemies of pests to regulate\r\ntheir populations. This is an eco-friendly way of pest management that avoids chemical\r\npesticides.\r\n\r\n- **Beneficial Insects**\r\n\r\n    - **Ladybugs (Ladybird Beetles):** Natural predators of aphids, mealybugs, and other softbodied pests.\r\n    - **Lacewing Larvae:** Lacewings are excellent predators of aphids, thrips, and mealybugs.\r\n    Their larvae can consume large numbers of pests, making them effective in pest control\r\n    for crops like lettuce, tomatoes, and other leafy vegetables.\r\n    - **Predatory Mites:** These mites feed on pest mites, helping to control spider mite\r\n    populations in crops like beans and cucumbers.\r\n    - **Parasitic Wasps:** Wasps like Trichogramma spp. parasitize the eggs of pest insects, such\r\n    as moths, and can help control caterpillar pests.\r\n\r\n- **Entomopathogenic Fungi and Bacteria**\r\n\r\n    - **Beauveria bassiana:** A naturally occurring fungus that targets a wide range of pests,\r\n    including aphids, whiteflies, and beetles. When applied to crops, it infects and kills the\r\n    pests without harming beneficial insects or plants.\r\n    - **Metarhizium anisopliae:** Another beneficial fungus that infects and kills insects such as\r\n    termites, beetles, and ants. It works similarly to Beauveria bassiana and can be applied to\r\n    crops to control pests like root weevils and other soil-borne insects.\r\n    - **Bacillus thuringiensis (Bt):** A bacterium that controls caterpillar pests by producing a\r\n    toxin that is toxic to insect larvae but harmless to humans, animals, and beneficial insects.\r\n\r\n- **Microbial Biological control agent**\r\n\r\n    - **Trichoderma spp:** This beneficial fungus is used in soil health management and to\r\n    control plant diseases like root rot caused by pathogens such as Pythium and Fusarium. It\r\n    also promotes plant growth by outcompeting harmful soil fungi, acting as a natural\r\n    biocontrol agent.', 3, '2025-09-17 03:39:40'),
+(16, 4, 'Management Practices for Pest and Disease Control ( Part 2 )', '## Cultural Practices\r\n\r\nCultural practices involve managing the growing environment to reduce\r\npest and disease pressures.\r\n\r\n- **Crop Rotation:** Rotating crops each season reduces the likelihood of pests and diseases\r\nthat favor certain plant families. For instance, avoiding planting tomatoes in the same\r\nspot as last year can prevent soil-borne pathogens like Fusarium wilt.\r\n- **Intercropping:** Growing different plant species together helps confuse pests and reduces\r\npest attraction to any one crop. For example, intercropping basil with tomatoes can help\r\ndeter pests like aphids and whiteflies.\r\n- **Resistant Varieties:** Select vegetable varieties that are resistant to common pests and\r\ndiseases. For example, certain tomato varieties are resistant to late blight, while other\r\nvegetables may have natural resistance to aphids or mildew.\r\n- **Proper Spacing:** Overcrowding can create a microclimate that is conducive to disease.\r\nProper spacing ensures adequate airflow, reducing humidity levels and the risk of\r\ndiseases like powdery mildew.\r\n- **Sanitation:** Regularly remove and dispose of infected plants or leaves to prevent the\r\nspread of pests and pathogens. Clean tools and equipment to avoid cross-contamination.', 4, '2025-09-17 03:43:06'),
+(17, 4, 'Management Practices for Pest and Disease Control ( Part 3 )', '## Organic Pesticides\r\n\r\nOrganic pesticides are a safer alternative to synthetic chemicals and are\r\ngenerally less toxic to humans, animals, and beneficial insects.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/tgf_SHvvrTQ\" title=\"BAKING SODA Powerful ORGANIC Pesticide Mix!\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n<br>\r\n\r\n- **Neem Oil:** Derived from the neem tree, neem oil is an organic pesticide that repels and\r\nkills pests like aphids, whiteflies, and spider mites. It works as an insect growth regulator,\r\npreventing pest larvae from maturing.\r\n- **Garlic Spray:** Garlic is a natural insect repellent. A garlic solution (blended garlic and\r\nwater) can deter aphids, whiteflies, and beetles.\r\n- **Chili Pepper Extract:** A strong spray made from hot peppers can deter a wide range of\r\npests, including aphids, caterpillars, and ants. The capsaicin in the peppers irritates pests,\r\nkeeping them away from plants.\r\n- **Diatomaceous Earth:** Made from fossilized remains of algae, diatomaceous earth is a fine\r\npowder that can be sprinkled around plants to control soft-bodied pests like slugs, snails,\r\nand aphids. It works by desiccating the pests.\r\n- **Insecticidal Soap:** Made from potassium salts, insecticidal soap is effective against softbodied \r\npests like aphids, whiteflies, and mealybugs. It disrupts the cell membranes of pests and dries them out.', 5, '2025-09-17 03:44:44'),
+(18, 4, 'Integrated Pest Management (IPM) for Vegetables', 'IPM combines multiple pest management strategies to minimize the impact of pests and diseases\r\non crops.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/_R0My-2ag94\" title=\"WHAT IS INTEGRATED PEST MANAGEMENT (IPM)?\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n<br>\r\n\r\n- **Monitoring:** Regularly inspect crops for signs of pests and diseases. Use tools like sticky\r\ntraps, visual checks, and soil tests to detect early infestations.\r\n- **Thresholds:** Determine pest population levels where control is needed. If pest numbers\r\nare below the threshold, no action is necessary. If they exceed the threshold, control\r\nmeasures are implemented.\r\n- **Physical Barriers:** Use row covers or netting to prevent pests like aphids and cabbage\r\nworms from accessing plants. Netting can also protect crops from flying insects like\r\nwhiteflies.\r\n- **Trap Cropping:** Grow a pest-attracting plant (e.g., marigolds for aphids or mustard for\r\ncabbage worms) near your vegetables. Pests are drawn to the trap crop, protecting your\r\nmain crops.\r\n- **Companion Planting:** Certain plants repel pests or attract beneficial insects. For example,\r\nplanting basil with tomatoes can deter whiteflies, and marigolds can help repel\r\nnematodes.<br><br><br><br><br>\r\n\r\n**References:**\r\n- _Altieri, M. A., & Nicholls, C. I. (1995). Biodiversity and pest management in agroecosystems. CRC Press._', 6, '2025-09-17 03:45:44'),
+(19, 5, 'Factors Influencing Crop Selection (Part 1)', '## Climate\n\nUrban microclimates are often distinct from rural areas, which can affect the growth and yield of\ncrops. In Baguio City, the temperate climate plays a significant role in determining which crops\nare best suited for cultivation\n\n- **Temperature:**\n![](../images/lessons/temperature.png)\n- **Rainfall:** \n![](../images/lessons/rainfall.png)\n- **Microclimates:** \n![](../images/lessons/microclimates.png)', 1, '2025-09-17 03:51:35'),
+(20, 5, 'Factors Influencing Crop Selection ( Part 2 )', '## Space Constraints\n\nUrban areas like Baguio City often have limited space for farming, especially in densely\npopulated regions. Therefore, choosing crops that can yield high results in small spaces or\nvertical spaces is essential.\n\n- **Vertical Farming:** Growing climbing crops like beans, peas, and tomatoes on trellises or\nusing vertical hydroponics can help maximize limited space.\n- **High-Yield, Low-Space Crops:** **Leafy vegetables** (e.g., lettuce, kale), **herbs** (e.g., basil,\ncilantro), and **small fruits** (e.g., strawberries, dwarf varieties of tomatoes) can be grown\nefficiently in compact spaces, such as containers, window boxes, and small garden beds.\n\n## Market Demand and Nutritional Value\n\nWhen selecting crops for urban farming, it\'s essential to consider local market demand and\nnutritional value. This ensures the crops are not only suited to local conditions but also meet\nconsumer needs.\n\n- **Local Restaurants and Markets:** Baguio City has a thriving food culture, with restaurants\nseeking fresh, local produce. Crops like basil, lettuce, tomatoes, and culinary herbs are\nalways in demand.\n- **Nutritional Value:** Prioritize crops that provide nutritional benefits, such as **leafy greens**\n(rich in vitamins A, C, and K) and **root vegetables** (good sources of carbohydrates and\nfiber).', 2, '2025-09-17 03:54:00'),
+(21, 5, 'Seasonal Crop Calendars for Baguio City ( Part 1)', 'A seasonal crop calendar helps farmers plan their crops to ensure year-round production,\r\nmaximize yields, and manage pest cycles effectively. The following steps outline the process for\r\ncreating a seasonal crop calendar tailored to the specific conditions of Baguio City.\r\n\r\n## Key Steps in Planning\r\n\r\n- **1. Identify Growing Seasons Based on Local Climatic Data**\r\n    - Baguio City experiences distinct dry and wet seasons. Knowing the timing and\r\n    duration of these seasons helps determine which crops are best suited for specific\r\n    months.\r\n    - Cool season crops are typically planted during the dry months (**November to\r\n    February**), while warm season crops are planted during the warmer, wetter\r\n    months (**March to June**).\r\n- **2. Plan for Crop Rotations**\r\n    - To maintain soil health and prevent pest build-up, practice crop rotation. For\r\n    instance, after growing nitrogen-demanding crops like beans, rotate with crops\r\n    like carrots or tomatoes that don’t deplete soil nutrients as quickly.\r\n- **3. Account for Crop Maturity Periods**\r\n    - To ensure staggered harvests and minimize waste, plan for crops with varying\r\n    maturity periods. For example, plant radishes (quick-growing) alongside broccoli\r\n    (longer growing period) to harvest different crops at different times.', 3, '2025-09-17 03:58:28'),
+(22, 5, 'Seasonal Crop Calendars for Baguio City (Part 2)', '## Example Crop Calendar for Baguio City\r\n![](../images/lessons/BaguioCrops.png)', 4, '2025-09-17 04:01:53'),
+(23, 5, 'Techniques for Maximizing Yields Across Different Seasons', '## 1. Greenhouses and Shade Netting\r\n\r\n- In Baguio, temperature fluctuations can sometimes affect crops. Using\r\n**greenhouses** or shade nets can help manage temperature, protect plants from\r\npests, and extend the growing season.\r\n\r\n##  2. Raised Beds and Containers\r\n\r\n- Utilize **raised beds** for better soil drainage, which is especially helpful during the\r\nrainy season. **Container gardening** is another space-saving technique that allows\r\nfarmers to grow crops like tomatoes, peppers, and herbs in compact urban spaces.\r\n\r\n## 3. Water Management\r\n\r\n-  Install **drip irrigation systems** to ensure efficient water delivery during dry periods\r\nand prevent waterlogging during the rainy season.\r\n\r\n<div style=\"position:relative;padding-bottom:56.25%;height:0;overflow:hidden;\">\r\n  <iframe src=\"https://www.youtube.com/embed/l_5Y7FdTzYg\" title=\"The Best Raised Garden Bed Option for you!\"\" frameborder=\"0\" allowfullscreen\r\n          style=\"position:absolute;top:0;left:0;width:100%;height:100%;\"></iframe>\r\n</div>\r\n\r\n<br><br><br><br><br>\r\n\r\n**References:**\r\n- _Lal, R. (2004). Soil carbon sequestration to mitigate climate change. Geoderma, 123(1),1–22_\r\n- _Pande, C., Joshi, A., & Tewari, A. (2020). Rainwater harvesting: An approach towardswater conservation. Water Management, 34(2), 78–85._', 5, '2025-09-17 04:03:42'),
+(55, 21, 'Understanding Organic Fertilizer', 'Plants need nutrients to grow, develop healthy leaves and roots, and produce flowers, fruits, and seeds. These nutrients are naturally found in soil, but continuous planting can gradually reduce the nutrients available to plants. **Fertilizers** can help supply nutrients and maintain soil productivity.\n\n**Organic fertilizers** are fertilizers made from materials that come from plants, animals, or other naturally occurring organic sources. Examples include *compost*, *animal manure*, *vermicompost*, and *decomposed plant materials*.\n\nUnlike **synthetic fertilizers**, which are manufactured or processed to provide specific concentrations of nutrients, **organic fertilizers** are generally derived from natural materials. Their nutrient content can vary depending on the materials used and how they were processed.\n\n## Why Is Organic Fertilizer Important?\n\n**Organic fertilizer** can provide several benefits to an urban garden. When organic materials are properly decomposed and applied, they can contribute nutrients and organic matter to the soil.\n\nOrganic fertilizers can also help:\n    - Improve soil structure\n    - Increase the soil\'s ability to retain moisture\n    - Support beneficial soil organisms\n    - Recycle household and garden organic waste\n    - Reduce the amount of organic waste sent to landfills\n    - Support more sustainable gardening practices\n\nHowever, **organic fertilizer** is **not automatically better** simply because it is natural. It still needs to be properly prepared and applied. Improperly handled materials   can contain pathogens, weed seeds, excessive nutrients, or other contaminants.\n\n## Organic Fertilizer vs. Synthetic Fertilizer\n\n![](../images/lessons/lesson_6a76e6c283236.png)\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaGF0IGlzIHRoZSBtYWluIHNvdXJjZSBvZiBvcmdhbmljIGZlcnRpbGl6ZXJzPyIsIm9wdGlvbnMiOnsiQSI6IlBsYW50cywgYW5pbWFscywgYW5kIG90aGVyIG5hdHVyYWxseSBvY2N1cnJpbmcgb3JnYW5pYyBtYXRlcmlhbHMiLCJCIjoiUGxhc3RpYyBhbmQgc3ludGhldGljIG1hdGVyaWFscyIsIkMiOiJNZXRhbHMgYW5kIGdsYXNzIiwiRCI6IlBldHJvbGV1bSBwcm9kdWN0cyJ9LCJjb3JyZWN0IjpbIkEiXX0=]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaGljaCBvZiB0aGUgZm9sbG93aW5nIGlzIGEgYmVuZWZpdCBvZiBvcmdhbmljIGZlcnRpbGl6ZXI/Iiwib3B0aW9ucyI6eyJBIjoiSXQgY2FuIGltcHJvdmUgc29pbCBzdHJ1Y3R1cmUgYW5kIGFkZCBvcmdhbmljIG1hdHRlci4iLCJCIjoiSXQgY29tcGxldGVseSBlbGltaW5hdGVzIHRoZSBuZWVkIGZvciB3YXRlci4iLCJDIjoiSXQgcHJldmVudHMgcGxhbnRzIGZyb20gYWJzb3JiaW5nIG51dHJpZW50cy4iLCJEIjoiSXQgYWx3YXlzIHByb3ZpZGVzIG51dHJpZW50cyBpbiBleGFjdGx5IHRoZSBzYW1lIGNvbmNlbnRyYXRpb24uIn0sImNvcnJlY3QiOlsiQSJdfQ==]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgZG9lcyBvcmdhbmljIGZlcnRpbGl6ZXIgc3RpbGwgbmVlZCB0byBiZSBwcm9wZXJseSBwcmVwYXJlZCBhbmQgYXBwbGllZD8iLCJvcHRpb25zIjp7IkEiOiJOYXR1cmFsIG1hdGVyaWFscyBjYW4gc3RpbGwgY29udGFpbiBwYXRob2dlbnMsIGNvbnRhbWluYW50cywgb3IgZXhjZXNzaXZlIG51dHJpZW50cy4iLCJCIjoiT3JnYW5pYyBmZXJ0aWxpemVyIGRvZXMgbm90IGNvbnRhaW4gYW55IG51dHJpZW50cy4iLCJDIjoiT3JnYW5pYyBmZXJ0aWxpemVyIGlzIGFsd2F5cyBoYXJtZnVsIHRvIHBsYW50cy4iLCJEIjoiT3JnYW5pYyBmZXJ0aWxpemVyIG11c3QgYmUgY29udmVydGVkIGludG8gc3ludGhldGljIGZlcnRpbGl6ZXIgZmlyc3QuIn0sImNvcnJlY3QiOlsiQSJdfQ==]', 1, '2026-08-08 06:17:39');
+INSERT INTO `lessons` (`lesson_id`, `module_id`, `title`, `content`, `lesson_order`, `created_at`) VALUES
+(58, 21, 'Types and Sources of Organic Fertilizer (Part 1)', '**Organic fertilizers** can come from different natural sources, including *plants*, *animals*, and *decomposed organic materials*. Each type has different characteristics and may be used in different ways depending on the needs of the plants and soil.\nUnderstanding the different types of organic fertilizer helps urban gardeners choose suitable materials for their plants and use them responsibly.\n\n## 1. Compost\n\n![](../images/lessons/lesson_6a76f3ac3176b.jpg)\n\n**Compost** is an organic material produced through the controlled decomposition of plant and other suitable organic materials.\n\nCommon materials used for composting include:\n     - Vegetable and fruit scraps\n     - Dried leaves\n     - Grass clippings\n     - Plant residues\n     - Shredded untreated paper or cardboard\n\nAs these materials decompose, *microorganisms* break them down into a dark, crumbly material that can be added to soil.\n\n**Benefits of Compost**:\n     - Add organic matter to soil\n     - Improve soil structure\n     - Help the soil retain moisture\n     - Support soil organisms\n     - Recycle suitable household and garden waste\n\nCompost is particularly useful for urban farming because it allows gardeners to turn some organic household waste into a useful resource.\n\n## 2. Vermicompost\n\n![](../images/lessons/lesson_6a76f6aa0a83c.jpg)\n\n**Vermicompost** is produced with the help of earthworms. In a suitable vermicomposting system, earthworms consume organic materials and produce worm castings, which can be used as an organic soil amendment. Vermicomposting can be suitable for urban households because it can be done in relatively small containers.\n\nBenefits of Vermicompost:\n     - Add organic matter to growing media\n     - Provide plant nutrients\n     - Support soil biological activity\n     - Make use of suitable food and plant waste\n\nHowever, vermicomposting requires *proper moisture*, *airflow*, *suitable materials*, and *appropriate conditions* for the earthworms.\n\n## 3. Animal Manure\n\n![](../images/lessons/lesson_6a76f7883c7bb.jpg)\n\n**Animal manure** is organic material produced by livestock and other farm animals. Examples include manure from:\n     - Chickens\n     - Cattle\n     - Goats\n     - Horses\n\nAnimal manure can contain nutrients that plants need. However, fresh manure should **not** simply be placed directly around edible crops.\nProper composting or treatment is important because improperly handled manure may contain *pathogens*, *weed seeds*, or *excessive nutrients*.\n\nSafe Use of Animal Manure\n     - Use properly treated or composted manure.\n     - Follow appropriate application practices.\n     - Avoid contaminating harvested crops.\n     - Store manure properly.\n     - Prevent runoff into waterways.\n\n**Proper handling** is especially important when growing vegetables and other crops that people will eat.\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaGljaCBvcmdhbmljIGZlcnRpbGl6ZXIgaXMgcHJvZHVjZWQgd2l0aCB0aGUgaGVscCBvZiBlYXJ0aHdvcm1zPyIsIm9wdGlvbnMiOnsiQSI6IkFuaW1hbCBtYW51cmUiLCJCIjoiVmVybWljb21wb3N0IiwiQyI6IlN5bnRoZXRpYyBmZXJ0aWxpemVyIiwiRCI6IkNoZW1pY2FsIHBlc3RpY2lkZSJ9LCJjb3JyZWN0IjpbIkIiXX0=]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgc2hvdWxkIGZyZXNoIGFuaW1hbCBtYW51cmUgYmUgcHJvcGVybHkgdHJlYXRlZCBvciBjb21wb3N0ZWQgYmVmb3JlIGJlaW5nIHVzZWQgYXJvdW5kIGVkaWJsZSBjcm9wcz8iLCJvcHRpb25zIjp7IkEiOiJUbyByZW1vdmUgYWxsIG51dHJpZW50cyIsIkIiOiJUbyByZWR1Y2UgcG90ZW50aWFsIGhlYWx0aCBhbmQgZW52aXJvbm1lbnRhbCByaXNrcyIsIkMiOiJUbyBwcmV2ZW50IGRlY29tcG9zaXRpb24iLCJEIjoiVG8gdHVybiBpdCBpbnRvIHN5bnRoZXRpYyBmZXJ0aWxpemVyIn0sImNvcnJlY3QiOlsiQiJdfQ==]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaGljaCBvZiB0aGUgZm9sbG93aW5nIGNhbiBiZSB1c2VkIGFzIGEgc291cmNlIG9mIHBsYW50LWJhc2VkIG9yZ2FuaWMgZmVydGlsaXplcj8iLCJvcHRpb25zIjp7IkEiOiJEcmllZCBsZWF2ZXMgYW5kIHBsYW50IHJlc2lkdWVzIiwiQiI6IlBsYXN0aWMgYm90dGxlcyIsIkMiOiJHbGFzcyBjb250YWluZXJzIiwiRCI6Ik1ldGFsIHNjcmFwcyJ9LCJjb3JyZWN0IjpbIkEiXX0=]', 2, '2026-08-08 09:10:10'),
+(59, 21, 'Types and Sources of Organic Fertilizer (Part 2)', '## 4. Plant-Based Organic Fertilizer\n\n![](../images/lessons/lesson_6a76fbacc5406.png)\n\n**Plant materials** can also become useful sources of organic nutrients and organic matter.\n\nExamples include:\n     - Dried leaves\n     - Grass clippings\n     - Crop residues\n     - Plant trimmings\n     - Other suitable plant materials\n\nThese materials can be composted or processed into other organic soil amendments. Instead of immediately throwing away suitable plant waste, urban gardeners can reuse some of it to support their gardens.\n\n**Example:**\nA household grows lettuce and regularly removes old leaves and other plant materials.\nInstead of throwing all of the plant waste into the trash, suitable materials can be added to a composting system. After decomposition, the resulting compost can be used to improve the soil for future crops.\n\nThis creates a simple cycle: \nPlant Waste → Compost → Soil → New Plants\n\n## 5. Organic Liquid Fertilizers\n\nSome organic materials can be processed into liquid fertilizers or nutrient solutions.\nThese may be made from **plant-based** or other** organic materials**. Their nutrient concentration depends on the ingredients and preparation method.\n\n**Organic liquid fertilizers** should be used carefully. A solution that is **too concentrated**may damage plants, while an improperly prepared product may not provide the expected nutrients.\n\nFor this reason, gardeners should follow reliable preparation and application instructions rather than assuming that any homemade organic mixture is safe.\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaGF0IHNob3VsZCBhIGdhcmRlbmVyIGNvbnNpZGVyIHdoZW4gY2hvb3NpbmcgYW4gb3JnYW5pYyBmZXJ0aWxpemVyPyIsIm9wdGlvbnMiOnsiQSI6IlRoZSB0eXBlIG9mIHBsYW50IGFuZCBjb25kaXRpb24gb2YgdGhlIHNvaWwiLCJCIjoiVGhlIGNvbG9yIG9mIHRoZSBmZXJ0aWxpemVyIG9ubHkiLCJDIjoiVGhlIHNpemUgb2YgdGhlIGNvbnRhaW5lciBvbmx5IiwiRCI6IlRoZSBwcmljZSBvZiB0aGUgZmVydGlsaXplciBvbmx5In0sImNvcnJlY3QiOlsiQSJdfQ==]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgaXMgaXQgaW1wb3J0YW50IHRvIGNvbnNpZGVyIHRoZSBhbW91bnQgb2YgZmVydGlsaXplciB0byBhcHBseT8iLCJvcHRpb25zIjp7IkEiOiJUb28gbXVjaCBmZXJ0aWxpemVyIGNhbiBjYXVzZSBudXRyaWVudCBwcm9ibGVtcyBhbmQgZW52aXJvbm1lbnRhbCBpbXBhY3RzLiIsIkIiOiJQbGFudHMgYWx3YXlzIGdyb3cgZmFzdGVyIHdoZW4gbW9yZSBmZXJ0aWxpemVyIGlzIGFwcGxpZWQuIiwiQyI6IkZlcnRpbGl6ZXIgaGFzIG5vIGVmZmVjdCBvbiBzb2lsLiIsIkQiOiJQbGFudHMgY2Fubm90IGFic29yYiBudXRyaWVudHMgZnJvbSBvcmdhbmljIGZlcnRpbGl6ZXIuIn0sImNvcnJlY3QiOlsiQSJdfQ==]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgaXMgdGhlcmUgbm8gc2luZ2xlIG9yZ2FuaWMgZmVydGlsaXplciB0aGF0IGlzIGJlc3QgZm9yIGV2ZXJ5IHNpdHVhdGlvbj8iLCJvcHRpb25zIjp7IkEiOiJEaWZmZXJlbnQgcGxhbnRzLCBzb2lscywgYW5kIGdyb3dpbmcgY29uZGl0aW9ucyBoYXZlIGRpZmZlcmVudCBuZWVkcy4iLCJCIjoiT3JnYW5pYyBmZXJ0aWxpemVycyBkbyBub3QgcHJvdmlkZSBudXRyaWVudHMuIiwiQyI6IkFsbCBvcmdhbmljIGZlcnRpbGl6ZXJzIGhhdmUgZXhhY3RseSB0aGUgc2FtZSBwcm9wZXJ0aWVzLiIsIkQiOiJQbGFudHMgZG8gbm90IG5lZWQgZGlmZmVyZW50IG51dHJpZW50cy4ifSwiY29ycmVjdCI6WyJBIl19]', 3, '2026-08-08 09:37:31'),
+(60, 21, 'Choosing an Organic Fertilizer', 'Different plants and growing conditions may require different approaches. Before choosing an organic fertilizer, consider the following:\n\n## 1. Type of Plant\n\nDifferent crops have different nutrient requirements. A leafy vegetable may have different needs from a fruiting crop.\n\n## 2. Soil Condition\n\nThe condition of the soil can affect which type of organic amendment is appropriate.\n\n## 3. Nutrient Requirements\n\nGardeners should consider what nutrients the plants need instead of applying fertilizer simply because it is available.\n\n## 4. Quality of the Material\n\n[youtube:Organic fertilizer should be properly prepared, mature, and suitable for its intended use.]\n\nOrganic fertilizer should be properly prepared, mature, and suitable for its intended use.\n\n## 5. Amount to Apply\n\nUsing too much fertilizer does not necessarily produce healthier plants. Excess nutrients can be wasted and may contribute to environmental problems.\n\n## Choosing the Right Type\n\nThere is **no** single organic fertilizer that is best for every situation.\n\nFor example:\n**Compost** may be useful when the goal is to add organic matter and improve soil condition.\n\n**Vermicompost** may be suitable for gardeners who have access to earthworms and want to recycle suitable organic household waste.\n\n**Animal manure** can provide nutrients but requires proper treatment and handling.\n\n**Plant-based** materials can be composted and returned to the soil.\n\nThe most appropriate choice depends on the *crop*, *soil condition*, *available materials*, and *intended use*.\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaGljaCBmYWN0b3Igc2hvdWxkIGEgZ2FyZGVuZXIgY29uc2lkZXIgd2hlbiBjaG9vc2luZyBhbiBvcmdhbmljIGZlcnRpbGl6ZXI/Iiwib3B0aW9ucyI6eyJBIjoiVGhlIHR5cGUgb2YgcGxhbnQgYW5kIGl0cyBudXRyaWVudCByZXF1aXJlbWVudHMiLCJCIjoiVGhlIGNvbG9yIG9mIHRoZSBmZXJ0aWxpemVyIiwiQyI6IlRoZSBzaXplIG9mIHRoZSBmZXJ0aWxpemVyIGNvbnRhaW5lciIsIkQiOiJUaGUgYnJhbmQgbmFtZSBvbmx5In0sImNvcnJlY3QiOlsiQSJdfQ==]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgaXMgaXQgaW1wb3J0YW50IHRvIGNvbnNpZGVyIHRoZSBxdWFsaXR5IG9mIGFuIG9yZ2FuaWMgZmVydGlsaXplciBiZWZvcmUgdXNpbmcgaXQ/Iiwib3B0aW9ucyI6eyJBIjoiQWxsIG9yZ2FuaWMgZmVydGlsaXplcnMgYXJlIGF1dG9tYXRpY2FsbHkgc2FmZSB0byB1c2UuIiwiQiI6IkZyZXNoIGFuZCB1bnRyZWF0ZWQgbWF0ZXJpYWxzIGFyZSBhbHdheXMgYmV0dGVyIGZvciBwbGFudHMuIiwiQyI6IlRoZSBxdWFsaXR5IG9mIGZlcnRpbGl6ZXIgZG9lcyBub3QgYWZmZWN0IHBsYW50IGdyb3d0aC4iLCJEIjoiT3JnYW5pYyBmZXJ0aWxpemVyIHNob3VsZCBiZSBwcm9wZXJseSBwcmVwYXJlZCwgbWF0dXJlLCBhbmQgc3VpdGFibGUgZm9yIGl0cyBpbnRlbmRlZCB1c2UuIn0sImNvcnJlY3QiOlsiRCJdfQ==]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgaXMgdGhlcmUgbm8gc2luZ2xlIG9yZ2FuaWMgZmVydGlsaXplciB0aGF0IGlzIGJlc3QgZm9yIGV2ZXJ5IHNpdHVhdGlvbj8iLCJvcHRpb25zIjp7IkEiOiJPcmdhbmljIGZlcnRpbGl6ZXJzIGNhbm5vdCBwcm92aWRlIG51dHJpZW50cyB0byBwbGFudHMuIiwiQiI6IlRoZSBhcHByb3ByaWF0ZSBmZXJ0aWxpemVyIGRlcGVuZHMgb24gdGhlIGNyb3AsIHNvaWwgY29uZGl0aW9uLCBhdmFpbGFibGUgbWF0ZXJpYWxzLCBhbmQgaW50ZW5kZWQgdXNlLiIsIkMiOiJHYXJkZW5lcnMgc2hvdWxkIGFsd2F5cyB1c2UgdGhlIG1vc3QgZXhwZW5zaXZlIGZlcnRpbGl6ZXIuIiwiRCI6IkFsbCBwbGFudHMgcmVxdWlyZSBleGFjdGx5IHRoZSBzYW1lIG51dHJpZW50cy4ifSwiY29ycmVjdCI6WyJCIl19]', 4, '2026-08-08 09:53:22'),
+(61, 21, 'Using Organic Fertilizers Responsibly', '**Organic fertilizers** can provide nutrients and organic matter, but organic does not mean unlimited or automatically risk-free. Using too much fertilizer, even if it comes from natural materials, can harm plants and the environment.\n\n## Responsible Use of Organic Fertilizers\n\nResponsible gardeners should:\n\n- **Use properly prepared materials**. Make sure compost, manure, and other organic fertilizers are properly decomposed before applying them to plants.\n- **Apply appropriate amounts**. Too much fertilizer can cause nutrient buildup, damage plant roots, or affect plant growth.\n- **Consider the needs of the crop**. Different plants have different nutrient requirements, so fertilizer application should be adjusted based on the type and growth stage of the plant.\n- **Avoid contaminated materials**. Do not use organic waste that may contain harmful chemicals, plastics, disease-causing organisms, or other contaminants.\n- **Prevent fertilizer from entering waterways**. Excess fertilizer can be carried by rainwater into drains, rivers, and other water sources, where it can contribute to water pollution.\n- **Observe how plants respond**. Watch for signs such as yellowing leaves, weak growth, leaf burn, or excessive growth, which may indicate nutrient problems.\n- **Reuse suitable organic waste whenever possible**. Kitchen scraps, plant residues, and other suitable biodegradable materials can be converted into compost or other organic fertilizers.\n- **Store fertilizers properly**. Keep organic fertilizers in a covered, dry, and safe area to prevent contamination and unwanted runoff.\n- **Use clean tools and containers**. Equipment used for preparing or applying fertilizers should be kept clean to prevent contamination.\n- **Follow proper preparation methods**. Liquid fertilizers, compost teas, and fermented organic fertilizers should be prepared using appropriate materials and methods before use.\n\n## Why Responsible Use Matters\n\nUsing organic fertilizers responsibly helps maintain healthy soil, healthy plants, and a cleaner environment. Organic fertilizers can improve soil structure and add nutrients, but they should be used carefully to avoid nutrient imbalance and pollution.\n\nBy practicing proper fertilizer management, urban gardeners can reduce organic waste, improve soil health, support plant growth, and make urban farming more sustainable.\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgc2hvdWxkIGdhcmRlbmVycyBhdm9pZCB1c2luZyBleGNlc3NpdmUgYW1vdW50cyBvZiBvcmdhbmljIGZlcnRpbGl6ZXI/Iiwib3B0aW9ucyI6eyJBIjoiRXhjZXNzIGZlcnRpbGl6ZXIgaW1tZWRpYXRlbHkgZGlzYXBwZWFycyBmcm9tIHRoZSBzb2lsLiIsIkIiOiJFeGNlc3MgZmVydGlsaXplciBjYW4gY2F1c2UgbnV0cmllbnQgYnVpbGR1cCwgcGxhbnQgcHJvYmxlbXMsIGFuZCBlbnZpcm9ubWVudGFsIGltcGFjdHMuIiwiQyI6Ik9yZ2FuaWMgZmVydGlsaXplciBjb250YWlucyBubyBudXRyaWVudHMuIiwiRCI6Ik1vcmUgZmVydGlsaXplciBhbHdheXMgcHJvZHVjZXMgaGVhbHRoaWVyIHBsYW50cy4ifSwiY29ycmVjdCI6WyJCIl19]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaHkgc2hvdWxkIGZlcnRpbGl6ZXIgYmUgcHJldmVudGVkIGZyb20gZW50ZXJpbmcgd2F0ZXJ3YXlzPyIsIm9wdGlvbnMiOnsiQSI6Ikl0IGNhbiBjb250cmlidXRlIHRvIHdhdGVyIHBvbGx1dGlvbiBhbmQgYWZmZWN0IGFxdWF0aWMgZWNvc3lzdGVtcy4iLCJCIjoiV2F0ZXJ3YXlzIG5hdHVyYWxseSByZW1vdmUgYWxsIGZlcnRpbGl6ZXIuIiwiQyI6IkZlcnRpbGl6ZXIgaGFzIG5vIGVmZmVjdCBvbiB3YXRlci4iLCJEIjoiRmVydGlsaXplciBtYWtlcyB3YXRlciBzYWZlciB0byBkcmluay4ifSwiY29ycmVjdCI6WyJBIl19]\n\n[checkpoint:eyJ0eXBlIjoibXVsdGlfc2VsZWN0IiwicXVlc3Rpb24iOiJXaGljaCBwcmFjdGljZSBkZW1vbnN0cmF0ZXMgcmVzcG9uc2libGUgdXNlIG9mIG9yZ2FuaWMgZmVydGlsaXplcj8iLCJvcHRpb25zIjp7IkEiOiJVc2luZyBjb250YW1pbmF0ZWQgb3JnYW5pYyB3YXN0ZSIsIkIiOiJSZXVzaW5nIHN1aXRhYmxlIG9yZ2FuaWMgd2FzdGUgYW5kIGFwcGx5aW5nIHByb3Blcmx5IHByZXBhcmVkIGZlcnRpbGl6ZXIgaW4gYXBwcm9wcmlhdGUgYW1vdW50cyIsIkMiOiJBcHBseWluZyBmZXJ0aWxpemVyIGRpcmVjdGx5IGludG8gcml2ZXJzIGFuZCBkcmFpbmFnZSBzeXN0ZW1zIiwiRCI6IkFwcGx5aW5nIGZlcnRpbGl6ZXIgd2hlbmV2ZXIgcGxhbnRzIGxvb2sgZ3JlZW4ifSwiY29ycmVjdCI6WyJCIl19]', 5, '2026-08-08 10:02:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lesson_progress`
+--
+
+CREATE TABLE `lesson_progress` (
+  `progress_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `lesson_id` int(11) NOT NULL,
+  `completed` tinyint(1) DEFAULT 0,
+  `checkpoint_progress` text DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `lesson_progress`
+--
+
+INSERT INTO `lesson_progress` (`progress_id`, `user_id`, `lesson_id`, `completed`, `checkpoint_progress`, `completed_at`, `created_at`) VALUES
+(100, 47, 18, 1, NULL, '2026-06-23 05:10:06', '2026-06-23 05:10:06'),
+(101, 47, 8, 1, NULL, '2026-06-23 05:31:39', '2026-06-23 05:31:39'),
+(102, 47, 9, 1, NULL, '2026-06-23 05:31:41', '2026-06-23 05:31:41'),
+(103, 47, 10, 1, NULL, '2026-06-23 05:31:44', '2026-06-23 05:31:44'),
+(104, 47, 1, 1, NULL, '2026-06-30 08:04:35', '2026-06-30 08:04:35'),
+(105, 47, 2, 1, NULL, '2026-06-30 08:04:36', '2026-06-30 08:04:36'),
+(106, 47, 3, 1, NULL, '2026-06-30 08:04:38', '2026-06-30 08:04:38'),
+(109, 47, 5, 1, NULL, '2026-08-05 02:57:10', '2026-08-05 02:57:10'),
+(110, 47, 6, 1, NULL, '2026-08-05 02:59:53', '2026-08-05 02:59:53'),
+(111, 47, 7, 1, NULL, '2026-08-05 03:00:34', '2026-08-05 03:00:34'),
+(112, 47, 11, 1, NULL, '2026-08-05 05:30:18', '2026-08-05 05:30:18'),
+(113, 47, 12, 1, NULL, '2026-08-05 05:30:20', '2026-08-05 05:30:20'),
+(114, 47, 19, 1, NULL, '2026-08-05 05:51:43', '2026-08-05 05:51:43'),
+(115, 47, 20, 1, NULL, '2026-08-05 06:07:34', '2026-08-05 06:07:34'),
+(126, 47, 21, 1, NULL, '2026-08-05 07:32:15', '2026-08-05 07:32:15'),
+(132, 62, 19, 1, NULL, '2026-08-06 10:14:11', '2026-08-06 10:14:11'),
+(146, 47, 55, 1, '[\"0\",\"1\",\"2\"]', '2026-08-08 10:43:16', '2026-08-08 10:43:07'),
+(150, 47, 58, 1, '[\"0\",\"1\",\"2\"]', '2026-08-08 10:43:42', '2026-08-08 10:43:24'),
+(154, 47, 59, 1, '[\"0\",\"1\",\"2\"]', '2026-08-08 10:43:51', '2026-08-08 10:43:45'),
+(158, 47, 60, 1, '[\"0\",\"1\",\"2\"]', '2026-08-08 10:50:11', '2026-08-08 10:50:00'),
+(162, 47, 61, 1, '[\"0\",\"1\",\"2\"]', '2026-08-08 10:50:33', '2026-08-08 10:50:16'),
+(166, 48, 55, 1, '[\"0\",\"1\",\"2\"]', '2026-08-08 11:02:51', '2026-08-08 11:02:17'),
+(170, 48, 58, 0, '[\"0\",\"1\",\"2\"]', NULL, '2026-08-08 11:03:58'),
+(173, 48, 59, 0, '[\"2\",\"1\"]', NULL, '2026-08-08 11:04:12');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `modules`
+--
+
+CREATE TABLE `modules` (
+  `module_id` int(100) NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `description` text NOT NULL,
+  `image_path` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `rewards` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `modules`
+--
+
+INSERT INTO `modules` (`module_id`, `title`, `description`, `image_path`, `created_at`, `updated_at`, `rewards`) VALUES
+(1, 'Introduction to Urban Agriculture', 'In this module, you’ll learn about the fundamentals of urban agriculture, including its definition, historical development, and key benefits. You will also explore how farming within cities supports food security, sustainability, and community well-being.', '../html/moduleimages/module_1783757351_7710.jpg', '2025-09-16 06:58:21', '2026-07-11 08:09:11', 'Free seeds: Kangkong and Pechay\r\nFree Nursery Pots'),
+(2, 'Planning and Designing Urban Agriculture Systems', 'Urban agriculture systems must be carefully planned and designed to maximize the use of\r\navailable resources, ensure sustainability, and adapt to urban constraints. This module provides a\r\ndetailed guide to site assessment, system designs, and resource management.', '../html/moduleimages/module_1767852055_7385.jpg', '2025-09-16 10:31:50', '2026-01-29 02:35:09', 'Free seeds: Okra and Alugbati'),
+(3, 'Techniques and Practices in Urban Agriculture', 'This module focuses on various techniques and practices essential for successful urban\r\nagriculture. It covers soil-based farming, soilless farming techniques (hydroponics and\r\naeroponics), and the importance of composting and resource recycling in urban settings.', '../html/moduleimages/module_1767852063_4288.jpg', '2025-09-17 02:51:30', '2026-01-29 02:35:47', 'Free seeds: Sitao and Upo'),
+(4, 'Pest and Disease Management in Urban Farming', 'Effective pest and disease management is crucial for urban agriculture, where limited space and proximity to homes and communities require sustainable and environmentally friendly approaches. Integrated Pest Management (IPM) integrates biological, cultural, mechanical, and chemical controls to manage pests and diseases without harming the environment or human health.', '../html/moduleimages/module_1767852071_4463.jpg', '2025-09-17 03:29:05', '2026-01-29 02:36:06', 'Free seeds: Eggplant and Saluyot'),
+(5, 'Crop Selection and Calendar Planning (Baguio City Focus)', 'In urban agriculture, selecting the right crops and creating an efficient seasonal crop calendar are essential for maximizing yields, meeting market demands, and ensuring the sustainability of farming systems. Baguio City, with its distinct climate and terrain, presents unique challenges and opportunities for crop selection. This module provides a comprehensive approach to understanding these factors and creating an effective crop calendar tailored to Baguio City\'s conditions.', '../html/moduleimages/module_1767852088_2399.jpg', '2025-09-17 03:48:32', '2026-01-29 02:37:12', 'Free seeds: Tomato\r\nFree Nursery Pots'),
+(21, 'Organic Fertilizer for Sustainable Urban Farming', 'Organic fertilizer is an important part of sustainable urban farming because it provides nutrients to plants while making use of naturally occurring organic materials. This module introduces learners to organic fertilizers, their different types, methods of production, proper application, and environmental importance. Learners will also explore how household and garden waste can be transformed into useful materials for growing plants.', '../images/modules/module_1786186563_6a770b436701c.jpg', '2026-08-08 06:03:34', '2026-08-08 10:56:03', 'Organic Fertilizer and Onion Leeks Seeds');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `module_quizzes`
+--
+
+CREATE TABLE `module_quizzes` (
+  `quiz_id` int(11) NOT NULL,
+  `module_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `module_quizzes`
+--
+
+INSERT INTO `module_quizzes` (`quiz_id`, `module_id`, `title`) VALUES
+(1, 1, 'Introduction to Urban Farming Quiz'),
+(2, 2, 'Soil Management and Composting Quiz'),
+(3, 3, 'Water Management in Urban Farming Quiz'),
+(4, 4, 'Pest and Disease Management in Urban Farming Quiz'),
+(5, 5, 'Crop Selection and Calendar Planning (Baguio City) Quiz'),
+(12, 21, 'Organic Fertilizer for Sustainable Urban Farming');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `notification_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `type` varchar(60) NOT NULL,
+  `message` varchar(255) NOT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `is_read` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`notification_id`, `user_id`, `type`, `message`, `link`, `is_read`, `created_at`) VALUES
+(1, 39, 'expert_reply', 'An expert replied to your thread \"Beginner Friendly Plants\".', '../Forum/thread.php?id=54', 1, '2026-04-09 22:12:02'),
+(2, 35, 'thread_approved', 'Your thread \"asdasd\" has been approved.', '../Forum/community.php?filter=my_posts', 0, '2026-04-09 22:24:09'),
+(3, 39, 'expert_reply', 'An expert replied to your thread \"Beginner Friendly Plants\".', '../Forum/thread.php?id=54', 1, '2026-04-09 22:24:38'),
+(4, 39, 'thread_approved', 'Your thread \"test\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-06-16 23:11:02'),
+(5, 39, 'thread_approved', 'Your thread \"asdasd\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-06-16 23:11:04'),
+(6, 39, 'thread_approved', 'Your thread \"test1\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-06-16 23:21:11'),
+(7, 39, 'thread_reply', 'Someone replied to your thread \"test1\".', '../Forum/thread.php?id=57', 1, '2026-06-18 14:15:30'),
+(8, 47, 'thread_approved', 'Your thread \"Test Post\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-06-18 16:02:30'),
+(9, 47, 'expert_reply', 'An expert replied to your thread \"Test Post\".', '../Forum/thread.php?id=58', 1, '2026-06-18 16:02:50'),
+(10, 47, 'thread_reply', 'Someone replied to your thread \"Test Post\".', '../Forum/thread.php?id=58', 1, '2026-06-18 16:03:49'),
+(11, 46, 'thread_approved', 'Your thread \"Test\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-06-18 17:29:16'),
+(12, 46, 'thread_reply', 'Someone replied to your thread \"Test\".', '../Forum/thread.php?id=59', 1, '2026-06-18 17:30:31'),
+(13, 47, 'thread_approved', 'Your thread \"Test\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-06-18 17:32:17'),
+(14, 47, 'expert_reply', 'An expert replied to your thread \"Test\".', '../Forum/thread.php?id=60', 1, '2026-06-18 17:36:40'),
+(17, 47, 'certificate_earned', 'A new certificate is now available for one of your completed modules.', '../userpage.php?section=certificates', 1, '2026-06-19 10:27:00'),
+(18, 47, 'reward_unlocked', 'A new module reward has been unlocked.', '../userpage.php?section=rewards', 1, '2026-06-30 16:09:44'),
+(19, 47, 'thread_approved', 'Your thread \"test\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-08-06 15:11:34'),
+(20, 47, 'expert_reply', 'An expert replied to your thread \"test\".', '../Forum/thread.php?id=62', 1, '2026-08-06 15:12:15'),
+(21, 47, 'thread_reply', 'Someone replied to your thread \"test\".', '../Forum/thread.php?id=62', 1, '2026-08-06 15:13:27'),
+(22, 47, '', 'Your access to the Farming Community has been restricted by an administrator.', 'php/Forum/community.php', 1, '2026-08-06 15:44:08'),
+(23, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 15:51:52'),
+(24, 47, '', 'Your access to the Farming Community has been restricted by an administrator.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 15:52:18'),
+(25, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:27:57'),
+(26, 48, '', 'Your access to the Farming Community has been restricted contact the admin for access.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:28:02'),
+(27, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:29:28'),
+(28, 48, '', 'Your access to the Farming Community has been restricted contact the admin for access.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:29:50'),
+(29, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 16:55:38'),
+(30, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:18:48'),
+(31, 48, '', 'Your Farming Community access has been temporarily restricted for 7 days due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:21:53'),
+(32, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:21:58'),
+(33, 48, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:22:08'),
+(34, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:22:26'),
+(35, 47, '', 'Your Farming Community access has been temporarily restricted for 1 day due to a violation of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:25:47'),
+(36, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:26:07'),
+(37, 47, '', 'Your Farming Community access has been temporarily restricted for 7 days due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:26:11'),
+(38, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:26:14'),
+(39, 47, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:26:15'),
+(40, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:26:16'),
+(41, 47, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:26:18'),
+(42, 60, '', 'Your Farming Community access has been temporarily restricted for 1 day due to a violation of the community guidelines.', '/capstone22/php/Forum/community.php', 0, '2026-08-06 17:26:36'),
+(43, 48, '', 'Your Farming Community access has been permanently restricted due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:29:15'),
+(44, 47, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:29:29'),
+(45, 48, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 17:29:33'),
+(46, 62, 'thread_approved', 'Your thread \"test tes\" has been approved.', '../Forum/community.php?filter=my_posts', 1, '2026-08-06 18:03:01'),
+(47, 62, 'expert_reply', 'An expert replied to your thread \"test tes\".', '../Forum/thread.php?id=63', 1, '2026-08-06 18:08:40'),
+(48, 62, '', 'Your Farming Community access has been temporarily restricted for 1 day due to a violation of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 18:13:41'),
+(49, 62, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 18:14:34'),
+(50, 62, '', 'Your Farming Community access has been temporarily restricted for 7 days due to repeated violations of the community guidelines.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 18:14:48'),
+(51, 62, 'thread_reply', 'Someone replied to your thread \"test tes\".', '../Forum/thread.php?id=63', 1, '2026-08-06 18:17:14'),
+(52, 62, 'thread_reply', 'Someone replied to your thread \"test tes\".', '../Forum/thread.php?id=63', 1, '2026-08-06 18:27:02'),
+(53, 62, 'thread_reply', 'Someone replied to your thread \"test tes\".', '../Forum/thread.php?id=63', 1, '2026-08-06 18:32:46'),
+(54, 62, 'thread_reply', 'Someone replied to your thread \"test tes\".', '../Forum/thread.php?id=63', 1, '2026-08-06 18:48:05'),
+(55, 62, 'certificate_earned', 'A new certificate is now available for one of your completed modules.', '../userpage.php?section=certificates', 0, '2026-08-06 20:54:45'),
+(56, 62, 'reward_unlocked', 'A new module reward has been unlocked.', '../userpage.php?section=rewards', 0, '2026-08-06 20:54:45'),
+(57, 62, '', 'Your access to the Farming Community has been restored.', '/capstone22/php/Forum/community.php', 1, '2026-08-06 21:09:38'),
+(58, 62, 'certificate_earned', 'A new certificate is now available for one of your completed modules.', '../userpage.php?section=certificates', 0, '2026-08-06 23:17:15'),
+(59, 62, 'reward_unlocked', 'A new module reward has been unlocked.', '../userpage.php?section=rewards', 0, '2026-08-06 23:17:16'),
+(60, 47, 'certificate_earned', 'A new certificate is now available for one of your completed modules.', '../userpage.php?section=certificates', 1, '2026-08-08 18:50:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `plant`
+--
+
+CREATE TABLE `plant` (
+  `plant_id` int(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `image` varchar(255) NOT NULL,
+  `container_soil` text DEFAULT NULL,
+  `watering` text DEFAULT NULL,
+  `sunlight` text DEFAULT NULL,
+  `tips` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `plant`
+--
+
+INSERT INTO `plant` (`plant_id`, `name`, `description`, `image`, `container_soil`, `watering`, `sunlight`, `tips`) VALUES
+(3, 'Eggplant', 'A versatile plant for urban farming, eggplants can be grown in large pots or vertical gardens. They are heat-tolerant and produce an abundant harvest in limited spaces. Perfect for homegrown meals, eggplants bring a fresh, rich flavor to dishes like stir-fries and pasta.', '../images/eggplant.jpg', 'Large pot, nutrient-rich soil', 'Water evenly, avoid overwatering', '6-8 hours sunlight', 'Use stakes or cages for support'),
+(4, 'Lettuce', 'A staple for urban farming beginners, lettuce is easy to grow in small containers or hydroponic systems. With its quick growth cycle, it provides a continuous harvest of fresh greens for salads and wraps. Lettuce thrives in partial sunlight, making it ideal for balcony or rooftop gardens.\r\n\r\n', '../images/lettuce.jpg', 'Shallow containers, loose soil', 'Water lightly and frequently', 'Partial sunlight', 'Harvest outer leaves first'),
+(6, 'Tomato', 'A favorite for urban farmers, tomatoes grow well in containers, hanging baskets, or vertical trellises. They love sunlight and adapt easily to urban spaces, producing vibrant, juicy fruits. Whether cherry or beefsteak, fresh tomatoes are a rewarding addition to any urban garden.\r\n\r\n', '../images/tomato.jpg', 'Large container, loose nutrient-rich soil', 'Water deeply and consistently', '6-8 hours sunlight', 'Use stakes, cages, or trellises for support');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `questions`
+--
+
+CREATE TABLE `questions` (
+  `question_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `body` text NOT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `best_reply_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `questions`
+--
+
+INSERT INTO `questions` (`question_id`, `user_id`, `title`, `body`, `image_path`, `created_at`, `updated_at`, `status`, `best_reply_id`) VALUES
+(59, 46, 'Test', 'Test', NULL, '2026-06-18 17:28:02', NULL, 'approved', NULL),
+(62, 47, 'test', 'test', NULL, '2026-08-06 15:11:10', NULL, 'approved', 59),
+(63, 62, 'test tes', 'test', NULL, '2026-08-06 17:55:45', NULL, 'approved', 61);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `quiz_questions`
+--
+
+CREATE TABLE `quiz_questions` (
+  `question_id` int(11) NOT NULL,
+  `quiz_id` int(11) NOT NULL,
+  `question_text` text NOT NULL,
+  `option_a` varchar(255) NOT NULL,
+  `option_b` varchar(255) NOT NULL,
+  `option_c` varchar(255) NOT NULL,
+  `option_d` varchar(255) NOT NULL,
+  `correct_option` char(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `quiz_questions`
+--
+
+INSERT INTO `quiz_questions` (`question_id`, `quiz_id`, `question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_option`) VALUES
+(1, 1, 'Which of the following best describes urban farming?', 'Farming only in rural areas', 'Growing food in cities and urban areas', 'Large-scale agriculture using tractors', 'Forestry and logging in rural zones', 'B'),
+(2, 1, 'A key benefit of urban farming is:', 'Increased food transportation costs', 'Improved local food security', 'Decreased green spaces in cities', 'Exclusive focus on export markets', 'B'),
+(3, 1, 'Which of the following is NOT an example of urban farming?', 'Rooftop gardens', 'Vertical farming', 'Hydroponics', 'Open-field rice farming in provinces', 'D'),
+(4, 1, 'Urban farming contributes to sustainability by:', 'Increasing pesticide use', 'Reducing food miles', 'Expanding deforestation', 'Limiting local employment', 'B'),
+(5, 1, 'Which is a social benefit of urban farming?', 'Food insecurity', 'Community engagement', 'Increased pollution', 'Soil erosion', 'B'),
+(6, 1, 'Vertical farming involves:', 'Using tall buildings to store seeds', 'Growing crops in stacked layers indoors', 'Building terraces in mountain areas', 'Cattle ranching on highlands', 'B'),
+(7, 1, 'Which urban farming technique uses water-based systems without soil?', 'Hydroponics', 'Composting', 'Aquaponics', 'Crop rotation', 'A'),
+(8, 1, 'Aquaponics combines:', 'Livestock and crop farming', 'Fish farming with hydroponics', 'Vertical farming and aeroponics', 'Soil-based organic gardening', 'B'),
+(9, 1, 'One environmental benefit of urban farming is:', 'Higher greenhouse gas emissions', 'Improved air quality and biodiversity', 'More deforestation', 'Soil depletion', 'B'),
+(10, 1, 'Which factor often limits urban farming?', 'Limited space', 'Unlimited land', 'Excess rural labor', 'Abundant fresh water', 'A'),
+(11, 2, 'Soil texture refers to:', 'The soil color', 'The proportion of sand, silt, and clay', 'The soil nutrient content', 'The water level in soil', 'B'),
+(12, 2, 'Which soil is best for vegetable production?', 'Sandy soil', 'Loam soil', 'Clay soil', 'Gravel soil', 'B'),
+(13, 2, 'Soil pH measures:', 'Temperature of soil', 'Acidity or alkalinity of soil', 'Organic matter level', 'Amount of oxygen in soil', 'B'),
+(14, 2, 'The ideal soil pH for most vegetables is:', '3.5 - 4.5', '5.5 - 7.0', '8.5 - 9.0', '2.0 - 3.0', 'B'),
+(15, 2, 'Which nutrient promotes leafy growth in plants?', 'Phosphorus', 'Nitrogen', 'Potassium', 'Calcium', 'B'),
+(16, 2, 'Which nutrient helps in root development and flowering?', 'Potassium', 'Phosphorus', 'Nitrogen', 'Magnesium', 'B'),
+(17, 2, 'Which nutrient improves fruit quality and disease resistance?', 'Potassium', 'Nitrogen', 'Phosphorus', 'Sulfur', 'A'),
+(18, 2, 'What is composting?', 'Burning organic waste', 'Decomposing organic matter into fertilizer', 'Storing waste in landfills', 'Mixing soil with chemicals', 'B'),
+(19, 2, 'Which materials are best for composting?', 'Plastic and glass', 'Fruit peels and vegetable scraps', 'Metal and rubber', 'Styrofoam', 'B'),
+(20, 2, 'One benefit of composting is:', 'Increased waste in landfills', 'Improved soil fertility', 'Reduced organic matter in soil', 'Increased pollution', 'B'),
+(21, 3, 'Why is water management important in urban farming?', 'It prevents crop rotation', 'It ensures efficient use of limited water resources', 'It increases pesticide use', 'It reduces plant growth', 'B'),
+(22, 3, 'Which irrigation method delivers water directly to plant roots?', 'Sprinkler irrigation', 'Drip irrigation', 'Flood irrigation', 'Hand watering', 'B'),
+(23, 3, 'Which irrigation method wastes the most water?', 'Drip irrigation', 'Flood irrigation', 'Container watering', 'Mulching', 'B'),
+(24, 3, 'Mulching helps conserve water by:', 'Adding fertilizer to soil', 'Reducing evaporation from soil', 'Attracting pests', 'Removing weeds permanently', 'B'),
+(25, 3, 'Which water source is most sustainable in cities?', 'Tap water only', 'Rainwater harvesting', 'Ocean water desalination', 'Chemical solutions', 'B'),
+(26, 3, 'Overwatering plants can cause:', 'Better yields', 'Root rot', 'Increased resistance', 'Faster germination', 'B'),
+(27, 3, 'Waterlogging is harmful because it:', 'Provides more oxygen to roots', 'Causes root rot and disease', 'Improves soil fertility', 'Promotes composting', 'B'),
+(28, 3, 'A water-efficient system combining fish farming and hydroponics is:', 'Drip irrigation', 'Flood irrigation', 'Aquaponics', 'Rainwater harvesting', 'C'),
+(29, 3, 'Which practice helps reduce urban water demand?', 'Rainwater collection', 'Chemical irrigation', 'Pesticide spraying', 'Flooding fields', 'A'),
+(30, 3, 'Monitoring soil moisture ensures:', 'Efficient watering schedules', 'Increased pests', 'Nutrient deficiency', 'Excessive pesticide use', 'A'),
+(31, 4, 'Which of the following pests is commonly found on leafy greens like lettuce and spinach?', 'Spider mites', 'Aphids', 'Thrips', 'Slugs', 'B'),
+(32, 4, 'Which pest causes speckled, discolored leaves and thrives in hot, dry conditions?', 'Whiteflies', 'Spider mites', 'Cabbage worms', 'Nematodes', 'B'),
+(33, 4, 'Which pest transmits viral diseases and is usually found on the undersides of leaves?', 'Thrips', 'Whiteflies', 'Slugs', 'Ladybugs', 'B'),
+(34, 4, 'Which pest leaves silvery slime trails on leafy vegetables?', 'Cabbage worms', 'Slugs and snails', 'Aphids', 'Thrips', 'B'),
+(35, 4, 'Root-knot nematodes mainly damage plants by:', 'Chewing leaves', 'Infecting roots and reducing water uptake', 'Transmitting fungal spores', 'Destroying flowers', 'B'),
+(36, 4, 'Which disease appears as white, powdery spots on leaves?', 'Downy mildew', 'Powdery mildew', 'Fusarium wilt', 'Root rot', 'B'),
+(37, 4, 'Bacterial blight commonly affects:', 'Cucumbers and squash', 'Tomatoes, peppers, and beans', 'Lettuce and spinach', 'Carrots and radishes', 'B'),
+(38, 4, 'Which soil-borne fungus causes wilting and yellowing in tomatoes and eggplants?', 'Fusarium wilt', 'Downy mildew', 'Root rot', 'Blight', 'A'),
+(39, 4, 'Which beneficial insect is a natural predator of aphids and mealybugs?', 'Lacewings', 'Ladybugs', 'Parasitic wasps', 'Predatory mites', 'B'),
+(40, 4, 'Bacillus thuringiensis (Bt) is effective mainly against:', 'Aphids', 'Caterpillar pests', 'Nematodes', 'Whiteflies', 'B'),
+(41, 4, 'Trichoderma spp. is primarily used for:', 'Killing aphids', 'Controlling soil-borne diseases like root rot', 'Repelling snails', 'Attracting pollinators', 'B'),
+(42, 4, 'Which cultural practice involves planting basil with tomatoes to deter pests?', 'Sanitation', 'Intercropping', 'Crop rotation', 'Companion planting', 'B'),
+(43, 4, 'Proper spacing in crops mainly helps prevent:', 'Nutrient loss', 'Pest resistance', 'High humidity and fungal diseases', 'Soil erosion', 'C'),
+(44, 4, 'Which organic pesticide disrupts insect growth and is derived from a tree?', 'Neem oil', 'Chili pepper extract', 'Garlic spray', 'Diatomaceous earth', 'A'),
+(45, 4, 'Diatomaceous earth controls soft-bodied pests by:', 'Repelling them with smell', 'Desiccating and drying them out', 'Poisoning them', 'Blocking nutrient uptake', 'B'),
+(46, 4, 'Which IPM strategy uses plants like marigolds to lure pests away from crops?', 'Companion planting', 'Trap cropping', 'Threshold monitoring', 'Intercropping', 'B'),
+(47, 4, 'The first step in IPM is:', 'Applying pesticides', 'Using barriers', 'Monitoring crops for pests and diseases', 'Planting resistant varieties', 'C'),
+(48, 5, 'Baguio’s average temperature (15–23°C) is most suitable for:', 'Rice and corn', 'Leafy vegetables and root crops', 'Mangoes and bananas', 'Sugarcane and cassava', 'B'),
+(49, 5, 'Which of the following crops may require sheltered areas during cooler months in Baguio?', 'Lettuce', 'Spinach', 'Tomatoes', 'Cabbage', 'C'),
+(50, 5, 'During Baguio’s rainy season (May–October), which crop is more tolerant of excess moisture?', 'Tomatoes', 'Peppers', 'Lettuce', 'Eggplant', 'C'),
+(51, 5, 'Rooftop microclimates in Baguio are warmer during the day. Which crop benefits most from this?', 'Spinach', 'Okra', 'Lettuce', 'Cabbage', 'B'),
+(52, 5, 'Which farming practice is ideal for maximizing limited space in Baguio?', 'Monocropping', 'Vertical farming', 'Slash-and-burn', 'Fallow rotation', 'B'),
+(53, 5, 'Which crop is in high demand by Baguio restaurants?', 'Sugarcane', 'Basil', 'Rice', 'Mango', 'B'),
+(54, 5, 'Which group of crops is best planted during the cool season (Nov–Feb) in Baguio?', 'Tomatoes and cucumbers', 'Lettuce, spinach, carrots, broccoli', 'Peppers and okra', 'Basil and oregano', 'B'),
+(55, 5, 'Warm season crops (March–June) include:', 'Radish and beets', 'Cabbage and spinach', 'Tomatoes, peppers, cucumbers', 'Kale and Brussels sprouts', 'C'),
+(56, 5, 'Which crops are resilient during the rainy transition period (July–October)?', 'Beans and peas', 'Tomatoes and peppers', 'Spinach and cabbage', 'Strawberries', 'A'),
+(57, 5, 'Which technique helps extend the growing season in Baguio by stabilizing temperatures?', 'Crop rotation', 'Shade netting and greenhouses', 'Intercropping', 'Flood irrigation', 'B'),
+(58, 5, 'Raised beds are particularly helpful in Baguio during:', 'The dry season', 'The rainy season', 'Harvest season', 'Cool season', 'B'),
+(59, 5, 'Which irrigation method is most efficient for water use during Baguio’s dry months?', 'Sprinkler irrigation', 'Flood irrigation', 'Drip irrigation', 'Hand watering', 'C'),
+(116, 12, 'What is organic fertilizer?', 'Fertilizer made mainly from natural organic materials', 'Fertilizer made from plastic', 'A type of pesticide', 'A type of irrigation system', 'A'),
+(117, 12, 'Which of the following is an example of organic fertilizer?', 'Compost', 'Plastic pellets', 'Glass', 'Metal scraps', 'A'),
+(118, 12, 'Which organic fertilizer uses earthworms to help process organic materials?', 'Animal manure', 'Vermicompost', 'Synthetic fertilizer', 'Chemical fertilizer', 'B'),
+(119, 12, 'Which of the following is a suitable plant-based material for organic fertilizer production?', 'Dried leaves', 'Plastic bags', 'Glass bottles', 'Aluminum cans', 'A'),
+(120, 12, 'What should be considered when choosing an organic fertilizer?', 'The type of plant, soil condition, and nutrient requirements', 'The color of the fertilizer only', 'The size of the container only', 'The amount available regardless of plant needs', 'A'),
+(121, 12, 'Why should organic liquid fertilizers be applied carefully?', 'Excessive concentration can damage plants.', 'They contain no nutrients.', 'Plants cannot absorb liquid nutrients.', 'They always damage soil.', 'A'),
+(122, 12, 'Which practice is most appropriate when using animal manure?', 'Use properly treated or composted manure.', 'Apply fresh manure directly to harvested vegetables.', 'Store manure beside a water source.', 'Apply unlimited amounts to plants.', 'A'),
+(123, 12, 'What can happen when too much fertilizer is applied?', 'Nutrient buildup, plant damage, and environmental problems may occur.', 'Plants will always become healthier.', 'Soil will automatically become more fertile.', 'Fertilizer will disappear immediately.', 'A'),
+(124, 12, 'How can urban gardeners help reduce organic waste?', 'Compost suitable kitchen and garden organic materials.', 'Throw all plant materials into waterways.', 'Burn all organic waste.', 'Mix organic waste with plastic.', 'A'),
+(125, 12, 'Which statement best describes responsible organic fertilizer use?', 'Use as much fertilizer as possible because it is organic.', 'Use properly prepared fertilizer in appropriate amounts based on plant and soil needs.', 'Apply fertilizer without considering the crop.', 'Use any available organic waste as fertilizer.', 'B');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `quiz_results`
+--
+
+CREATE TABLE `quiz_results` (
+  `result_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `quiz_id` int(11) NOT NULL,
+  `score` int(11) NOT NULL,
+  `taken_at` datetime DEFAULT NULL,
+  `attempt_count` int(11) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `quiz_results`
+--
+
+INSERT INTO `quiz_results` (`result_id`, `user_id`, `quiz_id`, `score`, `taken_at`, `attempt_count`) VALUES
+(90, 47, 5, 75, '2026-06-19 10:27:00', 1),
+(91, 47, 1, 90, '2026-06-30 16:09:44', 1),
+(94, 47, 12, 80, '2026-08-08 18:50:50', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reply`
+--
+
+CREATE TABLE `reply` (
+  `reply_id` int(11) NOT NULL,
+  `question_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `body` text NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reply`
+--
+
+INSERT INTO `reply` (`reply_id`, `question_id`, `user_id`, `body`, `created_at`, `updated_at`) VALUES
+(55, 59, 47, 'test', '2026-06-18 17:30:31', NULL),
+(59, 62, 46, 'asdasd', '2026-08-06 15:12:15', NULL),
+(60, 62, 48, 'asd', '2026-08-06 15:13:27', NULL),
+(61, 63, 63, 'Ang sayote ay masarap sa pinakbet', '2026-08-06 18:08:40', NULL),
+(62, 63, 64, 'sayote is layp', '2026-08-06 18:17:14', NULL),
+(63, 63, 62, 'haha', '2026-08-06 18:18:46', NULL),
+(64, 63, 64, 'pisting yawa', '2026-08-06 18:27:02', NULL),
+(65, 63, 64, 'okinam duro', '2026-08-06 18:32:46', NULL),
+(66, 63, 64, 'abdul', '2026-08-06 18:48:05', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `suggestions`
+--
+
+CREATE TABLE `suggestions` (
+  `suggestion_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` varchar(50) NOT NULL DEFAULT 'pending',
+  `seen` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `suggestions`
+--
+
+INSERT INTO `suggestions` (`suggestion_id`, `message`, `created_at`, `status`, `seen`) VALUES
+(3, 'Dagdag Modules', '2024-12-04 05:05:12', 'approved', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('student','admin','agriculturist','new user') NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` varchar(10) DEFAULT 'active',
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `verification_code` varchar(10) DEFAULT NULL,
+  `verification_expires` datetime DEFAULT NULL,
+  `email_verified` tinyint(1) DEFAULT 0,
+  `offense_count` int(11) NOT NULL DEFAULT 0,
+  `restriction_until` datetime DEFAULT NULL,
+  `restriction_type` enum('none','temporary','permanent') NOT NULL DEFAULT 'none'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `name`, `username`, `password`, `role`, `date_created`, `status`, `profile_picture`, `email`, `verification_code`, `verification_expires`, `email_verified`, `offense_count`, `restriction_until`, `restriction_type`) VALUES
+(1, 'admin', 'admin', '$2y$10$B.jf5ql45Tg/wj5YijIaZuANWPNmTtc0GGh.ZfTSckvnl.SCITgmq', 'admin', '2024-12-01 06:06:20', 'forum rest', NULL, NULL, NULL, NULL, 1, 0, NULL, 'none'),
+(46, 'Jhon Doe', 'test', '$2y$10$.2J45gpH.CFF2sh6xsxKv.XJZ626HGyPUt.3vccX2ggh35GLpbxP.', 'agriculturist', '2026-06-18 07:58:06', 'active', 'user_46_1783856078.png', NULL, NULL, NULL, 1, 0, NULL, 'none'),
+(47, 'John Does', 'test2', '$2y$10$63k.y8/QoYmYzN37Zzgc6et57cxkxT9GaWusIZ6DV6JRcfc62IeJu', 'new user', '2026-06-18 07:58:32', 'active', 'user_47_1782183973.png', NULL, NULL, NULL, 1, 4, NULL, 'none'),
+(48, 'Jane Doe', 'test3', '$2y$10$vaYUXJqeEic4jUVPH/cC.e0WLZOGue3cmdLCJDzKHnv.SXUFGh23G', 'new user', '2026-06-18 07:58:52', 'active', NULL, NULL, NULL, NULL, 1, 4, NULL, 'none'),
+(51, 'System Administrator', 'nimdA', '$2y$10$jVwXG1owiA/Jv.ntrIhQ0eG2CORBJ33RziahSI9cAJqMKHdqjdam6', 'admin', '2026-06-23 03:02:43', 'active', NULL, NULL, NULL, NULL, 1, 0, NULL, 'none'),
+(60, 'tets', 'tets', '$2y$10$F8wswZYFcyX/7AXODsdMluJnKSnNGhr.m4xbX9HcMFnaysSd6n1te', 'new user', '2026-07-30 13:27:11', 'inactive', NULL, 'mangjose246@gmail.com', NULL, NULL, 1, 1, '2026-08-07 11:26:36', 'temporary'),
+(62, 'Alexander Flores Lavarias', 'alex', '$2y$10$NOps/kgz6bsZ0diKHk0qD.1Btt29gAnc.9NWpEKwKjDdi60OkYQIe', 'new user', '2026-08-06 09:52:22', 'active', 'user_62_1786010962.png', 'lavariasalexanderf@gmail.com', NULL, NULL, 1, 2, NULL, 'none'),
+(63, 'aleks', 'aleks', '$2y$10$pH.XHFEWKFnTdd2Z7rYRvOanWS3ZVlJ43EiORYnMCX7y/yl9x.54O', 'agriculturist', '2026-08-06 09:53:25', 'active', 'user_63_1786010860.jfif', 'twicexalexander26@gmail.com', NULL, NULL, 1, 0, NULL, 'none'),
+(64, 'Mang Tomas', 'tomas', '$2y$10$E/BdMAixwoUHg2c0wsZydOYF1lqB8sNCwAEtI3QAIcgsMbdE7D2NC', 'new user', '2026-08-06 10:16:19', 'active', NULL, 'mykkelthebest@gmail.com', NULL, NULL, 1, 0, NULL, 'none');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_rewards`
+--
+
+CREATE TABLE `user_rewards` (
+  `reward_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `module_id` int(11) NOT NULL,
+  `reward_text` varchar(255) NOT NULL,
+  `status` enum('unclaimed','claimed') DEFAULT 'unclaimed',
+  `unlocked_at` datetime DEFAULT current_timestamp(),
+  `claimed_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_rewards`
+--
+
+INSERT INTO `user_rewards` (`reward_id`, `user_id`, `module_id`, `reward_text`, `status`, `unlocked_at`, `claimed_at`) VALUES
+(4, 37, 1, 'Free seeds: Kangkong and Pechay\r\nFree Nursery Pots', 'unclaimed', '2026-01-29 10:46:25', NULL),
+(5, 37, 2, 'Free seeds: Okra and Alugbati', 'claimed', '2026-01-29 10:46:30', '2026-03-02 17:23:25'),
+(7, 47, 5, 'Free seeds: Tomato\r\nFree Nursery Pots', 'unclaimed', '2026-06-19 09:48:09', NULL),
+(12, 47, 1, 'Free seeds: Kangkong and Pechay\r\nFree Nursery Pots', 'unclaimed', '2026-06-30 16:09:44', NULL);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `certificates`
+--
+ALTER TABLE `certificates`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `module_id` (`module_id`);
+
+--
+-- Indexes for table `community_updates`
+--
+ALTER TABLE `community_updates`
+  ADD PRIMARY KEY (`update_id`),
+  ADD KEY `idx_community_updates_created_at` (`created_at`),
+  ADD KEY `idx_community_updates_user_id` (`user_id`);
+
+--
+-- Indexes for table `forum_reports`
+--
+ALTER TABLE `forum_reports`
+  ADD PRIMARY KEY (`report_id`),
+  ADD KEY `idx_forum_reports_target` (`target_type`,`target_id`),
+  ADD KEY `idx_forum_reports_created_at` (`created_at`);
+
+--
+-- Indexes for table `lessons`
+--
+ALTER TABLE `lessons`
+  ADD PRIMARY KEY (`lesson_id`),
+  ADD KEY `module_id` (`module_id`);
+
+--
+-- Indexes for table `lesson_progress`
+--
+ALTER TABLE `lesson_progress`
+  ADD PRIMARY KEY (`progress_id`),
+  ADD UNIQUE KEY `unique_user_lesson` (`user_id`,`lesson_id`),
+  ADD KEY `lesson_id` (`lesson_id`);
+
+--
+-- Indexes for table `modules`
+--
+ALTER TABLE `modules`
+  ADD PRIMARY KEY (`module_id`);
+
+--
+-- Indexes for table `module_quizzes`
+--
+ALTER TABLE `module_quizzes`
+  ADD PRIMARY KEY (`quiz_id`),
+  ADD KEY `module_id` (`module_id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`notification_id`),
+  ADD KEY `idx_notifications_user` (`user_id`,`is_read`),
+  ADD KEY `idx_notifications_created_at` (`created_at`);
+
+--
+-- Indexes for table `plant`
+--
+ALTER TABLE `plant`
+  ADD PRIMARY KEY (`plant_id`);
+
+--
+-- Indexes for table `questions`
+--
+ALTER TABLE `questions`
+  ADD PRIMARY KEY (`question_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `idx_questions_best_reply_id` (`best_reply_id`);
+
+--
+-- Indexes for table `quiz_questions`
+--
+ALTER TABLE `quiz_questions`
+  ADD PRIMARY KEY (`question_id`),
+  ADD KEY `quiz_id` (`quiz_id`);
+
+--
+-- Indexes for table `quiz_results`
+--
+ALTER TABLE `quiz_results`
+  ADD PRIMARY KEY (`result_id`),
+  ADD UNIQUE KEY `unique_user_quiz` (`user_id`,`quiz_id`);
+
+--
+-- Indexes for table `reply`
+--
+ALTER TABLE `reply`
+  ADD PRIMARY KEY (`reply_id`),
+  ADD KEY `question_id` (`question_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `suggestions`
+--
+ALTER TABLE `suggestions`
+  ADD PRIMARY KEY (`suggestion_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indexes for table `user_rewards`
+--
+ALTER TABLE `user_rewards`
+  ADD PRIMARY KEY (`reward_id`),
+  ADD UNIQUE KEY `unique_reward` (`user_id`,`module_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `certificates`
+--
+ALTER TABLE `certificates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `community_updates`
+--
+ALTER TABLE `community_updates`
+  MODIFY `update_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `forum_reports`
+--
+ALTER TABLE `forum_reports`
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `lessons`
+--
+ALTER TABLE `lessons`
+  MODIFY `lesson_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+
+--
+-- AUTO_INCREMENT for table `lesson_progress`
+--
+ALTER TABLE `lesson_progress`
+  MODIFY `progress_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
+
+--
+-- AUTO_INCREMENT for table `modules`
+--
+ALTER TABLE `modules`
+  MODIFY `module_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `module_quizzes`
+--
+ALTER TABLE `module_quizzes`
+  MODIFY `quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+
+--
+-- AUTO_INCREMENT for table `plant`
+--
+ALTER TABLE `plant`
+  MODIFY `plant_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `questions`
+--
+ALTER TABLE `questions`
+  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+
+--
+-- AUTO_INCREMENT for table `quiz_questions`
+--
+ALTER TABLE `quiz_questions`
+  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+
+--
+-- AUTO_INCREMENT for table `quiz_results`
+--
+ALTER TABLE `quiz_results`
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+
+--
+-- AUTO_INCREMENT for table `reply`
+--
+ALTER TABLE `reply`
+  MODIFY `reply_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+
+--
+-- AUTO_INCREMENT for table `suggestions`
+--
+ALTER TABLE `suggestions`
+  MODIFY `suggestion_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+
+--
+-- AUTO_INCREMENT for table `user_rewards`
+--
+ALTER TABLE `user_rewards`
+  MODIFY `reward_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `certificates`
+--
+ALTER TABLE `certificates`
+  ADD CONSTRAINT `certificates_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `certificates_ibfk_2` FOREIGN KEY (`module_id`) REFERENCES `modules` (`module_id`);
+
+--
+-- Constraints for table `lessons`
+--
+ALTER TABLE `lessons`
+  ADD CONSTRAINT `lessons_ibfk_1` FOREIGN KEY (`module_id`) REFERENCES `modules` (`module_id`);
+
+--
+-- Constraints for table `lesson_progress`
+--
+ALTER TABLE `lesson_progress`
+  ADD CONSTRAINT `lesson_progress_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `lesson_progress_ibfk_2` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`lesson_id`);
+
+--
+-- Constraints for table `module_quizzes`
+--
+ALTER TABLE `module_quizzes`
+  ADD CONSTRAINT `module_quizzes_ibfk_1` FOREIGN KEY (`module_id`) REFERENCES `modules` (`module_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `questions`
+--
+ALTER TABLE `questions`
+  ADD CONSTRAINT `questions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `quiz_questions`
+--
+ALTER TABLE `quiz_questions`
+  ADD CONSTRAINT `quiz_questions_ibfk_1` FOREIGN KEY (`quiz_id`) REFERENCES `module_quizzes` (`quiz_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `reply`
+--
+ALTER TABLE `reply`
+  ADD CONSTRAINT `reply_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`question_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reply_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
