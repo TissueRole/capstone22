@@ -242,7 +242,7 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                         <th>Quiz Title</th>
                         <th>Module</th>
                         <th>Created At</th>
-                        <th>Edit</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                     <tbody id="quizTable">
@@ -253,14 +253,26 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                                 JOIN modules m ON q.module_id = m.module_id
                             ");
                             while ($row = $quizzes->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['title']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['module_title']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
-                            echo "<td><a href='editquiz.php?id=" . $row['quiz_id'] . "' class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i>Edit</a></td>";
-                            echo "</tr>";
-                        }
-                        ?>
+                                echo "<tr>";
+                                echo "<td>" . htmlspecialchars($row['title']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['module_title']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+
+                                echo "<td class='d-flex gap-1'>
+                                        <a href='editquiz.php?id=" . $row['quiz_id'] . "' class='btn btn-sm btn-warning'>
+                                            <i class='bi bi-pencil-square'></i> Edit
+                                        </a>
+
+                                        <a href='deletequiz.php?id=" . $row['quiz_id'] . "'
+                                        class='btn btn-sm btn-danger'
+                                        onclick=\"return confirm('Are you sure you want to delete the quiz: &quot;" . htmlspecialchars(addslashes($row['title'])) . "&quot;?\\n\\nThis action cannot be undone.')\">
+                                            <i class='bi bi-trash'></i> Remove
+                                        </a>
+                                    </td>";
+
+                                echo "</tr>";
+                            }
+                            ?>
                     </tbody>
                 </table>
             </div>
