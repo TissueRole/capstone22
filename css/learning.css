@@ -600,3 +600,83 @@
     gap: 1rem;
 }
 }
+
+.lesson-checkpoint {
+    margin: 1rem 0; /* Reduced top/bottom margin */
+}
+
+.checkpoint-card {
+    border: 1px solid #d6e7d4;
+    border-radius: 0.6rem; /* Slightly tighter rounded corners */
+    padding: 0.85rem 1rem; /* Reduced internal padding */
+    background: #f8fcf7;
+}
+
+.lesson-checkpoint.passed .checkpoint-card {
+    border-color: #43a047;
+    background: #eef8ef;
+}
+
+.checkpoint-badge {
+    display: inline-block;
+    margin-bottom: 0.4rem;
+    padding: 0.15rem 0.5rem; /* Smaller padding */
+    border-radius: 999px;
+    background: #e0f2e2;
+    color: #2e7d32;
+    font-size: 0.7rem; /* Reduced text size */
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.checkpoint-question {
+    margin-bottom: 0.6rem;
+    color: #2e7d32;
+    font-size: 0.95rem; /* Smaller font size */
+    font-weight: 600;
+}
+
+.checkpoint-options {
+    display: grid;
+    gap: 0.4rem; /* Tighter spacing between options */
+}
+
+.checkpoint-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.65rem; 
+    border-radius: 0.5rem;
+    background: #fff;
+    border: 1px solid #dfe8dc;
+    font-size: 0.875rem; 
+    cursor: pointer;
+}
+
+.checkpoint-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+
+.checkpoint-submit {
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 0.4rem !important;
+}
+
+.checkpoint-feedback {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.checkpoint-feedback.success {
+    color: #2e7d32;
+}
+
+.checkpoint-feedback.error {
+    color: #c62828;
+}

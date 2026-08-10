@@ -499,7 +499,7 @@ class TeenAnimLearning {
                 <h4 class="checkpoint-question">${payload.question}</h4>
                 <div class="checkpoint-options">${optionsHtml}</div>
                 <div class="checkpoint-actions">
-                    <button type="button" class="btn btn-success checkpoint-submit">Check Answer</button>
+                    <button type="button" class="btn btn-success btn-sm checkpoint-submit">Check Answer</button>
                     <div class="checkpoint-feedback"></div>
                 </div>
             </div>
