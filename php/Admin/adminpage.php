@@ -301,6 +301,7 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                         </tr>
                     </thead>
                     <tbody id="questionTable">
+
                         <?php
                         // Fetch all questions with user data and status
                         $questions = $conn->query("
@@ -314,7 +315,14 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($row['question_id']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['title']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['body']) . "</td>";
+                            $bodyText = htmlspecialchars($row['body']);
+                            echo "<td>
+                                    <button type='button' class='btn btn-sm btn-outline-primary' onclick='viewFullContent(\"Question Content\", " . json_encode($row['body']) . ")'>
+                                        <i class='bi bi-eye'></i> View Body
+                                    </button>
+
+                                </td>";
+                            echo "<td>" . htmlspecialchars($row['username']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['username']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
 
@@ -332,11 +340,11 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                                     </button>
                                 ";
                             }
-                            echo "
-                                <a href='deletequestions.php?id=" . $row['question_id'] . "' class='btn btn-sm btn-outline-danger'>
-                                    <i class='bi bi-trash'></i> Delete
-                                </a>
-                            ";
+
+                            // Single quotes for string concatenation to avoid escaping double quotes
+                            $confirmMsg = "Are you sure you want to delete this question? This action cannot be undone.";
+                            echo '<a href="deletequestions.php?id=' . $row['question_id'] . '" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'' . $confirmMsg . '\');"><i class="bi bi-trash"></i> Delete</a>';
+
                             echo "</td>";
                             echo "</tr>";
                         }
@@ -372,14 +380,21 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                             ORDER BY r.created_at DESC
                         ");
                         while ($row = $replies->fetch_assoc()) {
+                            $replyBodyText = htmlspecialchars($row['body']);
+
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($row['reply_id']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['question_id']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['body']) . "</td>";
+                            
+                            echo "<td>
+                                    <button type='button' class='btn btn-sm btn-outline-primary mb-1' onclick='viewFullContent(\"Reply Content\", " . json_encode($row['body']) . ")'>
+                                        <i class='bi bi-eye'></i> View Reply Body
+                                    </button>
+                                </td>";
                             echo "<td>" . htmlspecialchars($row['username']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
                             echo "<td>
-                                    <a href='deletereply.php?id=" . $row['reply_id'] . "' class='btn btn-sm btn-outline-danger'>
+                                    <a href='deletereply.php?id=" . $row['reply_id'] . "' class='btn btn-sm btn-outline-danger' onclick='return confirm(\"Are you sure you want to delete this reply?\")'>
                                         <i class='bi bi-trash'></i> Delete
                                     </a>
                                 </td>";
@@ -426,7 +441,9 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                             echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
                             echo "<td>";
                             if ($row['target_type'] === 'question') {
-                                echo "<a href='deletequestions.php?id=" . $row['target_id'] . "' class='btn btn-sm btn-outline-danger me-1'><i class='bi bi-trash'></i> Delete Thread</a>";
+                                echo "<a href='deletequestions.php?id=" . $row['question_id'] . "' class='btn btn-sm btn-outline-danger'>
+                                            <i class='bi bi-trash'></i> Delete
+                                        </a>";
                             } else {
                                 echo "<a href='deletereply.php?id=" . $row['target_id'] . "' class='btn btn-sm btn-outline-danger me-1'><i class='bi bi-trash'></i> Delete Reply</a>";
                             }
@@ -562,6 +579,22 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
             </table>
             </div>
         </section>
+        <div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="contentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contentModalLabel">Body Content</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalContentBody" style="white-space: pre-wrap; word-wrap: break-word;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
@@ -839,6 +872,13 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                 }
             }
         });
+        function viewFullContent(title, content) {
+            document.getElementById('contentModalLabel').innerText = title;
+            document.getElementById('modalContentBody').innerText = content;
+            
+            var contentModal = new bootstrap.Modal(document.getElementById('contentModal'));
+            contentModal.show();
+        }
     </script>
 </body>
 </html>

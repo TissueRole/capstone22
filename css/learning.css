@@ -19,11 +19,13 @@
 }
 
 .sidebar {
-    width: 320px;
+    width: 320px; 
+    height: auto; 
+    min-height: 100vh; 
     background: #fff;
     border-right: 2px solid #e8f5e9;
-    overflow-y: auto;
     box-shadow: 2px 0 10px rgba(76,175,80,0.1);
+    
 }
 
 .sidebar-header {
@@ -579,11 +581,6 @@
 .learning-container {
     flex-direction: column;
     height: auto;
-}
-
-.sidebar {
-    width: 100%;
-    height: 300px;
 }
 
 .lesson-header {
