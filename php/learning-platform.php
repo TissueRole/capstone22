@@ -119,10 +119,6 @@ if ($module_id) {
                     <h1 id="lesson-title"></h1>
                     <p id="lesson-module"><?php echo htmlspecialchars($current_module['title']); ?></p>
                 </div>
-                <button id="complete-btn" class="complete-btn">
-                    <span class="complete-icon"><i class="bi bi-circle"></i></span>
-                    <span class="complete-text">Mark Complete</span>
-                </button>
             </div>
 
             <!-- Lesson Content -->
@@ -135,8 +131,11 @@ if ($module_id) {
 
             <!-- Navigation Footer -->
             <div class="lesson-footer">
-                <button id="prev-btn" class="nav-btn"><i class="bi bi-arrow-left"></i> Previous</button>
-                <button id="next-btn" class="nav-btn next-btn">Next <i class="bi bi-arrow-right"></i></button>
+                <button id="prev-btn" class="nav-btn"><i class="bi bi-arrow-left"></i> </button>
+                <button id="complete-btn" class="nav-btn complete-btn">
+                    <span class="complete-icon"><i class="bi bi-circle"></i></span>
+                    <span class="complete-text">Mark Complete</span>
+                </button>
             </div>
         </div>
 
@@ -239,13 +238,12 @@ class TeenAnimLearning {
         });
 
         // Navigation
-        document.getElementById('prev-btn').addEventListener('click', () => {
-            this.navigateLesson('previous');
-        });
-        
-        document.getElementById('next-btn').addEventListener('click', () => {
-            this.navigateLesson('next');
-        });
+        const prevBtn = document.getElementById('prev-btn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                this.navigateLesson('previous');
+            });
+        }
 
         if (this.lessonContentEl) {
             this.lessonContentEl.addEventListener('scroll', this.onLessonScroll);
@@ -338,20 +336,30 @@ class TeenAnimLearning {
     
     updateCompleteButton() {
         const completeBtn = document.getElementById('complete-btn');
-        const isCompleted = this.currentLesson.completed == 1;
-        
+        if (!completeBtn) return;
+
+        const isCompleted = this.currentLesson && this.currentLesson.completed == 1; //
+        const iconEl = completeBtn.querySelector('.complete-icon');
+        const textEl = completeBtn.querySelector('.complete-text');
+
         if (isCompleted) {
-            completeBtn.classList.add('completed');
-            completeBtn.querySelector('.complete-icon').innerHTML = '<i class="bi bi-check-circle-fill"></i>';
-            completeBtn.querySelector('.complete-text').textContent = 'Completed';
-            completeBtn.disabled = true;
+            completeBtn.classList.add('completed'); //[cite: 1]
+            
+            if (iconEl) iconEl.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>'; //[cite: 1]
+            if (textEl) textEl.textContent = 'Completed'; //[cite: 1]
+            
+            completeBtn.disabled = true; //[cite: 1]
         } else {
-            completeBtn.classList.remove('completed');
-            completeBtn.querySelector('.complete-icon').innerHTML = '<i class="bi bi-circle"></i>';
-            completeBtn.querySelector('.complete-text').textContent = this.canUnlockCompletion()
-                ? 'Mark Complete'
-                : 'Finish Lesson Requirements';
-            completeBtn.disabled = !this.canUnlockCompletion();
+            completeBtn.classList.remove('completed'); //[cite: 1]
+            
+            if (iconEl) iconEl.innerHTML = '<i class="bi bi-circle me-1"></i>'; //[cite: 1]
+            if (textEl) {
+                textEl.textContent = this.canUnlockCompletion()
+                    ? 'Mark Complete'
+                    : 'Finish Lesson Requirements'; //[cite: 1]
+            }
+            
+            completeBtn.disabled = !this.canUnlockCompletion(); //[cite: 1]
         }
     }
 
@@ -626,7 +634,12 @@ class TeenAnimLearning {
         const index = lessons.findIndex(l => l.lesson_id == this.currentLesson.lesson_id);
         
         document.getElementById('prev-btn').disabled = index <= 0;
-        document.getElementById('next-btn').disabled = index >= lessons.length - 1;
+        
+        // Disable Mark Complete if completion requirements are not met or if already completed
+        const completeBtn = document.getElementById('complete-btn');
+        if (completeBtn) {
+            completeBtn.disabled = (this.currentLesson.completed == 1) || !this.canUnlockCompletion();
+        }
     }
     
     navigateLesson(direction) {

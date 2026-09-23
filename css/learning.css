@@ -677,3 +677,54 @@
 .checkpoint-feedback.error {
     color: #c62828;
 }
+.lesson-footer .complete-btn {
+    background-color: #2e7d32 !important;
+    color: #ffffff !important;
+    border: 2px solid #2e7d32 !important;
+    border-radius: 2rem;
+    padding: 0.75rem 1.75rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.25);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover State (Active) */
+.lesson-footer .complete-btn:not(:disabled):hover {
+    background-color: #1b5e20 !important;
+    border-color: #1b5e20 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(27, 94, 32, 0.35);
+}
+
+/* Disabled / Lock State (Clear High Contrast) */
+.lesson-footer .complete-btn:disabled:not(.completed) {
+    background-color: #e0e0e0 !important;
+    border-color: #cccccc !important;
+    color: #616161 !important;
+    cursor: not-allowed;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Completed State */
+.lesson-footer .complete-btn.completed {
+    background-color: #e8f5e9 !important;
+    border-color: #2e7d32 !important;
+    color: #2e7d32 !important;
+    box-shadow: none !important;
+    cursor: default;
+}
+
+/* Ensure text and icons inside inherit high-contrast colors */
+.lesson-footer .complete-btn .complete-text,
+.lesson-footer .complete-btn .complete-icon {
+    color: inherit !important;
+}
