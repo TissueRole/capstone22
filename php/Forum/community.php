@@ -183,7 +183,7 @@ if (!$isForumRestricted) {
         FROM community_updates cu
         JOIN users u ON cu.user_id = u.user_id
         ORDER BY cu.is_pinned DESC, cu.created_at DESC
-        LIMIT 6
+        LIMIT 50
     ";
     $updatesResult = $conn->query($updatesQuery);
     if ($updatesResult) {
@@ -323,8 +323,9 @@ function role_label(string $role): string
                     </div>
                     <div class="card-body">
                       <div class="community-update-list">
-                        <?php foreach ($communityUpdates as $update): ?>
-                          <article class="community-update-item">
+                        <?php $updateVisibleCount = 3; // announcements shown before "Show all" ?>
+                        <?php foreach ($communityUpdates as $updateIndex => $update): ?>
+                          <article class="community-update-item<?= $updateIndex >= $updateVisibleCount ? ' d-none js-extra-update' : '' ?>">
                             <div class="community-update-meta">
                               <?php if (!empty($update['is_pinned'])): ?>
                                 <span class="community-update-badge">Featured Announcements</span>
@@ -334,7 +335,21 @@ function role_label(string $role): string
                               <span class="discussion-meta-text"><?= date('M d, Y g:i A', strtotime($update['created_at'])) ?></span>
                             </div>
                             <h4><?= htmlspecialchars($update['title']) ?></h4>
-                            <p><?= nl2br(htmlspecialchars($update['body'])) ?></p>
+                            <?php
+                              $updateBody = (string) $update['body'];
+                              $updateLimit = 150; // max characters shown before "Read more"
+                              $updateIsLong = mb_strlen($updateBody) > $updateLimit;
+                              $updateShort = $updateIsLong
+                                ? rtrim(mb_substr($updateBody, 0, $updateLimit)) . '...'
+                                : $updateBody;
+                            ?>
+                            <p class="js-update-body"
+                               data-short="<?= htmlspecialchars($updateShort) ?>"
+                               data-full="<?= htmlspecialchars($updateBody) ?>"
+                               style="white-space: pre-line;"><?= htmlspecialchars($updateShort) ?></p>
+                            <?php if ($updateIsLong): ?>
+                              <button type="button" class="btn btn-link btn-sm p-0 mb-2 js-update-toggle">Read more</button>
+                            <?php endif; ?>
                             <?php if (!empty($update['image_url'])): ?>
                               <img src="<?= htmlspecialchars($update['image_url']) ?>" alt="Community update image" class="community-update-image" onerror="this.style.display='none'">
                             <?php endif; ?>
@@ -346,6 +361,11 @@ function role_label(string $role): string
                           </article>
                         <?php endforeach; ?>
                       </div>
+                      <?php if (count($communityUpdates) > $updateVisibleCount): ?>
+                        <button type="button" class="btn btn-outline-success btn-sm w-100 mt-3" id="toggleAllUpdates">
+                          Show all announcements (<?= count($communityUpdates) ?>)
+                        </button>
+                      <?php endif; ?>
                     </div>
                 </div>
               <?php endif; ?>
@@ -537,6 +557,27 @@ function role_label(string $role): string
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
 AOS.init();
+
+// Announcements: show all / show recent only
+document.getElementById('toggleAllUpdates')?.addEventListener('click', function() {
+    const expanded = this.dataset.expanded === '1';
+    document.querySelectorAll('.js-extra-update').forEach(el => el.classList.toggle('d-none', expanded));
+    this.dataset.expanded = expanded ? '0' : '1';
+    this.textContent = expanded
+        ? 'Show all announcements (' + (document.querySelectorAll('.js-extra-update').length + 3) + ')'
+        : 'Show fewer announcements';
+});
+
+// Announcements: toggle between shortened and full text
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.js-update-toggle');
+    if (!btn) return;
+    const p = btn.previousElementSibling;
+    const expanded = btn.dataset.expanded === '1';
+    p.textContent = expanded ? p.dataset.short : p.dataset.full;
+    btn.textContent = expanded ? 'Read more' : 'Show less';
+    btn.dataset.expanded = expanded ? '0' : '1';
+});
 
 document.getElementById('questionForm')?.addEventListener('submit', function(e) {
     e.preventDefault();

@@ -64,6 +64,19 @@ $activeSection = $_GET['section'] ?? 'dashboard';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../css/homepage.css">
+    <style>
+        /* Keep long update text (and long unbroken words/links) inside the box */
+        .agri-update-card,
+        .agri-update-card h5,
+        .agri-update-body {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .agri-update-card { overflow: hidden; }
+        .agri-update-head > div:first-child { min-width: 0; }
+    </style>
 </head>
 <body class="agri-dashboard-body">
 <?php include '../navbar.php'; ?>
@@ -180,20 +193,40 @@ $activeSection = $_GET['section'] ?? 'dashboard';
                 <div class="agri-card">
                     <div class="agri-card-header">Recent Updates</div>
                     <?php if ($updatesResult && $updatesResult->num_rows > 0): ?>
-                        <?php $updatePreviewCount = 0; ?>
+                        <?php $updateVisibleCount = 3; // updates shown before "Show all" ?>
+                        <?php $updateTotalCount = $updatesResult->num_rows; ?>
+                        <?php $updateIndex = 0; ?>
                         <?php while ($update = $updatesResult->fetch_assoc()): ?>
-                            <?php if ($updatePreviewCount >= 3) { break; } ?>
-                            <?php $updatePreviewCount++; ?>
-                            <div class="agri-update-card">
+                            <?php
+                                $updateBody = (string) $update['body'];
+                                $updateLimit = 150; // max characters shown before "Read more"
+                                $updateIsLong = mb_strlen($updateBody) > $updateLimit;
+                                $updateShort = $updateIsLong
+                                    ? rtrim(mb_substr($updateBody, 0, $updateLimit)) . '...'
+                                    : $updateBody;
+                            ?>
+                            <div class="agri-update-card<?php echo $updateIndex >= $updateVisibleCount ? ' d-none js-extra-update' : ''; ?>">
                                 <div class="agri-update-head">
                                     <div>
                                         <h5><?php echo htmlspecialchars($update['title']); ?></h5>
                                         <div class="agri-reply-date">Published on: <?php echo date('M d, Y g:i A', strtotime($update['created_at'])); ?></div>
                                     </div>
                                 </div>
-                                <div class="agri-update-body"><?php echo nl2br(htmlspecialchars($update['body'])); ?></div>
+                                <div class="agri-update-body js-update-body"
+                                     data-short="<?php echo htmlspecialchars($updateShort); ?>"
+                                     data-full="<?php echo htmlspecialchars($updateBody); ?>"
+                                     style="white-space: pre-line;"><?php echo htmlspecialchars($updateShort); ?></div>
+                                <?php if ($updateIsLong): ?>
+                                    <button type="button" class="btn btn-link btn-sm p-0 js-update-toggle">Read more</button>
+                                <?php endif; ?>
                             </div>
+                            <?php $updateIndex++; ?>
                         <?php endwhile; ?>
+                        <?php if ($updateTotalCount > $updateVisibleCount): ?>
+                            <button type="button" class="btn btn-outline-success btn-sm w-100 mt-3" id="toggleAllUpdates" data-total="<?php echo (int) $updateTotalCount; ?>">
+                                Show all updates (<?php echo (int) $updateTotalCount; ?>)
+                            </button>
+                        <?php endif; ?>
                     <?php else: ?>
                         <p class="mb-0">No published updates yet.</p>
                     <?php endif; ?>
@@ -473,6 +506,26 @@ document.querySelectorAll('.js-update-editor-form').forEach((form) => {
       alert('Network error. Please try again.');
     });
   });
+});
+</script>
+<script>
+// Recent Updates: show all / show recent only
+document.getElementById('toggleAllUpdates')?.addEventListener('click', function() {
+    const expanded = this.dataset.expanded === '1';
+    document.querySelectorAll('.js-extra-update').forEach(el => el.classList.toggle('d-none', expanded));
+    this.dataset.expanded = expanded ? '0' : '1';
+    this.textContent = expanded ? 'Show all updates (' + this.dataset.total + ')' : 'Show fewer updates';
+});
+
+// Recent Updates: toggle between shortened and full text
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.js-update-toggle');
+    if (!btn) return;
+    const body = btn.previousElementSibling;
+    const expanded = btn.dataset.expanded === '1';
+    body.textContent = expanded ? body.dataset.short : body.dataset.full;
+    btn.textContent = expanded ? 'Read more' : 'Show less';
+    btn.dataset.expanded = expanded ? '0' : '1';
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
