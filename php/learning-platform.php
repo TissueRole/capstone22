@@ -313,9 +313,7 @@ class TeenAnimLearning {
         this.lessonUnlockSent = this.currentLesson.completed == 1;
         this.hasScrolledThroughLesson = false;
         this.currentLessonCheckpointsPassed = this.currentLesson.completed == 1;
-        if (this.lessonContentEl) {
-            this.lessonContentEl.scrollTop = 0;
-        }
+        this.scrollLessonToTop();
         let savedCheckpointProgress = this.currentLesson.checkpoint_progress;
         if (typeof savedCheckpointProgress === 'string') {
             try {
@@ -640,6 +638,22 @@ class TeenAnimLearning {
         if (completeBtn) {
             completeBtn.disabled = (this.currentLesson.completed == 1) || !this.canUnlockCompletion();
         }
+    }
+    
+    scrollLessonToTop() {
+        const reset = () => {
+            // Reset every scrollable part that could be holding the old position
+            ['.lesson-content', '.lesson-view', '.main-content'].forEach(sel => {
+                const el = document.querySelector(sel);
+                if (el) el.scrollTop = 0;
+            });
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        };
+        reset();
+        // Run again after the new content has been laid out
+        requestAnimationFrame(reset);
     }
     
     navigateLesson(direction) {
