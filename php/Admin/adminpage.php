@@ -78,7 +78,7 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                         <th>Full Name</th>
                         <th>Username</th>
                         <th>Role</th>
-                        <th>Date Created</th>
+                        <th>Email</th>
                         <th>Offenses</th>
                         <th>Forum Restriction</th>
                         <th>Actions</th>
@@ -102,7 +102,7 @@ $unseenCount = $unseenResult ? (int)$unseenResult->fetch_assoc()['cnt'] : 0;
                                         <option value='agriculturist'" . ($row['role'] == 'agriculturist' ? ' selected' : '') . ">Agriculturist</option>
                                     </select>
                                 </td>";
-                        echo "<td>" . htmlspecialchars($row['date_created']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
                         echo "<td>";
                             if ($row['offense_count'] == 0) {
                                 echo "<span class='badge bg-success'>No Offense</span>";
